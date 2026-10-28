@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Société du dictaphone fantôme — Ravabulle</title>
+	<link rel="stylesheet" href="css/ghost-dictaphone.css">
+</head>
+<body data-role="ravabulle">
+	<p id="load_error" class="load_error" hidden role="alert"></p>
+	<main id="puzzle_shell">
+		<header id="puzzle_header">
+			<h1 id="puzzle_title">Société du dictaphone fantôme</h1>
+			<p id="player_hint">Encodez chaque voix : voyelle, courbe, durée. Quatre sons justes appellent l’esprit.</p>
+			<p id="seed_line">Séance <span id="seed_value">1</span></p>
+		</header>
+		<section id="crt_stage" class="panel" aria-labelledby="crt_title">
+			<h2 id="crt_title">Moniteur</h2>
+			<div id="crt_bezel">
+				<div id="crt_glass">
+					<p id="crt_empty">Aucun esprit au registre.</p>
+					<ul id="spirit_log"></ul>
+					<p id="password_half" hidden>
+						<span class="password_label">Moitié du mot de passe</span>
+						<span id="password_half_text"></span>
+					</p>
+				</div>
+			</div>
+		</section>
+		<section id="encoder" class="panel" aria-labelledby="encoder_title">
+			<h2 id="encoder_title">Séquence</h2>
+			<ol id="note_strip" aria-label="Notes inscrites"></ol>
+			<div class="choice_block">
+				<h3 id="vowel_label">Voyelle</h3>
+				<div id="vowel_row" class="choice_row" role="group" aria-labelledby="vowel_label"></div>
+			</div>
+			<div class="choice_block">
+				<h3 id="shape_label">Courbe</h3>
+				<div id="shape_row" class="choice_row" role="group" aria-labelledby="shape_label"></div>
+			</div>
+			<div class="choice_block">
+				<h3 id="duration_label">Durée</h3>
+				<div id="duration_row" class="choice_row" role="group" aria-labelledby="duration_label"></div>
+			</div>
+			<div id="strip_actions">
+				<button type="button" id="btn_commit_note">Inscrire la note</button>
+				<button type="button" id="btn_play_strip">Écouter la séquence</button>
+				<button type="button" id="btn_backspace">Effacer la dernière note</button>
+				<button type="button" id="btn_clear">Effacer la séquence</button>
+			</div>
+		</section>
+	</main>
+	<p id="status_live" class="visually-hidden" aria-live="polite"></p>
+	<script src="js/puzzle-instance.js"></script>
+	<script src="js/audio-synth.js"></script>
+	<script src="js/ghost-dictaphone-core.js"></script>
+	<script>
+		GhostDictaphoneCore.init({ role: 'ravabulle' });
+	</script>
+</body>
+</html>

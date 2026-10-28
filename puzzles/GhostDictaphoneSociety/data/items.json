@@ -1,0 +1,28 @@
+{
+	"items": [
+		{ "id": "it01", "name": "pomme", "category_id": "nourriture" },
+		{ "id": "it02", "name": "pain", "category_id": "nourriture" },
+		{ "id": "it03", "name": "soupe", "category_id": "nourriture" },
+		{ "id": "it04", "name": "gâteau", "category_id": "nourriture" },
+		{ "id": "it05", "name": "flûte", "category_id": "musique" },
+		{ "id": "it06", "name": "tambour", "category_id": "musique" },
+		{ "id": "it07", "name": "cloche", "category_id": "musique" },
+		{ "id": "it08", "name": "violon", "category_id": "musique" },
+		{ "id": "it09", "name": "marteau", "category_id": "outils" },
+		{ "id": "it10", "name": "scie", "category_id": "outils" },
+		{ "id": "it11", "name": "clé", "category_id": "outils" },
+		{ "id": "it12", "name": "clou", "category_id": "outils" },
+		{ "id": "it13", "name": "tulipe", "category_id": "fleurs" },
+		{ "id": "it14", "name": "rose", "category_id": "fleurs" },
+		{ "id": "it15", "name": "marguerite", "category_id": "fleurs" },
+		{ "id": "it16", "name": "feuille", "category_id": "fleurs" },
+		{ "id": "it17", "name": "roman", "category_id": "livres" },
+		{ "id": "it18", "name": "atlas", "category_id": "livres" },
+		{ "id": "it19", "name": "grimoire", "category_id": "livres" },
+		{ "id": "it20", "name": "carnet", "category_id": "livres" },
+		{ "id": "it21", "name": "bague", "category_id": "bijoux" },
+		{ "id": "it22", "name": "collier", "category_id": "bijoux" },
+		{ "id": "it23", "name": "broche", "category_id": "bijoux" },
+		{ "id": "it24", "name": "couronne", "category_id": "bijoux" }
+	]
+}

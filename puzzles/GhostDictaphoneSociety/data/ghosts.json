@@ -1,0 +1,24 @@
+{
+	"ghosts": [
+		{ "id": "g01", "article": "le", "name": "bibliothécaire" },
+		{ "id": "g02", "article": "la", "name": "cuisinière" },
+		{ "id": "g03", "article": "le", "name": "jardinier" },
+		{ "id": "g04", "article": "la", "name": "musicienne" },
+		{ "id": "g05", "article": "le", "name": "horloger" },
+		{ "id": "g06", "article": "la", "name": "couturière" },
+		{ "id": "g07", "article": "le", "name": "marin" },
+		{ "id": "g08", "article": "la", "name": "peintresse" },
+		{ "id": "g09", "article": "le", "name": "facteur" },
+		{ "id": "g10", "article": "la", "name": "danseuse" },
+		{ "id": "g11", "article": "le", "name": "pompier" },
+		{ "id": "g12", "article": "l'", "name": "astronome" }
+	],
+	"categories": [
+		{ "id": "nourriture", "name": "nourriture" },
+		{ "id": "musique", "name": "musique" },
+		{ "id": "outils", "name": "outils" },
+		{ "id": "fleurs", "name": "fleurs" },
+		{ "id": "livres", "name": "livres" },
+		{ "id": "bijoux", "name": "bijoux" }
+	]
+}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Aliens &amp; chapeaux — Ravabulle</title>
+	<link rel="stylesheet" href="css/aliens-and-hats.css">
+	<script src="js/puzzle-instance.js"></script>
+	<script src="js/aliens-and-hats-core.js"></script>
+</head>
+<body>
+	<main id="puzzle_shell">
+		<section id="object_box" aria-labelledby="object_box_title">
+			<h2 id="object_box_title"></h2>
+			<p id="dnd_instructions"></p>
+			<div id="grab_pool" aria-label="Réserve de chapeaux"></div>
+		</section>
+		<section id="book_stage" aria-label="Livre des invités">
+			<div id="book_cover">
+				<button type="button" id="btn_open_book" aria-expanded="false" aria-controls="book_open">
+					<img src="assets/misc/bookfront.png" alt="Ouvrir le livre des invités">
+				</button>
+			</div>
+			<div id="book_open" hidden>
+				<div id="book_spreads"></div>
+				<nav id="book_nav" aria-label="Feuilleter le livre">
+					<button type="button" id="btn_close_book">Fermer le livre</button>
+					<button type="button" id="btn_spread_prev">Page précédente</button>
+					<span id="spread_indicator" aria-live="polite">Pages 1 / 5</span>
+					<button type="button" id="btn_spread_next">Page suivante</button>
+				</nav>
+			</div>
+		</section>
+	</main>
+	<div id="password_reveal" hidden role="dialog" aria-labelledby="password_reveal_title" aria-modal="true">
+		<div id="password_reveal_card">
+			<h2 id="password_reveal_title">Moitié du mot de passe</h2>
+			<p class="visually-hidden">Une partie du mot de passe a été dévoilée.</p>
+			<p id="password_half_text" aria-live="assertive"></p>
+			<p>Communiquez cette moitié à votre partenaire.</p>
+			<button type="button" id="btn_dismiss_reveal">Fermer</button>
+		</div>
+	</div>
+	<script>
+		AliensAndHatsCore.init({ role: 'ravabulle' });
+	</script>
+</body>
+</html>

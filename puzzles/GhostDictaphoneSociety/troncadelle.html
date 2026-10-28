@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Société du dictaphone fantôme — Troncadelle</title>
+	<link rel="stylesheet" href="css/ghost-dictaphone.css">
+</head>
+<body data-role="troncadelle">
+	<p id="load_error" class="load_error" hidden role="alert"></p>
+	<main id="puzzle_shell">
+		<header id="puzzle_header">
+			<h1 id="puzzle_title">Société du dictaphone fantôme</h1>
+			<p id="player_hint">Écoutez le cylindre, puis indiquez l’esprit et les offrandes. L’écran ne s’allume que lorsque tous les cylindres sont justes.</p>
+			<p id="seed_line">Séance <span id="seed_value">1</span></p>
+		</header>
+		<section id="cylinder_bank" class="panel" aria-labelledby="bank_title">
+			<h2 id="bank_title">Cylindres</h2>
+			<p id="dnd_instructions">Glissez un cylindre sur le lecteur, ou choisissez-le puis activez Placer.</p>
+			<ul id="cylinder_list" aria-label="Banque de cylindres"></ul>
+		</section>
+		<section id="dictaphone" class="panel" aria-labelledby="player_title">
+			<h2 id="player_title">Lecteur</h2>
+			<div id="dictaphone_layout">
+				<div id="cylinder_slot" data-state="empty">
+					<p id="slot_empty">Aucun cylindre</p>
+					<div id="slot_mount"></div>
+				</div>
+				<div id="transport">
+					<button type="button" id="btn_place">Placer sur le lecteur</button>
+					<button type="button" id="btn_eject">Retirer le cylindre</button>
+					<button type="button" id="btn_play" aria-pressed="false">Lecture</button>
+					<button type="button" id="btn_stop">Stop</button>
+				</div>
+				<div id="mini_crt" data-state="dark" role="region" aria-label="Écran du lecteur">
+					<p id="screen_idle">Écran éteint</p>
+					<p id="password_half" hidden>
+						<span class="password_label">Moitié du mot de passe</span>
+						<span id="password_half_text"></span>
+					</p>
+				</div>
+			</div>
+		</section>
+		<section id="offering_board" class="panel" aria-label="Esprits et offrandes">
+			<div class="offering_block">
+				<h2 id="ghost_title">Esprits</h2>
+				<div id="ghost_buttons" role="group" aria-labelledby="ghost_title"></div>
+			</div>
+			<div class="offering_block">
+				<h2 id="item_title">Offrandes</h2>
+				<div id="item_buttons" role="group" aria-labelledby="item_title"></div>
+			</div>
+		</section>
+	</main>
+	<p id="status_live" class="visually-hidden" aria-live="polite"></p>
+	<script src="js/puzzle-instance.js"></script>
+	<script src="js/audio-synth.js"></script>
+	<script src="js/ghost-dictaphone-core.js"></script>
+	<script>
+		GhostDictaphoneCore.init({ role: 'troncadelle' });
+	</script>
+</body>
+</html>
