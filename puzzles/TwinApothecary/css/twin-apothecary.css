@@ -1,0 +1,413 @@
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	height: 100%;
+	margin: 0;
+}
+
+[hidden] {
+	display: none !important;
+}
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+body {
+	font-family: "Segoe UI", system-ui, sans-serif;
+	font-size: 1rem;
+	overflow: hidden;
+}
+
+body[data-role="ravabulle"] {
+	background: radial-gradient(ellipse at top, #1d3a36 0%, #101816 58%);
+	color: #e7f3ef;
+}
+
+body[data-role="troncadelle"] {
+	background: radial-gradient(ellipse at top, #3a2428 0%, #160e10 58%);
+	color: #f6efe9;
+}
+
+button {
+	font: inherit;
+	color: inherit;
+	background: rgba(16, 18, 24, 0.72);
+	border: 1px solid rgba(255, 255, 255, 0.16);
+	border-radius: 0.55rem;
+	cursor: pointer;
+}
+
+button:hover {
+	border-color: rgba(255, 255, 255, 0.42);
+}
+
+button:focus-visible {
+	outline: 3px solid #f2d48a;
+	outline-offset: 2px;
+}
+
+button[aria-pressed="true"] {
+	background: rgba(49, 58, 72, 0.95);
+	border-color: #e6c98a;
+	box-shadow: inset 0 0 0 1px #e6c98a;
+}
+
+.load_error {
+	margin: 1rem;
+	color: #ffd0d0;
+}
+
+#puzzle_shell {
+	display: grid;
+	height: 100dvh;
+	height: 100vh;
+	overflow: hidden;
+	padding: 0.55rem 0.75rem 0.65rem;
+	gap: 0.45rem;
+	grid-template-rows: auto minmax(0, 1fr);
+	grid-template-areas:
+		"header header"
+		"main side";
+}
+
+body[data-role="ravabulle"] #puzzle_shell {
+	grid-template-columns: minmax(0, 1.3fr) minmax(16rem, 0.85fr);
+}
+
+body[data-role="troncadelle"] #puzzle_shell {
+	grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.9fr);
+}
+
+#puzzle_header {
+	grid-area: header;
+	min-width: 0;
+}
+
+#puzzle_title {
+	margin: 0;
+	font-size: clamp(1.05rem, 2vw, 1.35rem);
+	font-weight: 650;
+}
+
+#player_hint,
+#seed_line {
+	margin: 0.15rem 0 0;
+	font-size: 0.84rem;
+	line-height: 1.35;
+}
+
+body[data-role="ravabulle"] #player_hint,
+body[data-role="ravabulle"] #seed_line {
+	color: #c5ddd4;
+}
+
+body[data-role="troncadelle"] #player_hint,
+body[data-role="troncadelle"] #seed_line {
+	color: #e4d0c8;
+}
+
+.panel {
+	min-width: 0;
+	min-height: 0;
+	padding: 0.55rem 0.7rem;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 0.8rem;
+	background: rgba(0, 0, 0, 0.18);
+	overflow: auto;
+}
+
+#clinic,
+#shelf_panel {
+	grid-area: main;
+}
+
+#tray_panel,
+#pad_panel {
+	grid-area: side;
+}
+
+h2, h3 {
+	margin: 0;
+}
+
+h2 {
+	font-size: 0.95rem;
+}
+
+#patient_name {
+	margin: 0.35rem 0 0.2rem;
+	font-size: 1.05rem;
+}
+
+#visit_tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+}
+
+.visit_tab {
+	padding: 0.28rem 0.5rem;
+	font-size: 0.78rem;
+}
+
+.visit_tab[data-state="steady"] {
+	box-shadow: inset 0 -2px 0 #9ddead;
+}
+
+#creature_stage {
+	display: grid;
+	grid-template-columns: minmax(8rem, 14rem) minmax(0, 1fr);
+	gap: 0.6rem;
+	align-items: center;
+	margin-top: 0.35rem;
+}
+
+.creature_svg {
+	width: 100%;
+	height: auto;
+	display: block;
+}
+
+#creature_art[data-species="mousse"] .body_main { fill: #6f8f62; }
+#creature_art[data-species="mousse"] .body_accent { fill: #3f5a45; }
+#creature_art[data-species="mousse"] .body_detail { fill: #d7e2c8; }
+#creature_art[data-species="mousse"] .body_spot { fill: #8fb56a; }
+
+#creature_art[data-species="oiseau"] .body_main { fill: #c4a574; }
+#creature_art[data-species="oiseau"] .body_accent { fill: #8d6239; }
+#creature_art[data-species="oiseau"] .body_detail { fill: #e6c98a; }
+#creature_art[data-species="oiseau"] .body_spot { fill: #6e7f86; }
+#creature_art[data-species="oiseau"] .body_eye { fill: #1b140f; }
+
+#creature_art[data-species="gelee"] .body_main { fill: #d989b4; }
+#creature_art[data-species="gelee"] .body_accent { fill: rgba(255, 255, 255, 0.35); }
+#creature_art[data-species="gelee"] .body_eye { fill: #2a1c28; }
+#creature_art[data-species="gelee"] { color: #6d3148; }
+
+#creature_art[data-species="lanterne"] .body_main { fill: #6d5a86; }
+#creature_art[data-species="lanterne"] .body_accent { fill: #3c3150; }
+#creature_art[data-species="lanterne"] .body_detail { fill: #2a2438; }
+#creature_art[data-species="lanterne"] .body_spot { fill: #f2d48a; }
+
+#mark_list,
+#tray_slots,
+#pad_slots,
+#jar_list,
+#password_letters {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+#mark_list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+}
+
+#mark_list li {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.1rem;
+	min-width: 6.5rem;
+	padding: 0.3rem 0.4rem;
+	border: 1px solid rgba(255, 255, 255, 0.16);
+	border-radius: 0.45rem;
+	background: rgba(0, 0, 0, 0.2);
+}
+
+#mark_list svg {
+	width: 1.7rem;
+	height: 1.7rem;
+}
+
+#mark_list .mark_label,
+#mark_list .mark_state {
+	font-size: 0.75rem;
+	line-height: 1.2;
+}
+
+#mark_list li[data-state="faded"] {
+	opacity: 0.45;
+}
+
+#mark_list li[data-state="worse"] {
+	border-color: #e7a0a0;
+	color: #ffd0d0;
+}
+
+#mark_list li[data-state="flare"] {
+	border-color: #f2d48a;
+	color: #f2d48a;
+}
+
+#mark_list li[data-state="extra"] {
+	border-style: dashed;
+	color: #f0c7a2;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	#mark_list li[data-state="flare"] svg {
+		animation: mark_flare 1.6s ease-in-out infinite;
+	}
+}
+
+@keyframes mark_flare {
+	50% { transform: scale(1.08); }
+}
+
+#visit_status {
+	margin: 0.45rem 0 0;
+	font-size: 0.9rem;
+}
+
+#visit_status[data-state="steady"] {
+	color: #b7e0b2;
+}
+
+#password_strip {
+	margin-top: 0.55rem;
+}
+
+.password_label {
+	margin: 0 0 0.25rem;
+	font-size: 0.75rem;
+	letter-spacing: 0.02em;
+}
+
+#password_letters {
+	display: flex;
+	gap: 0.3rem;
+}
+
+#password_letters li {
+	width: 1.7rem;
+	height: 1.9rem;
+	display: grid;
+	place-items: center;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: 0.3rem;
+	font-size: 1.05rem;
+}
+
+#password_letters li[data-state="blank"]::before {
+	content: "·";
+	opacity: 0.35;
+}
+
+#tray_slots,
+#pad_slots {
+	display: flex;
+	gap: 0.4rem;
+	margin: 0.4rem 0;
+}
+
+#tray_slots button,
+#pad_slots button {
+	min-width: 5.5rem;
+	min-height: 3.2rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.1rem;
+	padding: 0.2rem;
+}
+
+#tray_slots svg,
+#pad_slots svg,
+.sigil_button svg,
+.jar_button svg {
+	width: 1.35rem;
+	height: 1.35rem;
+}
+
+#sigil_buttons {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 0.35rem;
+}
+
+.sigil_button,
+.jar_button {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.1rem;
+	padding: 0.3rem 0.2rem;
+	font-size: 0.75rem;
+}
+
+#tray_actions,
+#pad_actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	margin-top: 0.45rem;
+}
+
+#tray_actions button,
+#pad_actions button {
+	padding: 0.4rem 0.7rem;
+}
+
+#jar_list {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 0.4rem;
+}
+
+.jar_button {
+	width: 100%;
+	min-height: 4.4rem;
+}
+
+.jar_name {
+	font-size: 0.72rem;
+	opacity: 0.85;
+}
+
+#filed_line {
+	margin: 0.2rem 0 0;
+	min-height: 1.2rem;
+	font-size: 0.85rem;
+}
+
+#filed_line[data-state="steady"] {
+	color: #f0d7a4;
+}
+
+@media (max-width: 800px) {
+	#puzzle_shell {
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-rows: auto minmax(0, 1fr) minmax(0, 1fr);
+		grid-template-areas:
+			"header"
+			"main"
+			"side";
+	}
+
+	#creature_stage {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	#jar_list,
+	#sigil_buttons {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+}

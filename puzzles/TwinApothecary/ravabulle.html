@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Apothicairerie jumelle — Ravabulle</title>
+	<link rel="stylesheet" href="css/twin-apothecary.css">
+</head>
+<body data-role="ravabulle">
+	<p id="load_error" class="load_error" hidden role="alert"></p>
+	<main id="puzzle_shell">
+		<header id="puzzle_header">
+			<h1 id="puzzle_title">Apothicairerie jumelle</h1>
+			<p id="player_hint">Décrivez les marques. Posez les sigils dictés par le laboratoire, puis administrez.</p>
+			<p id="seed_line">Séance <span id="seed_value">1</span></p>
+		</header>
+		<section id="clinic" class="panel" aria-labelledby="clinic_title">
+			<h2 id="clinic_title" class="visually-hidden">Chevet</h2>
+			<div id="visit_tabs" role="group" aria-label="Visites du jour"></div>
+			<div id="visit_panel">
+				<h3 id="patient_name"></h3>
+				<div id="creature_stage">
+					<div id="creature_art" aria-hidden="true"></div>
+					<ul id="mark_list" aria-label="Marques visibles"></ul>
+				</div>
+				<p id="visit_status" data-state="arrival">Tel qu’à l’arrivée</p>
+			</div>
+			<div id="password_strip">
+				<p class="password_label">Moitié du mot de passe</p>
+				<ol id="password_letters" aria-label="Lettres par visite"></ol>
+			</div>
+		</section>
+		<section id="tray_panel" class="panel" aria-labelledby="tray_title">
+			<h2 id="tray_title">Plateau</h2>
+			<ol id="tray_slots" aria-label="Sigils posés"></ol>
+			<div id="sigil_buttons" role="group" aria-label="Sigils"></div>
+			<div id="tray_actions">
+				<button type="button" id="btn_administer">Administrer</button>
+				<button type="button" id="btn_clear">Vider</button>
+			</div>
+		</section>
+	</main>
+	<p id="status_live" class="visually-hidden" aria-live="polite"></p>
+	<script src="js/puzzle-instance.js"></script>
+	<script src="js/twin-apothecary-core.js"></script>
+	<script>
+		TwinApothecaryCore.init({ role: 'ravabulle' });
+	</script>
+</body>
+</html>

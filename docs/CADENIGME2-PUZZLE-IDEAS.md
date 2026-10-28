@@ -46,7 +46,7 @@ When authoring a concept below, the **On-screen UI** subsection is the contract 
 | Working title | Voice core | Primary interaction |
 |---------------|------------|---------------------|
 | [Ghost Dictaphone Society](#ghost-dictaphone-society) | Listen → describe vowels and contours → name the spirit | Audio encode + icon offering |
-| [Twin Apothecary](#twin-apothecary) | Symptom ↔ ingredient reasoning | Lab mixing, dose choices |
+| [Twin Apothecary](#twin-apothecary) | Symptom marks ↔ jar sigils | Two-slot tray, shelf pad |
 | [Elevator of Unlikely Floors](#elevator-of-unlikely-floors) | Narrative manifest ↔ symbol logic | Sequence building |
 | [Archive of Lost Gestures](#archive-of-lost-gestures) | Spatial / body description | Pose matching |
 | [The Split Symphony](#the-split-symphony-conductor--engineer) | Rhythm & texture in words | Stem layout / ordering |
@@ -61,7 +61,7 @@ When authoring a concept below, the **On-screen UI** subsection is the contract 
 | [Partitioned Hymn](#partitioned-hymn-no-audio) | Metre & rhyme by voice | Verse ↔ chord rows |
 | [Pinboard Alibi](#pinboard-alibi) | Timeline reconstruction | Suspect ↔ time slots |
 
-**Shipped / in repo:** Aliens & hats — [`CADENIGME2-DESIGN.md`](CADENIGME2-DESIGN.md#puzzle-aliens--hats-working-title). Ghost Dictaphone Society — [`CADENIGME2/GhostDictaphoneSociety/`](../CADENIGME2/GhostDictaphoneSociety/README.txt).
+**Shipped / in repo:** Aliens & hats — [`CADENIGME2-DESIGN.md`](CADENIGME2-DESIGN.md#puzzle-aliens--hats-working-title). Ghost Dictaphone Society — [`puzzles/GhostDictaphoneSociety/`](../puzzles/GhostDictaphoneSociety/README.txt). Twin Apothecary — [`puzzles/TwinApothecary/`](../puzzles/TwinApothecary/README.txt).
 
 ---
 
@@ -133,58 +133,77 @@ Ghost and item **button order** stays fixed so printed icons and the notebook do
 
 ### One-line pitch
 
-Two apothecaries share one **ridiculous patient**: one sees **symptoms and reactions**, the other owns the **lab** with cryptically labelled jars. Together they deduce a **prescription** per visit — no twitchy crafting.
+Two apothecaries share a **day book of five ridiculous patients**. **Ravabulle** reads the body; **Troncadelle** owns the shelf. A dose moves by voice — sigils spoken aloud, then placed on the bedside tray. Implementation: [`puzzles/TwinApothecary/`](../puzzles/TwinApothecary/README.txt).
 
 ### Fantasy & tone
 
-Whimsical anatomy (jelly beast, moss knight, clockwork bird). Humour in side effects; mood is “gentle clinic”, not emergency room.
+Gentle clinic, not an emergency room. Species: moss knight, clockwork bird, jelly beast, mist lantern. A wrong draught is comic and reversible. No clock.
 
-### Co-op split
+### Co-op split (voice-only)
 
 | Player | Screen | Notebook |
 |--------|--------|----------|
-| **Bedside** | Animated **patient**, symptom checklist that updates when the lab sends a dose | **Folk ↔ scholarly** name table, icon legend for “what worsens what” |
-| **Lab** | **Shelves** of ingredients (symbols + long names), a **prescription pad** with slots: morning / noon / evening (or 3–5 dose lines) | Same name table from the other script angle, **contraindication** hints as riddles |
+| **Ravabulle** (bedside) | The open visit’s creature, its **marks as shapes**, an eight-sigil tray (two slots), **Administrer** / **Vider** | Shape → quality, which quality is **natural** for each species, the three rules |
+| **Troncadelle** (lab) | The same five names, shelf of **sigil + jar name**, two pad slots, **Inscrire** / **Retirer** | Jar → quality it soothes and quality it spoils, the three rules |
 
-Neither screen shows the partner’s full ingredient list labels in plain form if names are the puzzle — bedside might see effects as colours/icons only.
+Browsers are not linked. Neither page shows soothe/spoil lines, nor which mark is natural. Quality words live in the notebooks; the screen says shapes (zigzag, goutte, fente, nuage) and sigils (cloche, soleil, feuille, goutte, engrenage, clou, nuage, plume).
 
 ### On-screen UI (HTML scope)
 
-- **Bedside page:** large **patient illustration** (one layer stack or a few CSS states: `data-mood`, symptom icons as a `<ul>`); **visit tabs** or prev/next for each patient.
-- **Lab page:** **jar grid** (fixed slots, click or DnD jar icon into **3–5 dose slots** on a prescription pad); jar labels visible only on lab side.
-- **“Send dose”** (or auto-apply on fill): bedside runs a short CSS animation / swaps sprite — no minigame timer.
-- **Validate all visits** when every pad is complete; silent until correct.
+- **Bedside:** visit tabs **I–V**, inline creature, mark list with states `admission` / `faded` / `worse` / `flare` / `extra`, two tray slots, eight sigil buttons. **Administrer** applies the tray, including an empty one. **Vider** clears it and restores the admission picture. Each visit keeps its own tray.
+- **Lab:** the same tabs and creature names, fixed shelf order, two pad slots. **Inscrire** files the current pad, including an empty pad. **Retirer** withdraws the filing. No reaction on this screen.
+- **Both:** a five-cell discharge strip. A cell fills with that visit’s letter when **this** page’s filing is a legal cure. A wrong or unfiled visit stays blank — no error text.
+- Prototype art is inline SVG. Scroll, if needed, stays inside a panel.
 
-### Co-op flow
+### Co-op flow (reflective)
 
-1. Read the **visit card** (patient name + chief complaint flavour text).
-2. Bedside describes **visible symptoms** (animation + vitals as icons, not numbers racing).
-3. Lab proposes ingredients; bedside **applies** or the lab “sends” dose — patient reacts (silent wrong, subtle wrong, obvious wrong — tune for kindness).
-4. Iterate until the visit stabilizes; move to next patient in the **day book**.
-5. Five to eight visits per chapter; players can reopen past visits freely.
+1. Agree a visit by numeral and creature name. Any visit can be opened; nothing in the day book locks.
+2. Ravabulle names each mark’s shape. The bedside notebook turns shapes into qualities and says which quality that species always carries.
+3. Troncadelle picks up to two jars whose soothe/spoil lines cover the complaints, reads the sigils aloud, and files them.
+4. Ravabulle places those sigils and administers. Soothed complaints fade. A spoilt complaint gets worse, even if another jar soothes it. A jar that soothes the natural mark makes that mark flare. Any other unnecessary jar adds a passing mark. **Vider** puts the arrival picture back. The patient does not leave.
+5. A letter appears on each side for that visit only when that side’s own filing is legal. Other visits stay as they were.
+
+Three rules, printed in both notebooks:
+
+1. Every complaint needs a jar that soothes it.
+2. No jar may spoil a complaint the patient arrived with.
+3. A natural mark is not a complaint. If it is the only mark, the tray stays empty.
 
 ### Instance variation
 
-- Which **ingredients** are decoys on the shelf.
-- Patient roster and which **letter** each cured patient contributes.
-- Symptom animations randomized among a species template.
+Notebooks stay session-agnostic: four qualities, eight jars, four species, three rules. Shelf order stays fixed.
+
+Per seed (same seed on both pages):
+
+- Which species sits in which visit (one species repeats).
+- The complaint set for visits **I**, **II**, **III**, and **V**. The natural quality is never also a complaint. **II**, **III**, and **V** are pairs where one obvious soother spoils the other complaint. **IV** has no complaint.
+- The two five-letter halves, one letter stored on each visit.
 
 ### Win condition & password
 
-- All visits **stable** → patients line up for a **group photo**; markings (spots, stripes, bandages) encode **letters** per player (different encoding, same word when notebook order is applied).
-- Or: prescription pad footer prints **password half** in dose order.
+- **Ravabulle:** the visit letter appears when the **administered** tray currently steadies the patient. Emptying the tray hides it again.
+- **Troncadelle:** the visit letter appears when the **filed** pad is a legal cure. An unfiled pad stays blank, including a still-empty pad on visit **IV**, so the empty cure is a choice.
+- Order is day-book order, **I** through **V**. The archive word is Ravabulle’s half, then Troncadelle’s. Lowercase letters only.
+
+Visit roles, so a first pass in order teaches the rules:
+
+| Visit | Lesson |
+|-------|--------|
+| **I** | One complaint, plus the natural mark. Either safe soother works. |
+| **II** | Two complaints. One of the two soothers spoils the other complaint. |
+| **III** | A second trap pair. |
+| **IV** | Natural mark only. The cure is an empty tray. |
+| **V** | A trap pair again. Soothing the natural mark spends a slot the two complaints still need. |
 
 ### Design intent
 
-- **Logic + communication**: “when we added X, the shimmer stopped” — classic co-op deduction.
-- No real-time stirring; at most **select / assign** ingredients to time slots.
-- Notebook stays a **dictionary** players skim together on voice.
+- The voice work is shapes one way and sigils the other. The deduction is which soother does not spoil the second complaint.
+- A reaction is information, not a fail state. The password stays quiet on a wrong filing.
+- Players can leave a visit mid-thought and come back to the same dose.
 
 ### Open questions
 
-- [ ] Single patient revisited vs roster of distinct patients.
-- [ ] Whether bedside or lab “commits” the final prescription click.
-- [ ] Physical prop: sticker **herb stamps** in notebook vs all-digital.
+- [ ] Final illustrated creatures and jars replace the inline SVG. Shape and sigil silhouettes need to stay readable without the notebook.
 
 ---
 

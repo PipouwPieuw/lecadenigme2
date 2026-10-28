@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Apothicairerie jumelle — Troncadelle</title>
+	<link rel="stylesheet" href="css/twin-apothecary.css">
+</head>
+<body data-role="troncadelle">
+	<p id="load_error" class="load_error" hidden role="alert"></p>
+	<main id="puzzle_shell">
+		<header id="puzzle_header">
+			<h1 id="puzzle_title">Apothicairerie jumelle</h1>
+			<p id="player_hint">Choisissez jusqu’à deux fioles, lisez les sigils, puis inscrivez l’ordonnance. Le carnet dit ce que chaque fiole apaise ou gâte.</p>
+			<p id="seed_line">Séance <span id="seed_value">1</span></p>
+		</header>
+		<section id="shelf_panel" class="panel" aria-labelledby="shelf_title">
+			<h2 id="shelf_title">Étagère</h2>
+			<ul id="jar_list" aria-label="Fioles"></ul>
+		</section>
+		<section id="pad_panel" class="panel" aria-labelledby="pad_title">
+			<h2 id="pad_title">Ordonnance</h2>
+			<div id="visit_tabs" role="group" aria-label="Visites du jour"></div>
+			<h3 id="patient_name"></h3>
+			<ol id="pad_slots" aria-label="Sigils inscrits sur le brouillon"></ol>
+			<p id="filed_line" data-state="empty">Rien d’inscrit</p>
+			<div id="pad_actions">
+				<button type="button" id="btn_file">Inscrire</button>
+				<button type="button" id="btn_clear">Retirer</button>
+			</div>
+			<div id="password_strip">
+				<p class="password_label">Moitié du mot de passe</p>
+				<ol id="password_letters" aria-label="Lettres par visite"></ol>
+			</div>
+		</section>
+	</main>
+	<p id="status_live" class="visually-hidden" aria-live="polite"></p>
+	<script src="js/puzzle-instance.js"></script>
+	<script src="js/twin-apothecary-core.js"></script>
+	<script>
+		TwinApothecaryCore.init({ role: 'troncadelle' });
+	</script>
+</body>
+</html>
