@@ -1,0 +1,138 @@
+{
+	"species": {
+		"alien1": {
+			"names": [
+				"Calaramasse",
+				"Tentaculsec",
+				"Venpartouse",
+				"Poulpocuse",
+				"Chturlhute"
+			],
+			"description": "N'a toujours pas surmonté sa période adolescent-émo même passé 148 ans, vient de découvrir les tubes de Lorie alors croisons les doigts."
+		},
+		"alien2": {
+			"names": [
+				"Tandemordeur",
+				"Padaccordeon",
+				"Vorassassin",
+				"Lamicanine",
+				"Mangedaichu"
+			],
+			"description": "A l'air effrayant et vorace mais est juste effrayé d'être affamé, transporte toujours un sachet de marijuana bread dans sa besace, how embarrassing is he??"
+		},
+		"alien3": {
+			"names": [
+				"Voiropticien",
+				"Tristoonz",
+				"Nainfoerster",
+				"Puppiye",
+				"Palmoral"
+			],
+			"description": "Voit de loin et voit très bien, fera un excellent espion une fois adulte mais se contente de voyeurisme pour le moment."
+		},
+		"alien4": {
+			"names": [
+				"Occupode",
+				"Aracholage",
+				"Demygale",
+				"Mimicuisse",
+				"Voitourelle"
+			],
+			"description": "Reine des legs days malgré son âge avancé, aiment particulièrement son métier de directrice d'un centre aéré pour pouvoir asseoir sa domination."
+		},
+		"alien5": {
+			"names": [
+				"Tarbagel",
+				"Sacadonut",
+				"Troudbalour",
+				"Pivortex",
+				"Anucleaire"
+
+			],
+			"description": "A roulé sa bosse et a roulé tout court, ne rate jamais une occasion pour se prendre une cuite et se réveiller le lendemain au creux de tentacules différents."
+		},
+		"alien6": {
+			"names": [
+				"Glougloufoque",
+				"Poivrosel",
+				"Decantique",
+				"Grandibulle",
+				"Hydratique"
+			],
+			"description": "Les métisses d'Ibiza constituent son plat le plus goutu. Dites jamais que je vous ai dit ça ou Mélissa me tue."
+		},
+		"alien7": {
+			"names": [
+				"Periscopain",
+				"Boulazaide"
+			],
+			"description": "Calme et Zen, fan de jus de citron au petit dej, de zest de citron au déjeuner, de graines de citron au dîner pour bien s'ouvrir les chakras et tout ce qui peut s'ouvrir chez elle."
+		},
+		"alien8": {
+			"names": ["Snobenouille"],
+			"description": "Une classe à la British mais impossible de le prendre au sérieux lorsqu'il vous parle en scrutant votre vision périphérique à vous, a du mal à anticiper les poteaux dans la rue."
+		},
+		"alien9": {
+			"names": ["Videtanche"],
+			"description": "La cousine bercée trop près du mur du Covid-19. Enjouée pour un rien."
+		},
+		"alien10": {
+			"names": ["Flottopets"],
+			"description": "A tenté le régime comme j'aime qui a trop bien marché, même son âme a été éliminée, au moins il n'a pas à être remboursé."
+		}
+	},
+	"guests": [
+		"Jean-Marie",
+		"Godefroy",
+		"Boniface",
+		"Leonard",
+		"Lilian",
+		"Jasmin",
+		"Dylan",
+		"Alceste",
+		"Neo",
+		"Roland",
+		"Ross",
+		"Joshua",
+		"Axel",
+		"Javier",
+		"Zakarias",
+		"Matsumoto",
+		"Wilson",
+		"Siegfried",
+		"Philibert",
+		"Walcaud",
+		"Theodon",
+		"Childebert",
+		"Eudes",
+		"Eustache",
+		"Gontrand",
+		"Josselin",
+		"Nolwen",
+		"Bondi",
+		"Bernarde",
+		"Anasthesie",
+		"Chantal",
+		"Lorraine",
+		"Marie-France",
+		"Sakurazaki",
+		"Ada",
+		"Hildegarde",
+		"Ursula",
+		"Carlota",
+		"Chelsea",
+		"Piper",
+		"Bethany",
+		"Juanita",
+		"Gervaise",
+		"Giselle",
+		"Marlene",
+		"Micheline",
+		"Yvone",
+		"Paulette",
+		"Rita",
+		"Jacqueline",
+		"Therese",
+		"Colette"
+	]
+}

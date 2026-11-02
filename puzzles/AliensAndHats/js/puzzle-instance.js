@@ -5,11 +5,12 @@
 (function (global) {
 	'use strict';
 
-	var GENERATOR_VERSION = 2;
+	var GENERATOR_VERSION = 4;
 
 	var RAV_SYMBOL_CHARS = '◈◇△▷○●□■◆★☆⌁∇⊛∿';
 	var TRON_SYMBOL_CHARS = '⟦⟧⟨⟩╬╳◐◑◒◓⬡⬢⬣⌖⌗※⊹⊰⊱';
-	var TAG_ART = ['tag01', 'tag02', 'tag03', 'tag04', 'tag05', 'tag06'];
+	var NAME_TAG_ART = ['tag01', 'tag02', 'tag03'];
+	var SPECIES_TAG_ART = ['tag04', 'tag05', 'tag06'];
 
 	var DEFAULT_NAMES = [
 		'zorblax', 'quipple', 'mernid', 'flootch', 'grindle',
@@ -72,16 +73,49 @@
 		return out;
 	}
 
-	function assignTagArts(rng) {
-		var arts = shuffle(rng, TAG_ART).concat([]);
-		var result = [];
-		for (var i = 0; i < 6; i += 1) {
-			result.push(arts[i]);
-		}
-		for (var j = 6; j < 10; j += 1) {
-			result.push(TAG_ART[Math.floor(rng() * TAG_ART.length)]);
+	function assignTagArts(rng, arts, count) {
+		var result = shuffle(rng, arts).slice();
+		while (result.length < count) {
+			result.push(arts[Math.floor(rng() * arts.length)]);
 		}
 		return shuffle(rng, result);
+	}
+
+	function speciesMeta(catalog) {
+		var source = (catalog && catalog.species) || {};
+		var byAlien = {};
+		for (var i = 0; i < ALIEN_KEYS.length; i += 1) {
+			var key = ALIEN_KEYS[i];
+			var entry = source[key] || {};
+			var raw = Array.isArray(entry.names) ? entry.names : (entry.name ? [entry.name] : []);
+			var names = [];
+			for (var n = 0; n < raw.length; n += 1) {
+				var label = String(raw[n] || '').trim();
+				if (label && names.indexOf(label) === -1) {
+					names.push(label);
+				}
+			}
+			if (!names.length) {
+				names.push('espece' + (i + 1));
+			}
+			byAlien[key] = {
+				names: names,
+				description: entry.description || ("Description de l'espèce " + (i + 1) + '.')
+			};
+		}
+		return byAlien;
+	}
+
+	function guestNamePool(nameList) {
+		var source = (nameList && nameList.length) ? nameList : DEFAULT_NAMES;
+		var unique = [];
+		for (var i = 0; i < source.length; i += 1) {
+			var label = String(source[i] || '').trim();
+			if (label && unique.indexOf(label) === -1) {
+				unique.push(label);
+			}
+		}
+		return unique.length >= 10 ? unique : DEFAULT_NAMES.slice();
 	}
 
 	function randomLetters(rng, count) {
@@ -103,21 +137,29 @@
 
 	/**
 	 * @param {number|string} [seed]
-	 * @param {string[]} [nameList]
+	 * @param {{ species?: Object, guests?: string[] }} [catalog]
 	 */
-	function createInstance(seed, nameList) {
+	function createInstance(seed, catalog) {
 		if (seed === undefined || seed === null || seed === '') {
 			seed = Math.floor(Math.random() * 0x7fffffff);
 		} else {
 			seed = parseInt(String(seed), 10) || 1;
 		}
 
-		var names = (nameList && nameList.length >= 10) ? nameList.slice(0, 10) : DEFAULT_NAMES.slice();
+		var species = speciesMeta(catalog);
 		var rng = mulberry32(seed);
+		var names = sampleUnique(rng, guestNamePool(catalog && catalog.guests), 10);
 
-		var ravSymbols = uniqueStrings(rng, RAV_SYMBOL_CHARS, 10);
-		var tronSymbols = uniqueStrings(rng, TRON_SYMBOL_CHARS, 10);
-		var tagArts = assignTagArts(rng);
+		var speciesCodes = uniqueStrings(rng, RAV_SYMBOL_CHARS, 10);
+		var nameCodes = uniqueStrings(rng, TRON_SYMBOL_CHARS, 10);
+		var speciesTagArts = assignTagArts(rng, SPECIES_TAG_ART, 10);
+		var nameTagArts = assignTagArts(rng, NAME_TAG_ART, 10);
+		var speciesCodeByAlien = {};
+		var speciesArtByAlien = {};
+		for (var s = 0; s < ALIEN_KEYS.length; s += 1) {
+			speciesCodeByAlien[ALIEN_KEYS[s]] = speciesCodes[s];
+			speciesArtByAlien[ALIEN_KEYS[s]] = speciesTagArts[s];
+		}
 		var alienKeys = sampleUnique(rng, ALIEN_KEYS, 10);
 		var hatIds = sampleUnique(rng, HAT_IDS, 10);
 		var lettersRav = randomLetters(rng, 10);
@@ -125,15 +167,20 @@
 
 		var guests = [];
 		for (var g = 0; g < 10; g += 1) {
+			var alienKey = alienKeys[g];
+			var meta = species[alienKey];
 			guests.push({
 				guest_id: g,
 				name: names[g],
-				alien: alienKeys[g],
+				alien: alienKey,
 				alien_variant: 1 + Math.floor(rng() * 5),
 				hat_id: hatIds[g],
-				tag_art: tagArts[g],
-				tag_rav: ravSymbols[g],
-				tag_tron: tronSymbols[g],
+				species_name: meta.names[Math.floor(rng() * meta.names.length)],
+				species_description: meta.description,
+				species_code: speciesCodeByAlien[alienKey],
+				species_tag_art: speciesArtByAlien[alienKey],
+				name_code: nameCodes[g],
+				name_tag_art: nameTagArts[g],
 				letter_rav: lettersRav[g],
 				letter_tron: lettersTron[g]
 			});

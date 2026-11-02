@@ -4,7 +4,7 @@ For product rules and co-op flow, see [`docs/CADENIGME2-DESIGN.md`](../../docs/C
 
 ## Run locally
 
-From `CADENIGME2/AliensAndHats/`:
+From `puzzles/AliensAndHats/`:
 
 ```bash
 npx serve .
@@ -22,11 +22,11 @@ Open:
 | File | Role |
 |------|------|
 | `ravabulle.html` / `troncadelle.html` | Thin shells; call `AliensAndHatsCore.init({ role })` |
-| `js/puzzle-instance.js` | `createInstance(seed)` → shared blob |
+| `js/puzzle-instance.js` | `createInstance(seed, catalog)` → shared blob |
 | `js/aliens-and-hats-core.js` | UI, DnD, validation, reveal, sizing |
-| `css/aliens-and-hats.css` | Layout (⅓ pool, ⅔ book), portrait stack, tags |
+| `css/aliens-and-hats.css` | Layout (⅓ pool, ⅔ book), portrait stack, dossier |
 | `data/book-layout.json` | Per-species sizes and hat-on-head offsets |
-| `data/names.json` | Guest names (placeholder; wire into generator when loading async) |
+| `data/catalog.json` | Guest names, species names, and species descriptions (placeholders until authored) |
 
 ## `init({ role, seed?, instance? })`
 
@@ -39,22 +39,31 @@ Open:
 | | Ravabulle | Troncadelle |
 |---|-----------|-------------|
 | Pool | 16 colored hats | 50 colored aliens (10×5 variants) |
-| Fixed on page | B&W alien + Rav-script tag | B&W hat + Tron-script tag |
-| Empty slot | Hat (colored when placed) | Alien (colored when placed) |
-| Validates | `hat_id` per page | `alien` + `alien_variant` per page |
+| Left page | B&W alien + hat slot | B&W hat + alien slot |
+| Species tag (`tag04`–`tag06`) | Rav-script code, not editable | Empty tag + text field |
+| Name tag (`tag01`–`tag03`) | Empty tag + text field | Tron-script code, not editable |
+| Description | Same species text on both sides | Same species text on both sides |
+| Validates | `hat_id` and typed guest `name` | `alien` + `alien_variant` and typed `species_name` |
 | Page order | `instance.rav_page_order` | `instance.tron_page_order` |
 | Password half | `password_half_rav` (10 letters, Rav page order) | `password_half_tron` |
 
-## Book page DOM
+## Book spread DOM
 
-Each `.book_page` contains:
+**10 spreads**, one guest each. Page index `p` is also the spread index.
 
-- `.page_scene` (inset inside the open-book frame)
-  - `.portrait_stack` → `.portrait_body` (reserved alien silhouette) + `.portrait_hat` (absolute, head anchor)
-  - `.fixed_tag` — **absolute bottom** (above the blue border), not inside the stack
-- `.page_letter` — revealed password glyph (hidden until solve / navigation)
+Each `.book_spread` contains:
 
-**Both roles** use the same composition: alien body anchored at the bottom of `.portrait_body`, hat anchored on the head via `.portrait_hat` (does not move when the partner piece is placed).
+- `.book_spread_frame`
+- Left `.book_page--portrait` → `.page_scene` → `.portrait_stack` → `.portrait_body` (alien silhouette) + `.portrait_hat` (absolute, head anchor). No tag. `.portrait_stack` stays at `bottom: 16%` so the band the old tag occupied stays empty and sprites do not shift.
+- Right `.book_page--dossier` → `.page_scene--dossier`
+  - `.dossier_tag--species` — code or `<input class="tag_input">`
+  - `.species_description`
+  - `.dossier_tag--name` — code or input
+- `.spread_letter` — one password glyph for the spread (hidden until solve)
+
+The right page is not a drop target.
+
+**Both roles** use the same portrait composition: alien body anchored at the bottom of `.portrait_body`, hat anchored on the head via `.portrait_hat` (does not move when the partner piece is placed).
 
 **Ravabulle:** B&W alien in the body; colored hat drops into `.portrait_hat`.
 
@@ -67,9 +76,11 @@ Cover: `#btn_open_book` opens only. When open, `#btn_close_book` in `#book_nav` 
 | Field | Use |
 |-------|-----|
 | `guest_id` | Canonical index 0–9 |
-| `name` | Wheel / design (not Latin in DOM) |
+| `name` | Latin guest name. Typed on Ravabulle; not written into Troncadelle’s page text |
+| `species_name`, `species_description` | From `catalog.json` via `alien`. Description is shown on both sides. Species name is typed on Troncadelle and not written into Ravabulle’s page text |
 | `alien`, `alien_variant`, `hat_id` | Pair identity |
-| `tag_art`, `tag_rav`, `tag_tron` | Fixed tags on pages |
+| `species_code`, `species_tag_art` | Rav-script species code; art is `tag04`–`tag06` (each used at least once). Same code for a given `alien` key |
+| `name_code`, `name_tag_art` | Tron-script guest-name code; art is `tag01`–`tag03` (each used at least once) |
 | `letter_rav`, `letter_tron` | Password characters for that guest |
 
 Page index `p` (0–9) → guest `instance.guests[page_order[p]]`.
@@ -88,18 +99,29 @@ While dragging, the piece keeps its current pixel box; `.grab_piece--dragging` a
 
 ## DnD
 
-- Whole `.book_page` accepts drop; item snaps to `.placement_slot`.
+- The left `.book_page--portrait` accepts drop; item snaps to `.placement_slot`. The dossier page does not.
 - Hit-testing uses `document.elementsFromPoint` (dragged piece stays visible; `pointer-events: none` on drag).
 - Invalid drop → restore pre-drag position.
 - Drop on occupied slot → swap (slot↔slot or pool↔slot with swap to pool).
 - Pool: seeded **shuffle**, then **≥3 columns** (round-robin, count grows if needed for height); even vertical spread, centered in column (no jitter); layout runs after images decode; all pieces clamped in bounds; `#grab_pool { overflow: hidden }`.
-- Silent validation when all 10 slots filled.
+- Silent validation when all 10 slots are filled **and** all 10 text fields for this role are non-empty. Typed answers are trim + case-insensitive, with internal whitespace collapsed. Accents must match the catalog. A wrong placement or word leaves pieces and text in place.
 
 ## Password reveal
 
-- On 10/10 correct: non-visible spreads show letter immediately; **current spread** fades scene → letter.
-- Modal shows full 10-character half for this role.
-- Navigate spreads to read each letter.
+- On a full correct book: other spreads show their letter immediately; the **current spread** fades both pages, then shows **one** centered letter.
+- Modal shows the full 10-character half for this role.
+- Navigate the 10 spreads to read each letter.
+
+## Catalog JSON
+
+Edit `data/catalog.json` (loaded before `createInstance`):
+
+- `species.alien1` … `species.alien10` — `names` (array of labels; the seed picks one, and that is what Troncadelle types) and `description` (shown on both sides)
+- `guests` — Latin names. Ten are drawn from the list for each seed (what Ravabulle types)
+
+`SHOW_PLAIN_LABELS` in `js/aliens-and-hats-core.js` is temporary. While it is `true`, Ravabulle’s species tag and Troncadelle’s name tag show those Latin words instead of the symbol codes. Set it to `false` when the hand-drawn symbols are ready. Symbol strings are still generated.
+
+Symbol codes stay seed-generated. They are not stored in the catalog. Reload the puzzle after edits.
 
 ## Layout JSON
 

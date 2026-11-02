@@ -4,6 +4,10 @@
 (function (global) {
 	'use strict';
 
+	// Temporary: tags show the Latin species and guest names.
+	// Set to false when hand-drawn symbol codes replace them.
+	var SHOW_PLAIN_LABELS = true;
+
 	var POOL_PIECE_MAX_HEIGHT_PX = 200;
 	var POOL_MIN_COLUMNS = 3;
 	var POOL_EDGE_PAD = 4;
@@ -433,24 +437,44 @@
 		return document.getElementById(id);
 	}
 
-	function buildTag(guest) {
-		var symbols = state.role === 'ravabulle' ? guest.tag_rav : guest.tag_tron;
-		var wrap = document.createElement('div');
-		wrap.className = 'fixed_tag';
+	function tagArtImg(art) {
 		var img = document.createElement('img');
-		img.src = assetPath('misc', guest.tag_art);
+		img.src = assetPath('misc', art);
 		img.alt = '';
 		img.setAttribute('aria-hidden', 'true');
-		wrap.appendChild(img);
-		var span = document.createElement('span');
-		span.className = 'tag_symbols';
-		span.setAttribute('aria-hidden', 'true');
-		span.textContent = symbols;
-		wrap.appendChild(span);
+		return img;
+	}
+
+	function buildCodedTag(className, art, symbols, accessibleLabel) {
+		var wrap = document.createElement('div');
+		wrap.className = className;
+		wrap.appendChild(tagArtImg(art));
 		var hidden = document.createElement('span');
 		hidden.className = 'visually-hidden';
-		hidden.textContent = 'Étiquette invité';
+		hidden.textContent = accessibleLabel;
 		wrap.appendChild(hidden);
+		var span = document.createElement('span');
+		span.className = 'tag_symbols' + (SHOW_PLAIN_LABELS ? ' tag_symbols--plain' : '');
+		span.textContent = symbols;
+		wrap.appendChild(span);
+		return wrap;
+	}
+
+	function buildInputTag(className, art, inputLabel, pageIndex, field) {
+		var wrap = document.createElement('div');
+		wrap.className = className;
+		wrap.appendChild(tagArtImg(art));
+		var input = document.createElement('input');
+		input.type = 'text';
+		input.className = 'tag_input';
+		input.setAttribute('aria-label', inputLabel);
+		input.setAttribute('autocomplete', 'off');
+		input.setAttribute('autocapitalize', 'off');
+		input.spellcheck = false;
+		input.dataset.pageIndex = String(pageIndex);
+		input.dataset.field = field;
+		input.addEventListener('input', tryValidate);
+		wrap.appendChild(input);
 		return wrap;
 	}
 
@@ -518,36 +542,73 @@
 		return stack;
 	}
 
-	function buildRavPage(pageIndex) {
-		var guest = guestAtPage(pageIndex);
+	function buildPortraitPage(pageIndex) {
 		var page = document.createElement('div');
-		page.className = 'book_page';
+		page.className = 'book_page book_page--portrait';
 		page.dataset.pageIndex = String(pageIndex);
 
 		var scene = document.createElement('div');
 		scene.className = 'page_scene';
-
-		var letter = document.createElement('div');
-		letter.className = 'page_letter';
-		letter.hidden = true;
-		letter.textContent = letterAtPage(pageIndex);
-		letter.setAttribute('aria-hidden', 'true');
-
 		scene.appendChild(buildPortraitStack(pageIndex));
-		scene.appendChild(buildTag(guest));
 		page.appendChild(scene);
-		page.appendChild(letter);
 		return page;
 	}
 
-	function buildTronPage(pageIndex) {
-		return buildRavPage(pageIndex);
+	function buildDossierPage(pageIndex) {
+		var guest = guestAtPage(pageIndex);
+		var page = document.createElement('div');
+		page.className = 'book_page book_page--dossier';
+
+		var scene = document.createElement('div');
+		scene.className = 'page_scene page_scene--dossier';
+
+		if (state.role === 'ravabulle') {
+			scene.appendChild(buildCodedTag(
+				'dossier_tag dossier_tag--species',
+				guest.species_tag_art,
+				SHOW_PLAIN_LABELS ? guest.species_name : guest.species_code,
+				SHOW_PLAIN_LABELS ? 'Espèce' : "Code d'espèce"
+			));
+		} else {
+			scene.appendChild(buildInputTag(
+				'dossier_tag dossier_tag--species',
+				guest.species_tag_art,
+				"Nom de l'espèce",
+				pageIndex,
+				'species'
+			));
+		}
+
+		var description = document.createElement('p');
+		description.className = 'species_description';
+		description.textContent = guest.species_description;
+		scene.appendChild(description);
+
+		if (state.role === 'ravabulle') {
+			scene.appendChild(buildInputTag(
+				'dossier_tag dossier_tag--name',
+				guest.name_tag_art,
+				"Nom de l'invité",
+				pageIndex,
+				'name'
+			));
+		} else {
+			scene.appendChild(buildCodedTag(
+				'dossier_tag dossier_tag--name',
+				guest.name_tag_art,
+				SHOW_PLAIN_LABELS ? guest.name : guest.name_code,
+				SHOW_PLAIN_LABELS ? 'Nom' : 'Code du nom'
+			));
+		}
+
+		page.appendChild(scene);
+		return page;
 	}
 
 	function renderBook() {
 		var container = el('book_spreads');
 		container.innerHTML = '';
-		for (var s = 0; s < 5; s += 1) {
+		for (var s = 0; s < 10; s += 1) {
 			var spread = document.createElement('div');
 			spread.className = 'book_spread';
 			spread.dataset.spread = String(s);
@@ -558,15 +619,16 @@
 			frame.className = 'book_spread_frame';
 			frame.setAttribute('aria-hidden', 'true');
 			spread.appendChild(frame);
+			spread.appendChild(buildPortraitPage(s));
+			spread.appendChild(buildDossierPage(s));
 
-			for (var side = 0; side < 2; side += 1) {
-				var pageIndex = s * 2 + side;
-				spread.appendChild(
-					state.role === 'ravabulle'
-						? buildRavPage(pageIndex)
-						: buildTronPage(pageIndex)
-				);
-			}
+			var letter = document.createElement('div');
+			letter.className = 'page_letter spread_letter';
+			letter.hidden = true;
+			letter.textContent = letterAtPage(s);
+			letter.setAttribute('aria-hidden', 'true');
+			spread.appendChild(letter);
+
 			container.appendChild(spread);
 		}
 		updateSpreadNav();
@@ -839,7 +901,7 @@
 			if (elements[i] === dragPiece) {
 				continue;
 			}
-			var page = elements[i].closest && elements[i].closest('.book_page');
+			var page = elements[i].closest && elements[i].closest('.book_page--portrait');
 			if (page && page.closest('.book_spread:not([hidden])')) {
 				return { page: page, pool: false };
 			}
@@ -952,7 +1014,7 @@
 
 	function slotFilledCorrectly(pageIndex) {
 		var guest = guestAtPage(pageIndex);
-		var page = document.querySelector('.book_page[data-page-index="' + pageIndex + '"]');
+		var page = document.querySelector('.book_page--portrait[data-page-index="' + pageIndex + '"]');
 		if (!page) {
 			return false;
 		}
@@ -967,31 +1029,62 @@
 			&& parseInt(piece.dataset.alienVariant, 10) === guest.alien_variant;
 	}
 
+	function normalizeAnswer(value) {
+		return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+	}
+
+	function typedAnswer(pageIndex) {
+		var field = state.role === 'ravabulle' ? 'name' : 'species';
+		var input = document.querySelector(
+			'.tag_input[data-page-index="' + pageIndex + '"][data-field="' + field + '"]'
+		);
+		return input ? input.value : '';
+	}
+
+	function textFilledCorrectly(pageIndex) {
+		var guest = guestAtPage(pageIndex);
+		var expected = state.role === 'ravabulle' ? guest.name : guest.species_name;
+		var value = normalizeAnswer(typedAnswer(pageIndex));
+		if (!value) {
+			return false;
+		}
+		return value === normalizeAnswer(expected);
+	}
+
 	function tryValidate() {
 		if (!state.bookOpen || state.puzzleSolved) {
 			return;
 		}
 		for (var i = 0; i < 10; i += 1) {
-			var page = document.querySelector('.book_page[data-page-index="' + i + '"]');
+			var page = document.querySelector('.book_page--portrait[data-page-index="' + i + '"]');
 			if (!page || !page.querySelector('.placement_slot .grab_piece')) {
+				return;
+			}
+			if (!normalizeAnswer(typedAnswer(i))) {
 				return;
 			}
 		}
 		for (var j = 0; j < 10; j += 1) {
-			if (!slotFilledCorrectly(j)) {
+			if (!slotFilledCorrectly(j) || !textFilledCorrectly(j)) {
 				return;
 			}
 		}
 		onPuzzleSolved();
 	}
 
-	function revealPageInstant(pageIndex) {
-		var page = document.querySelector('.book_page[data-page-index="' + pageIndex + '"]');
-		if (!page) {
+	function revealSpreadInstant(spreadIndex) {
+		var spread = document.querySelector('.book_spread[data-spread="' + spreadIndex + '"]');
+		if (!spread) {
 			return;
 		}
-		page.querySelector('.page_scene').hidden = true;
-		page.querySelector('.page_letter').hidden = false;
+		spread.querySelectorAll('.page_scene').forEach(function (scene) {
+			scene.hidden = true;
+		});
+		spread.querySelector('.spread_letter').hidden = false;
+	}
+
+	function motionReduced() {
+		return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 	}
 
 	function onPuzzleSolved() {
@@ -999,11 +1092,9 @@
 		for (var i = 0; i < 10; i += 1) {
 			state.pageRevealed[i] = true;
 		}
-		var spreadStart = state.currentSpread * 2;
-		var spreadEnd = spreadStart + 1;
 		for (var p = 0; p < 10; p += 1) {
-			if (p < spreadStart || p > spreadEnd) {
-				revealPageInstant(p);
+			if (p !== state.currentSpread) {
+				revealSpreadInstant(p);
 			}
 		}
 		animateRevealOnCurrentSpread();
@@ -1013,17 +1104,21 @@
 
 	function refreshPageViews() {
 		for (var i = 0; i < 10; i += 1) {
-			var page = document.querySelector('.book_page[data-page-index="' + i + '"]');
-			if (!page) {
+			var spread = document.querySelector('.book_spread[data-spread="' + i + '"]');
+			if (!spread) {
 				continue;
 			}
-			var scene = page.querySelector('.page_scene');
-			var letter = page.querySelector('.page_letter');
+			var letter = spread.querySelector('.spread_letter');
+			var scenes = spread.querySelectorAll('.page_scene');
 			if (state.pageRevealed[i]) {
-				scene.hidden = true;
+				scenes.forEach(function (scene) {
+					scene.hidden = true;
+				});
 				letter.hidden = false;
 			} else {
-				scene.hidden = false;
+				scenes.forEach(function (scene) {
+					scene.hidden = false;
+				});
 				letter.hidden = true;
 			}
 		}
@@ -1034,13 +1129,22 @@
 		if (!spread) {
 			return;
 		}
-		spread.querySelectorAll('.page_scene:not([hidden])').forEach(function (scene) {
+		var scenes = spread.querySelectorAll('.page_scene:not([hidden])');
+		if (!scenes.length || motionReduced()) {
+			revealSpreadInstant(state.currentSpread);
+			return;
+		}
+		var pending = scenes.length;
+		scenes.forEach(function (scene) {
 			scene.classList.add('page_scene--fade-out');
 			scene.addEventListener('animationend', function () {
+				pending -= 1;
 				scene.hidden = true;
-				var page = scene.closest('.book_page');
-				page.querySelector('.page_letter').hidden = false;
-				page.querySelector('.page_letter').classList.add('page_letter--fade-in');
+				if (pending === 0) {
+					var letter = spread.querySelector('.spread_letter');
+					letter.hidden = false;
+					letter.classList.add('page_letter--fade-in');
+				}
 			}, { once: true });
 		});
 	}
@@ -1061,7 +1165,7 @@
 
 	function goSpread(delta) {
 		var next = state.currentSpread + delta;
-		if (next < 0 || next > 4) {
+		if (next < 0 || next > 9) {
 			return;
 		}
 		state.currentSpread = next;
@@ -1073,8 +1177,8 @@
 
 	function updateSpreadNav() {
 		el('btn_spread_prev').disabled = state.currentSpread === 0;
-		el('btn_spread_next').disabled = state.currentSpread === 4;
-		el('spread_indicator').textContent = 'Pages ' + (state.currentSpread + 1) + ' / 5';
+		el('btn_spread_next').disabled = state.currentSpread === 9;
+		el('spread_indicator').textContent = 'Pages ' + (state.currentSpread + 1) + ' / 10';
 	}
 
 	function bindChrome(role) {
@@ -1083,8 +1187,8 @@
 			? 'Chapeaux à placer'
 			: 'Aliens à placer';
 		el('dnd_instructions').textContent =
-			'Glissez un élément vers une page du livre (toute la page accepte le dépôt). '
-			+ 'Les étiquettes sont déjà fixées : utilisez la roue et votre partenaire pour les associer.';
+			'Glissez un élément vers la page de gauche (toute la page accepte le dépôt). '
+			+ 'Décrivez les codes à votre partenaire pour remplir l\'étiquette vide.';
 
 		el('btn_open_book').addEventListener('click', function () {
 			if (!state.bookOpen) {
@@ -1102,24 +1206,41 @@
 		document.addEventListener('pointerdown', onPointerDown);
 	}
 
-	function loadLayout(done) {
-		fetch('data/book-layout.json')
-			.then(function (r) { return r.json(); })
-			.catch(function () { return null; })
-			.then(function (json) {
-				state.layout = json;
-				done();
+	function loadJson(url) {
+		return fetch(url)
+			.then(function (r) {
+				if (!r.ok) {
+					throw new Error(url);
+				}
+				return r.json();
+			})
+			.catch(function () {
+				return null;
 			});
+	}
+
+	function startUi() {
+		bindChrome(state.role);
+		renderPool();
+		renderBook();
 	}
 
 	function init(options) {
 		state.role = options.role;
-		state.instance = options.instance
-			|| global.AliensAndHatsInstance.createInstance(options.seed || readSeed());
-		loadLayout(function () {
-			bindChrome(state.role);
-			renderPool();
-			renderBook();
+		loadJson('data/book-layout.json').then(function (layout) {
+			state.layout = layout;
+			if (options.instance) {
+				state.instance = options.instance;
+				startUi();
+				return;
+			}
+			loadJson('data/catalog.json').then(function (catalog) {
+				state.instance = global.AliensAndHatsInstance.createInstance(
+					options.seed || readSeed(),
+					catalog
+				);
+				startUi();
+			});
 		});
 	}
 

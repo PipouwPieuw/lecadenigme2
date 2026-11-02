@@ -175,7 +175,7 @@ body.ah_puzzle {
 
 .page_scene {
 	position: absolute;
-	inset: 8% 10% 10%;
+	inset: 10%;
 }
 
 .page_letter {
@@ -245,31 +245,88 @@ body.ah_puzzle {
 	pointer-events: none;
 }
 
-.fixed_tag {
-	position: absolute;
-	left: 20%;
-	right: 20%;
-	bottom: 0%;
-	width: auto;
-	max-width: none;
+.page_scene--dossier {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: center;
+	gap: 0.35rem;
+	overflow: hidden;
+}
+
+.dossier_tag {
+	position: relative;
+	flex: 0 0 auto;
+	width: 300px;
+	max-width: 90%;
 	z-index: 6;
 	pointer-events: none;
 }
 
-.fixed_tag img {
+.dossier_tag img {
 	width: 100%;
+	height: auto;
 	display: block;
 }
 
-.fixed_tag .tag_symbols {
+.dossier_tag .tag_symbols,
+.dossier_tag .tag_input {
 	position: absolute;
 	left: 50%;
 	top: 42%;
+	width: 76%;
 	transform: translate(-50%, -50%);
 	font-size: 0.75rem;
-	letter-spacing: 0.1em;
+	letter-spacing: 0.08em;
 	color: #1a1020;
+	text-align: center;
+}
+
+.dossier_tag .tag_symbols {
 	white-space: nowrap;
+	pointer-events: none;
+}
+
+.dossier_tag .tag_symbols--plain {
+	letter-spacing: 0.01em;
+	font-size: 0.68rem;
+	line-height: 1.15;
+	white-space: normal;
+}
+
+.dossier_tag .tag_input {
+	pointer-events: auto;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0 0.15rem;
+	border: 0;
+	background: transparent;
+	font: inherit;
+	font-size: 0.75rem;
+	letter-spacing: 0.06em;
+}
+
+.dossier_tag .tag_input:focus {
+	outline: 2px solid #6b5a8e;
+	outline-offset: 2px;
+}
+
+.species_description {
+	flex: 1 1 auto;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 0;
+	width: 86%;
+	margin: 0;
+	overflow: auto;
+	text-align: center;
+	color: #1a1020;
+	font-size: 0.85rem;
+	line-height: 1.35;
+}
+
+.spread_letter {
 	pointer-events: none;
 }
 

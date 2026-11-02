@@ -336,6 +336,24 @@
 			playBtn.setAttribute('aria-pressed', playing ? 'true' : 'false');
 		}
 
+		function gestureReadout(ids) {
+			var slots = [];
+			var i;
+			for (i = 0; i < 4; i += 1) {
+				slots.push(ids[i] ? String(parseInt(ids[i], 10)) : '_');
+			}
+			return slots.join(' ');
+		}
+
+		function gestureName(ids) {
+			var slots = [];
+			var i;
+			for (i = 0; i < 4; i += 1) {
+				slots.push(ids[i] ? String(parseInt(ids[i], 10)) : 'vide');
+			}
+			return slots.join(', ');
+		}
+
 		function gestureCountLabel(count) {
 			if (!loadedId) return 'Aucun cylindre chargé';
 			if (count === 0) return 'Aucun geste choisi';
@@ -357,8 +375,9 @@
 				var btn = buttons[cylinder.id];
 				var selection = selections[cylinder.id];
 				var mark = btn.querySelector('.cylinder_mark');
-				/* Réglé only means four gestures are stored, not that they are correct. */
-				mark.hidden = selection.gesture_ids.length !== 4;
+				/* The digits are the stored gestures, not a correctness check. */
+				mark.textContent = gestureReadout(selection.gesture_ids);
+				btn.setAttribute('aria-label', 'Cylindre ' + cylinder.label + ', gestes ' + gestureName(selection.gesture_ids));
 				var armed = armedId === cylinder.id && loadedId !== cylinder.id;
 				btn.dataset.state = cylinder.id === loadedId ? 'loaded' : (armed ? 'armed' : 'bank');
 				btn.setAttribute('aria-pressed', armed ? 'true' : 'false');
@@ -431,8 +450,7 @@
 			num.textContent = cylinder.label;
 			var mark = document.createElement('span');
 			mark.className = 'cylinder_mark';
-			mark.hidden = true;
-			mark.textContent = 'Réglé';
+			mark.textContent = '_ _ _ _';
 			meta.appendChild(prefix);
 			meta.appendChild(num);
 			meta.appendChild(mark);

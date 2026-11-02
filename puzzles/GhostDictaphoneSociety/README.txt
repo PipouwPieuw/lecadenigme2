@@ -13,8 +13,9 @@ Open both pages with the same seed (default 1):
 Ravabulle encodes vowel, contour, and duration. A correct strip plays four
 hand-gesture clips on the monitor and unlocks that cylinder’s replay slot.
 Troncadelle picks the four matching numbers, in any order. A wrong strip stays
-put. Troncadelle's screen stays dark until every cylinder is right. "Réglé"
-only means four gestures are stored.
+put. Troncadelle's screen stays dark until every cylinder is right. Each
+cylinder shows its four numbers as _ _ _ _ until they are chosen. The digits
+are what is stored, not a correctness check.
 
 The archive word is Ravabulle's half followed by Troncadelle's half.
 Placeholder halves come from the seed. They are not a campaign password.
