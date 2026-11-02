@@ -11,7 +11,7 @@
 	<main id="puzzle_shell">
 		<header id="puzzle_header">
 			<h1 id="puzzle_title">Société du dictaphone fantôme</h1>
-			<p id="player_hint">Écoutez le cylindre, puis indiquez l’esprit et les offrandes. L’écran ne s’allume que lorsque tous les cylindres sont justes.</p>
+			<p id="player_hint">Écoutez le cylindre, puis indiquez les quatre gestes. L’écran ne s’allume que lorsque tous les cylindres sont justes.</p>
 			<p id="seed_line">Séance <span id="seed_value">1</span></p>
 		</header>
 		<section id="cylinder_bank" class="panel" aria-labelledby="bank_title">
@@ -41,19 +41,15 @@
 				</div>
 			</div>
 		</section>
-		<section id="offering_board" class="panel" aria-label="Esprits et offrandes">
-			<div class="offering_block">
-				<h2 id="ghost_title">Esprits</h2>
-				<div id="ghost_buttons" role="group" aria-labelledby="ghost_title"></div>
-			</div>
-			<div class="offering_block">
-				<h2 id="item_title">Offrandes</h2>
-				<div id="item_buttons" role="group" aria-labelledby="item_title"></div>
-			</div>
+		<section id="gesture_board" class="panel" aria-labelledby="gesture_title">
+			<h2 id="gesture_title">Gestes</h2>
+			<p id="gesture_count">Aucun cylindre chargé</p>
+			<div id="gesture_buttons" role="group" aria-labelledby="gesture_title"></div>
 		</section>
 	</main>
 	<p id="status_live" class="visually-hidden" aria-live="polite"></p>
 	<script src="js/puzzle-instance.js"></script>
+	<script src="js/vowel-clips.js"></script>
 	<script src="js/audio-synth.js"></script>
 	<script src="js/ghost-dictaphone-core.js"></script>
 	<script>

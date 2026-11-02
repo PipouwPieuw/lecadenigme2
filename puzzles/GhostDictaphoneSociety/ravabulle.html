@@ -11,21 +11,25 @@
 	<main id="puzzle_shell">
 		<header id="puzzle_header">
 			<h1 id="puzzle_title">Société du dictaphone fantôme</h1>
-			<p id="player_hint">Encodez chaque voix : voyelle, courbe, durée. Quatre sons justes appellent l’esprit.</p>
+			<p id="player_hint">Encodez chaque voix : voyelle, courbe, durée. Quatre sons justes ouvrent une séquence de gestes.</p>
 			<p id="seed_line">Séance <span id="seed_value">1</span></p>
 		</header>
 		<section id="crt_stage" class="panel" aria-labelledby="crt_title">
 			<h2 id="crt_title">Moniteur</h2>
 			<div id="crt_bezel">
-				<div id="crt_glass">
-					<p id="crt_empty">Aucun esprit au registre.</p>
-					<ul id="spirit_log"></ul>
-					<p id="password_half" hidden>
-						<span class="password_label">Moitié du mot de passe</span>
-						<span id="password_half_text"></span>
-					</p>
+				<div id="crt_glass" data-glitch="off">
+					<p id="crt_empty">Écran en veille.</p>
+					<div id="cctv_frame">
+						<video id="gesture_video" playsinline muted disablepictureinpicture hidden></video>
+					</div>
+					<div id="vhs_glitch" hidden aria-hidden="true"></div>
 				</div>
 			</div>
+			<ol id="replay_slots" aria-label="Cylindres reçus"></ol>
+			<p id="password_half" hidden>
+				<span class="password_label">Moitié du mot de passe</span>
+				<span id="password_half_text"></span>
+			</p>
 		</section>
 		<section id="encoder" class="panel" aria-labelledby="encoder_title">
 			<h2 id="encoder_title">Séquence</h2>
@@ -52,7 +56,9 @@
 	</main>
 	<p id="status_live" class="visually-hidden" aria-live="polite"></p>
 	<script src="js/puzzle-instance.js"></script>
+	<script src="js/vowel-clips.js"></script>
 	<script src="js/audio-synth.js"></script>
+	<script src="js/gesture-reel.js"></script>
 	<script src="js/ghost-dictaphone-core.js"></script>
 	<script>
 		GhostDictaphoneCore.init({ role: 'ravabulle' });

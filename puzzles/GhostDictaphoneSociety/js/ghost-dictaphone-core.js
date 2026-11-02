@@ -23,15 +23,6 @@
 		return null;
 	}
 
-	function ghostLabel(ghost) {
-		if (ghost.article === "l'") return "L'" + ghost.name;
-		return ghost.article.charAt(0).toUpperCase() + ghost.article.slice(1) + ' ' + ghost.name;
-	}
-
-	function itemLabel(item) {
-		return item.name.charAt(0).toUpperCase() + item.name.slice(1);
-	}
-
 	function shapeSvg(id) {
 		return '<svg viewBox="0 0 48 42" aria-hidden="true" focusable="false">'
 			+ '<path d="M5 8 H9 M5 34 H9" fill="none" stroke="currentColor" stroke-opacity="0.4" stroke-width="1.6" stroke-linecap="round"></path>'
@@ -66,19 +57,6 @@
 		return note.vowel.toUpperCase() + ', ' + shape.label.toLowerCase() + ', ' + duration.label.toLowerCase();
 	}
 
-	function loadCatalog() {
-		return Promise.all([
-			fetch('data/ghosts.json').then(function (response) { return response.json(); }),
-			fetch('data/items.json').then(function (response) { return response.json(); })
-		]).then(function (parts) {
-			return {
-				ghosts: parts[0].ghosts,
-				categories: parts[0].categories,
-				items: parts[1].items
-			};
-		});
-	}
-
 	function readSeed() {
 		var params = new URLSearchParams(global.location.search);
 		if (!params.has('seed')) return 1;
@@ -97,14 +75,21 @@
 		var draft = { vowel: null, shape: null, duration: null };
 		var strip = [];
 		var foundIds = [];
-		var log = document.getElementById('spirit_log');
 		var empty = document.getElementById('crt_empty');
+		var video = document.getElementById('gesture_video');
+		var glass = document.getElementById('crt_glass');
+		var slots = document.getElementById('replay_slots');
 		var password = document.getElementById('password_half');
 		var passwordText = document.getElementById('password_half_text');
 		var commitBtn = document.getElementById('btn_commit_note');
 		var playBtn = document.getElementById('btn_play_strip');
 		var backBtn = document.getElementById('btn_backspace');
 		var clearBtn = document.getElementById('btn_clear');
+		var reel = global.GhostDictaphoneReel.createReel({
+			video: video,
+			glitch: document.getElementById('vhs_glitch'),
+			glass: glass
+		});
 
 		document.getElementById('seed_value').textContent = String(instance.seed);
 
@@ -169,27 +154,39 @@
 			}
 		}
 
-		function renderLog() {
-			var ordered = foundIds.map(function (id) {
-				return findById(instance.cylinders, id);
-			}).sort(function (left, right) {
-				return instance.cylinders.indexOf(left) - instance.cylinders.indexOf(right);
+		function playReel(cylinder) {
+			empty.hidden = true;
+			var urls = cylinder.gestures.map(function (id) {
+				return 'assets/videos/' + id + '.mp4';
 			});
-			log.textContent = '';
-			empty.hidden = ordered.length > 0;
-			ordered.forEach(function (cylinder) {
-				var ghost = findById(instance.ghosts, cylinder.ghost_id);
-				var category = findById(instance.categories, cylinder.category_id);
+			reel.play(urls, {
+				onError: function () {
+					say('La séquence du cylindre ' + cylinder.label + ' n’a pas pu être lue.');
+				}
+			});
+		}
+
+		function renderSlots() {
+			slots.textContent = '';
+			instance.cylinders.forEach(function (cylinder) {
+				var found = foundIds.indexOf(cylinder.id) !== -1;
 				var li = document.createElement('li');
-				li.className = 'spirit_line';
-				var num = document.createElement('span');
-				num.className = 'spirit_num';
-				num.textContent = cylinder.label;
-				var text = document.createElement('span');
-				text.textContent = ghostLabel(ghost) + ' — désir : ' + category.name;
-				li.appendChild(num);
-				li.appendChild(text);
-				log.appendChild(li);
+				var btn = document.createElement('button');
+				btn.type = 'button';
+				btn.className = 'replay_slot';
+				btn.dataset.state = found ? 'ready' : 'locked';
+				btn.disabled = !found;
+				if (found) {
+					btn.textContent = cylinder.label;
+					btn.setAttribute('aria-label', 'Rejouer les gestes du cylindre ' + cylinder.label);
+					btn.addEventListener('click', function () {
+						playReel(cylinder);
+					});
+				} else {
+					btn.setAttribute('aria-label', 'Cylindre ' + cylinder.label + ', pas encore reçu');
+				}
+				li.appendChild(btn);
+				slots.appendChild(li);
 			});
 		}
 
@@ -249,21 +246,17 @@
 			var already = foundIds.indexOf(match.id) !== -1;
 			strip = [];
 			renderStrip();
-			var ghost = findById(instance.ghosts, match.ghost_id);
-			var category = findById(instance.categories, match.category_id);
-			var line = 'cylindre ' + match.label + ', ' + ghostLabel(ghost) + ', désir ' + category.name;
-			if (!already) {
-				foundIds.push(match.id);
-				renderLog();
-			}
+			if (!already) foundIds.push(match.id);
+			renderSlots();
+			playReel(match);
 			if (already) {
-				say('Cet esprit est déjà au registre.');
+				say('Cylindre ' + match.label + ', séquence déjà reçue.');
 			} else if (api.ravabulleSolved(foundIds)) {
 				password.hidden = false;
 				passwordText.textContent = instance.password_half_rav;
-				say('Esprit au registre : ' + line + '. Moitié du mot de passe : ' + instance.password_half_rav + '.');
+				say('Cylindre ' + match.label + ' reçu. Moitié du mot de passe : ' + instance.password_half_rav + '.');
 			} else {
-				say('Esprit au registre : ' + line + '.');
+				say('Cylindre ' + match.label + ' reçu.');
 			}
 			syncEncoderButtons();
 		});
@@ -290,14 +283,14 @@
 		});
 
 		renderStrip();
-		renderLog();
+		renderSlots();
 		syncEncoderButtons();
 	}
 
 	function mountTroncadelle(instance) {
 		var selections = {};
 		instance.cylinders.forEach(function (cylinder) {
-			selections[cylinder.id] = { ghost_id: null, item_ids: [] };
+			selections[cylinder.id] = { gesture_ids: [] };
 		});
 
 		var loadedId = null;
@@ -320,8 +313,8 @@
 		var passwordText = document.getElementById('password_half_text');
 		var idle = document.getElementById('screen_idle');
 		var mini = document.getElementById('mini_crt');
-		var ghostRow = document.getElementById('ghost_buttons');
-		var itemRow = document.getElementById('item_buttons');
+		var gestureRow = document.getElementById('gesture_buttons');
+		var gestureCount = document.getElementById('gesture_count');
 
 		document.getElementById('seed_value').textContent = String(instance.seed);
 
@@ -343,16 +336,20 @@
 			playBtn.setAttribute('aria-pressed', playing ? 'true' : 'false');
 		}
 
+		function gestureCountLabel(count) {
+			if (!loadedId) return 'Aucun cylindre chargé';
+			if (count === 0) return 'Aucun geste choisi';
+			if (count === 1) return '1 geste choisi';
+			return count + ' gestes choisis';
+		}
+
 		function syncToggles() {
-			var selection = loadedId ? selections[loadedId] : { ghost_id: null, item_ids: [] };
-			Array.prototype.forEach.call(ghostRow.querySelectorAll('button'), function (btn) {
+			var ids = loadedId ? selections[loadedId].gesture_ids : [];
+			Array.prototype.forEach.call(gestureRow.querySelectorAll('button'), function (btn) {
 				btn.disabled = !loadedId;
-				btn.setAttribute('aria-pressed', selection.ghost_id === btn.dataset.ghostId ? 'true' : 'false');
+				btn.setAttribute('aria-pressed', ids.indexOf(btn.dataset.gestureId) !== -1 ? 'true' : 'false');
 			});
-			Array.prototype.forEach.call(itemRow.querySelectorAll('button'), function (btn) {
-				btn.disabled = !loadedId;
-				btn.setAttribute('aria-pressed', selection.item_ids.indexOf(btn.dataset.itemId) !== -1 ? 'true' : 'false');
-			});
+			gestureCount.textContent = gestureCountLabel(ids.length);
 		}
 
 		function syncCylinders() {
@@ -360,8 +357,8 @@
 				var btn = buttons[cylinder.id];
 				var selection = selections[cylinder.id];
 				var mark = btn.querySelector('.cylinder_mark');
-				/* Réglé only means a choice is stored, not that it is correct. */
-				mark.hidden = !(selection.ghost_id || selection.item_ids.length);
+				/* Réglé only means four gestures are stored, not that they are correct. */
+				mark.hidden = selection.gesture_ids.length !== 4;
 				var armed = armedId === cylinder.id && loadedId !== cylinder.id;
 				btn.dataset.state = cylinder.id === loadedId ? 'loaded' : (armed ? 'armed' : 'bank');
 				btn.setAttribute('aria-pressed', armed ? 'true' : 'false');
@@ -458,54 +455,35 @@
 			buttons[cylinder.id] = btn;
 		});
 
-		instance.ghosts.forEach(function (ghost) {
+		var gestureIds = [];
+		var gestureIndex;
+		for (gestureIndex = 1; gestureIndex <= 25; gestureIndex += 1) {
+			gestureIds.push((gestureIndex < 10 ? '0' : '') + gestureIndex);
+		}
+		gestureIds.forEach(function (id, index) {
 			var btn = document.createElement('button');
 			btn.type = 'button';
-			btn.className = 'ghost_btn';
-			btn.dataset.ghostId = ghost.id;
+			btn.className = 'gesture_btn';
+			btn.dataset.gestureId = id;
+			btn.textContent = String(index + 1);
 			btn.setAttribute('aria-pressed', 'false');
-			var img = document.createElement('img');
-			img.src = 'assets/images/ghosts/' + ghost.id + '.svg';
-			img.alt = '';
-			var caption = document.createElement('span');
-			caption.className = 'btn_caption';
-			caption.textContent = ghostLabel(ghost);
-			btn.appendChild(img);
-			btn.appendChild(caption);
+			btn.setAttribute('aria-label', 'Geste ' + (index + 1));
 			btn.addEventListener('click', function () {
 				if (!loadedId) return;
 				var selection = selections[loadedId];
-				selection.ghost_id = selection.ghost_id === ghost.id ? null : ghost.id;
+				var at = selection.gesture_ids.indexOf(id);
+				if (at !== -1) {
+					selection.gesture_ids.splice(at, 1);
+				} else if (selection.gesture_ids.length >= 4) {
+					say('Quatre gestes déjà choisis. Retirez-en un pour en changer.');
+					return;
+				} else {
+					selection.gesture_ids.push(id);
+				}
 				syncCylinders();
 				refreshSolve();
 			});
-			ghostRow.appendChild(btn);
-		});
-
-		instance.items.forEach(function (item) {
-			var btn = document.createElement('button');
-			btn.type = 'button';
-			btn.className = 'item_btn';
-			btn.dataset.itemId = item.id;
-			btn.setAttribute('aria-pressed', 'false');
-			var img = document.createElement('img');
-			img.src = 'assets/images/items/' + item.id + '.svg';
-			img.alt = '';
-			var caption = document.createElement('span');
-			caption.className = 'btn_caption';
-			caption.textContent = itemLabel(item);
-			btn.appendChild(img);
-			btn.appendChild(caption);
-			btn.addEventListener('click', function () {
-				if (!loadedId) return;
-				var selection = selections[loadedId];
-				var at = selection.item_ids.indexOf(item.id);
-				if (at === -1) selection.item_ids.push(item.id);
-				else selection.item_ids.splice(at, 1);
-				syncCylinders();
-				refreshSolve();
-			});
-			itemRow.appendChild(btn);
+			gestureRow.appendChild(btn);
 		});
 
 		placeBtn.addEventListener('click', function () {
@@ -573,11 +551,13 @@
 	function init(options) {
 		var role = options && options.role;
 		if (role) document.body.dataset.role = role;
-		loadCatalog().then(function (catalog) {
-			var instance = global.GhostDictaphoneInstance.createInstance(readSeed(), catalog);
+		try {
+			var instance = global.GhostDictaphoneInstance.createInstance(readSeed());
 			if (role === 'ravabulle') mountRavabulle(instance);
 			else if (role === 'troncadelle') mountTroncadelle(instance);
-		}).catch(showLoadError);
+		} catch (error) {
+			showLoadError();
+		}
 	}
 
 	global.GhostDictaphoneCore = {

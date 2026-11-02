@@ -5,7 +5,7 @@
 (function (global) {
 	'use strict';
 
-	var GENERATOR_VERSION = 1;
+	var GENERATOR_VERSION = 2;
 	var ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
 	var ONSETS = ['b', 'd', 'f', 'g', 'l', 'm', 'n', 'p', 'r', 's', 't', 'v'];
 	var NUCLEI = ['a', 'e', 'i', 'o', 'u'];
@@ -97,17 +97,18 @@
 		return (n < 10 ? '0' : '') + n;
 	}
 
-	function createInstance(seed, catalog) {
-		if (!catalog || !catalog.ghosts || catalog.ghosts.length < 12) {
-			throw new Error('Catalogue de fantômes incomplet');
-		}
-		if (!catalog.items || catalog.items.length < 24) {
-			throw new Error('Catalogue d’offrandes incomplet');
-		}
-		if (!catalog.categories || catalog.categories.length < 1) {
-			throw new Error('Catalogue de désirs incomplet');
-		}
+	function gesturePool() {
+		var pool = [];
+		var n;
+		for (n = 1; n <= 25; n += 1) pool.push(pad(n));
+		return pool;
+	}
 
+	function gestureSetKey(ids) {
+		return ids.slice().sort().join('/');
+	}
+
+	function createInstance(seed) {
 		var normalized = normalizeSeed(seed);
 		var rng = mulberry32(normalized);
 		var used = {};
@@ -131,21 +132,21 @@
 			throw new Error('Séquences de cylindres insuffisantes');
 		}
 
-		var ghostIds = shuffle(rng, catalog.ghosts.map(function (ghost) {
-			return ghost.id;
-		})).slice(0, 8);
-		var categoryIds = catalog.categories.map(function (category) {
-			return category.id;
-		});
-		var categoryPool = [];
-		while (categoryPool.length < cylinders.length) {
-			categoryPool = categoryPool.concat(shuffle(rng, categoryIds));
-		}
-		categoryPool = categoryPool.slice(0, cylinders.length);
-
-		cylinders.forEach(function (cylinder, index) {
-			cylinder.ghost_id = ghostIds[index];
-			cylinder.category_id = categoryPool[index];
+		var usedSets = {};
+		cylinders.forEach(function (cylinder) {
+			var setGuard = 0;
+			var assigned = null;
+			while (!assigned && setGuard < 200) {
+				setGuard += 1;
+				var picked = shuffle(rng, gesturePool()).slice(0, 4);
+				var setKey = gestureSetKey(picked);
+				if (usedSets[setKey]) continue;
+				usedSets[setKey] = true;
+				assigned = picked;
+			}
+			if (!assigned) throw new Error('Jeux de gestes insuffisants');
+			/* Array order is the playback order. Matching ignores it. */
+			cylinder.gestures = assigned;
 		});
 
 		var passwordHalfRav = speakableHalf(rng);
@@ -160,9 +161,6 @@
 			generator_version: GENERATOR_VERSION,
 			seed: normalized,
 			cylinders: cylinders,
-			ghosts: catalog.ghosts,
-			items: catalog.items,
-			categories: catalog.categories,
 			password_half_rav: passwordHalfRav,
 			password_half_tron: passwordHalfTron
 		};
@@ -178,14 +176,6 @@
 		return null;
 	}
 
-	function expectedItemIds(items, categoryId) {
-		return items.filter(function (item) {
-			return item.category_id === categoryId;
-		}).map(function (item) {
-			return item.id;
-		}).sort();
-	}
-
 	function sameIds(left, right) {
 		if (left.length !== right.length) return false;
 		var i;
@@ -195,11 +185,11 @@
 		return true;
 	}
 
-	function selectionMatches(cylinder, selection, items) {
-		if (!selection || selection.ghost_id !== cylinder.ghost_id) return false;
-		var expected = expectedItemIds(items, cylinder.category_id);
-		var got = (selection.item_ids || []).slice().sort();
-		return sameIds(expected, got);
+	function selectionMatches(cylinder, selection) {
+		if (!cylinder || !selection || !cylinder.gestures) return false;
+		var got = selection.gesture_ids || [];
+		if (got.length !== cylinder.gestures.length) return false;
+		return sameIds(gestureSetKey(cylinder.gestures).split('/'), gestureSetKey(got).split('/'));
 	}
 
 	function troncadelleSolved(instance, selections) {
@@ -208,7 +198,7 @@
 		var i;
 		for (i = 0; i < cylinders.length; i += 1) {
 			var cylinder = cylinders[i];
-			if (!selectionMatches(cylinder, selections[cylinder.id], instance.items)) return false;
+			if (!selectionMatches(cylinder, selections[cylinder.id])) return false;
 		}
 		return true;
 	}
@@ -235,7 +225,6 @@
 		noteKey: noteKey,
 		sequenceKey: sequenceKey,
 		findCylinder: findCylinder,
-		expectedItemIds: expectedItemIds,
 		selectionMatches: selectionMatches,
 		troncadelleSolved: troncadelleSolved,
 		ravabulleSolved: ravabulleSolved

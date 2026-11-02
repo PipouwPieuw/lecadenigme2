@@ -160,7 +160,7 @@ h3 {
 #encoder,
 #cylinder_bank,
 #dictaphone,
-#offering_board {
+#gesture_board {
 	display: flex;
 	flex-direction: column;
 	overflow: auto;
@@ -174,7 +174,7 @@ body[data-role="troncadelle"] #dictaphone {
 	grid-area: player;
 }
 
-body[data-role="troncadelle"] #offering_board {
+body[data-role="troncadelle"] #gesture_board {
 	grid-area: board;
 }
 
@@ -199,10 +199,12 @@ body[data-role="troncadelle"] #offering_board {
 
 #crt_glass {
 	flex: 1;
-	min-height: 0;
-	overflow: auto;
+	min-height: 12rem;
+	overflow: hidden;
 	border-radius: 1rem;
-	padding: 0.75rem 0.95rem 0.9rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 #crt_glass::after,
@@ -210,6 +212,7 @@ body[data-role="troncadelle"] #offering_board {
 	content: "";
 	position: absolute;
 	inset: 0;
+	z-index: 3;
 	pointer-events: none;
 	border-radius: inherit;
 	background: repeating-linear-gradient(
@@ -228,30 +231,94 @@ body[data-role="troncadelle"] #offering_board {
 	}
 }
 
+#crt_glass::after {
+	box-shadow: inset 0 0 72px rgba(0, 0, 0, 0.62);
+}
+
 @keyframes crt_roll {
 	from { background-position: 0 0; }
 	to { background-position: 0 4px; }
 }
 
 #crt_empty {
+	position: relative;
+	z-index: 1;
 	margin: 0;
+	padding: 0.75rem;
 	opacity: 0.8;
 }
 
-#spirit_log {
+#cctv_frame {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	background: #000;
+	filter: grayscale(0.35) contrast(1.15) saturate(0.75);
+}
+
+#cctv_frame:has(#gesture_video[hidden]) {
+	display: none;
+}
+
+#gesture_video {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	background: #000;
+}
+
+#crt_glass[data-glitch="on"] #gesture_video {
+	animation: vhs_shift 0.12s steps(2) infinite;
+}
+
+#vhs_glitch {
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	pointer-events: none;
+	background: repeating-linear-gradient(
+		to bottom,
+		transparent 0 3px,
+		rgba(190, 255, 210, 0.28) 3px 4px,
+		rgba(0, 0, 0, 0.55) 4px 7px,
+		transparent 7px 12px
+	);
+	mix-blend-mode: screen;
+	animation: vhs_bars 0.08s linear infinite;
+}
+
+@keyframes vhs_shift {
+	0% { transform: translate(0, 0); }
+	25% { transform: translate(-14px, 1px); }
+	50% { transform: translate(16px, -2px); }
+	75% { transform: translate(-7px, 2px); }
+	100% { transform: translate(3px, 0); }
+}
+
+@keyframes vhs_bars {
+	from { background-position: 0 0; }
+	to { background-position: 0 12px; }
+}
+
+#replay_slots {
 	list-style: none;
-	margin: 0;
+	display: grid;
+	grid-template-columns: repeat(8, minmax(0, 1fr));
+	gap: 0.35rem;
+	margin: 0.45rem 0 0;
 	padding: 0;
-	line-height: 1.45;
 }
 
-.spirit_line {
-	display: flex;
-	gap: 0.75rem;
+.replay_slot {
+	width: 100%;
+	min-height: 2.6rem;
+	font-family: "Courier New", ui-monospace, monospace;
+	font-size: 0.95rem;
 }
 
-.spirit_num {
-	flex: 0 0 2.4rem;
+.replay_slot[data-state="ready"] {
+	border-color: rgba(183, 247, 198, 0.75);
 }
 
 #password_half {
@@ -480,44 +547,27 @@ body[data-role="troncadelle"] #offering_board {
 	opacity: 0.7;
 }
 
-.offering_block + .offering_block {
-	margin-top: 0.45rem;
+#gesture_count {
+	margin: 0 0 0.4rem;
+	font-size: 0.84rem;
+	color: #e4d0c8;
 }
 
-#ghost_buttons,
-#item_buttons {
+#gesture_buttons {
 	display: grid;
-	grid-template-columns: repeat(12, minmax(0, 1fr));
+	grid-template-columns: repeat(5, minmax(0, 1fr));
 	gap: 0.35rem;
 }
 
-.ghost_btn,
-.item_btn {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 0.12rem;
-	min-width: 0;
-	padding: 0.22rem 0.12rem 0.28rem;
+.gesture_btn {
+	min-height: 2.6rem;
+	font-family: "Courier New", ui-monospace, monospace;
+	font-size: 1.05rem;
 }
 
-.ghost_btn img,
-.item_btn img {
-	width: 2rem;
-	height: 2rem;
-}
-
-.btn_caption {
-	font-size: 0.68rem;
-	line-height: 1.15;
-	text-align: center;
-	overflow-wrap: anywhere;
-}
-
-@media (max-width: 1100px) {
-	#ghost_buttons,
-	#item_buttons {
-		grid-template-columns: repeat(auto-fill, minmax(4.5rem, 1fr));
+@media (max-width: 720px) {
+	#gesture_buttons {
+		grid-template-columns: repeat(auto-fill, minmax(2.6rem, 1fr));
 	}
 }
 
@@ -535,7 +585,9 @@ body[data-role="troncadelle"] #offering_board {
 
 @media (prefers-reduced-motion: reduce) {
 	#crt_glass::after,
-	#mini_crt::after {
+	#mini_crt::after,
+	#vhs_glitch,
+	#crt_glass[data-glitch="on"] #gesture_video {
 		animation: none;
 	}
 }

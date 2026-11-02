@@ -1,23 +1,60 @@
 /**
- * Ghost Dictaphone — vowel synth.
- * A quiet sine carries the pitch contour. Two band-pass filters on a saw
- * approximate sung vowels so A, E, I, O and U stay distinguishable.
+ * Ghost Dictaphone — recorded vowels.
+ * Each take is a steady note. Playback rate draws the contour, and the clip
+ * loops inside the audio engine so a long note has no gap between repeats.
+ * Bases are the recorded fundamentals, so every vowel's low note matches.
+ * Fixed filters keep the vowel color in place. O and U stay close to the
+ * recordings: a dark lowpass made their high notes muffled, so each only dips
+ * the brightness of I.
  */
 (function (global) {
 	'use strict';
 
-	var LOW = 146.83;
-	var HIGH = 293.66;
-	var FORMANTS = {
-		a: [730, 1090],
-		e: [530, 1840],
-		i: [270, 2290],
-		o: [500, 900],
-		u: [350, 600]
+	/* C3 to G3, a fifth. An octave above the takes made the high O and U sound strained. */
+	var LOW = 130.81;
+	var HIGH = 196;
+	var SHORT = 1;
+	var LONG = 2;
+	var GAP = 0.14;
+	var LEVEL = 0.62;
+	/* Frequencies stay put while the pitch moves, so each vowel keeps its color. */
+	var BODY = { a: 0.9, e: 0.8, i: 0.55, o: 1, u: 1 };
+	var COLOR = {
+		a: [
+			{ type: 'peaking', f: 780, q: 1.3, g: 6 },
+			{ type: 'peaking', f: 1200, q: 1.5, g: 5 },
+			{ type: 'lowpass', f: 3800, q: 0.7 }
+		],
+		e: [
+			{ type: 'peaking', f: 480, q: 1.1, g: 3 },
+			{ type: 'peaking', f: 1950, q: 2.2, g: 8 },
+			{ type: 'highshelf', f: 2600, q: 0.7, g: 3 }
+		],
+		i: [
+			{ type: 'peaking', f: 680, q: 1.3, g: -6 },
+			{ type: 'peaking', f: 2500, q: 2.6, g: 10 },
+			{ type: 'highshelf', f: 3200, q: 0.7, g: 5 }
+		],
+		o: [
+			{ type: 'peaking', f: 560, q: 1, g: 2 },
+			{ type: 'peaking', f: 2500, q: 1.6, g: -4 }
+		],
+		u: [
+			{ type: 'peaking', f: 450, q: 1, g: 2 },
+			{ type: 'peaking', f: 2500, q: 1.6, g: -4 }
+		]
+	};
+	var BASE_HZ = {
+		a: 130,
+		e: 145,
+		i: 144,
+		o: 133,
+		u: 158
 	};
 
 	var ctx = null;
-	var noise = null;
+	var buffers = null;
+	var decoding = null;
 	var active = [];
 	var token = 0;
 
@@ -28,24 +65,56 @@
 		return ctx;
 	}
 
-	function noiseBuffer() {
-		if (noise) return noise;
-		var length = Math.floor(ctx.sampleRate * 0.5);
-		noise = ctx.createBuffer(1, length, ctx.sampleRate);
-		var data = noise.getChannelData(0);
+	function bytesFromBase64(value) {
+		var binary = global.atob(value);
+		var bytes = new Uint8Array(binary.length);
 		var i;
-		for (i = 0; i < data.length; i += 1) {
-			data[i] = Math.random() * 2 - 1;
+		for (i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+		return bytes.buffer;
+	}
+
+	function ensureBuffers() {
+		var context = audioContext();
+		if (!context || !global.GhostDictaphoneClips) return Promise.reject(new Error('clips'));
+		if (buffers) return Promise.resolve(buffers);
+		if (decoding) return decoding;
+		decoding = Promise.all(Object.keys(BASE_HZ).map(function (id) {
+			var copy = bytesFromBase64(global.GhostDictaphoneClips[id]).slice(0);
+			return context.decodeAudioData(copy).then(function (buffer) {
+				return { id: id, buffer: buffer };
+			});
+		})).then(function (list) {
+			buffers = {};
+			list.forEach(function (item) {
+				buffers[item.id] = item.buffer;
+			});
+			return buffers;
+		});
+		return decoding;
+	}
+
+	function noteDuration(note) {
+		return note.duration === 'long' ? LONG : SHORT;
+	}
+
+	function glide(shape, t) {
+		var span = HIGH - LOW;
+		if (shape === 'flat_low') return LOW;
+		if (shape === 'flat_high') return HIGH;
+		if (shape === 'rise') return LOW + span * t;
+		if (shape === 'fall') return HIGH - span * t;
+		if (shape === 'arch') {
+			return t < 0.5 ? LOW + span * (t * 2) : HIGH - span * ((t - 0.5) * 2);
 		}
-		return noise;
+		return t < 0.5 ? HIGH - span * (t * 2) : LOW + span * ((t - 0.5) * 2);
 	}
 
 	function silence() {
 		active.forEach(function (node) {
 			try {
-				if (typeof node.stop === 'function') node.stop();
+				node.stop();
 			} catch (err) {
-				/* Oscillator already stopped. */
+				/* Source already stopped. */
 			}
 			try {
 				node.disconnect();
@@ -61,105 +130,69 @@
 		silence();
 	}
 
-	function glide(shape, t) {
-		var span = HIGH - LOW;
-		if (shape === 'flat_low') return LOW;
-		if (shape === 'flat_high') return HIGH;
-		if (shape === 'rise') return LOW + span * t;
-		if (shape === 'fall') return HIGH - span * t;
-		if (shape === 'arch') {
-			return t < 0.5 ? LOW + span * (t * 2) : HIGH - span * ((t - 0.5) * 2);
-		}
-		return t < 0.5 ? HIGH - span * (t * 2) : LOW + span * ((t - 0.5) * 2);
-	}
-
 	function scheduleNote(note, when) {
-		var dur = note.duration === 'long' ? 2 : 1;
-		var formant = FORMANTS[note.vowel] || FORMANTS.a;
-		var osc = ctx.createOscillator();
-		var body = ctx.createOscillator();
-		var breath = ctx.createBufferSource();
-		var f1 = ctx.createBiquadFilter();
-		var f2 = ctx.createBiquadFilter();
-		var breathFilter = ctx.createBiquadFilter();
-		var g1 = ctx.createGain();
-		var g2 = ctx.createGain();
-		var gBody = ctx.createGain();
-		var gBreath = ctx.createGain();
-		var master = ctx.createGain();
-
-		osc.type = 'sawtooth';
-		body.type = 'sine';
-		f1.type = 'bandpass';
-		f1.frequency.value = formant[0];
-		f1.Q.value = 6;
-		f2.type = 'bandpass';
-		f2.frequency.value = formant[1];
-		f2.Q.value = 8;
-		breathFilter.type = 'highpass';
-		breathFilter.frequency.value = 700;
-		g1.gain.value = 0.62;
-		g2.gain.value = 0.34;
-		gBody.gain.value = 0.22;
-		gBreath.gain.value = 0.045;
-
-		osc.connect(f1);
-		f1.connect(g1);
-		g1.connect(master);
-		osc.connect(f2);
-		f2.connect(g2);
-		g2.connect(master);
-		body.connect(gBody);
-		gBody.connect(master);
-		breath.buffer = noiseBuffer();
-		breath.loop = true;
-		breath.connect(breathFilter);
-		breathFilter.connect(gBreath);
-		gBreath.connect(master);
-		master.connect(ctx.destination);
-
-		var steps = Math.round(dur * 24);
+		var dur = noteDuration(note);
+		var buffer = buffers[note.vowel];
+		var base = BASE_HZ[note.vowel];
+		if (!buffer || !base) return dur;
+		var src = ctx.createBufferSource();
+		var gain = ctx.createGain();
+		var steps = Math.max(1, Math.round(dur * 30));
+		var release = 0.14;
+		var attack = 0.02;
+		var color = COLOR[note.vowel] || COLOR.a;
+		var nodes = [src, gain];
+		var previous = src;
 		var s;
+		src.buffer = buffer;
+		src.loop = true;
+		color.forEach(function (spec) {
+			var filter = ctx.createBiquadFilter();
+			filter.type = spec.type;
+			filter.frequency.value = spec.f;
+			filter.Q.value = spec.q;
+			if (spec.g !== undefined) filter.gain.value = spec.g;
+			previous.connect(filter);
+			previous = filter;
+			nodes.push(filter);
+		});
+		previous.connect(gain);
+		gain.connect(ctx.destination);
 		for (s = 0; s <= steps; s += 1) {
 			var tNorm = s / steps;
-			var freq = glide(note.shape, tNorm) + Math.sin(tNorm * Math.PI * 6) * 3;
+			var rate = glide(note.shape, tNorm) / base;
 			var at = when + dur * tNorm;
-			osc.frequency.setValueAtTime(freq, at);
-			body.frequency.setValueAtTime(freq, at);
+			if (s === 0) src.playbackRate.setValueAtTime(rate, at);
+			else src.playbackRate.linearRampToValueAtTime(rate, at);
 		}
-
-		var release = 0.16;
-		var holdAt = when + Math.max(0.08, dur - release);
-		master.gain.setValueAtTime(0.0001, when);
-		master.gain.exponentialRampToValueAtTime(0.4, when + 0.03);
-		master.gain.setValueAtTime(0.4, holdAt);
-		master.gain.exponentialRampToValueAtTime(0.0001, when + dur);
-
-		osc.start(when);
-		body.start(when);
-		breath.start(when);
-		osc.stop(when + dur + 0.02);
-		body.stop(when + dur + 0.02);
-		breath.stop(when + dur + 0.02);
-		active.push(osc, body, breath);
+		var level = LEVEL * (BODY[note.vowel] || 1);
+		gain.gain.setValueAtTime(0.0001, when);
+		gain.gain.exponentialRampToValueAtTime(level, when + attack);
+		gain.gain.setValueAtTime(level, Math.max(when + attack, when + dur - release));
+		gain.gain.exponentialRampToValueAtTime(0.0001, when + dur);
+		src.start(when);
+		src.stop(when + dur + 0.03);
+		nodes.forEach(function (node) {
+			active.push(node);
+		});
 		return dur;
 	}
 
 	function playNotes(notes) {
+		if (!notes || !notes.length) return Promise.resolve(0);
 		var context = audioContext();
-		if (!context || !notes || !notes.length) return Promise.resolve(0);
+		if (!context) return Promise.resolve(0);
 		var mine = ++token;
-		var ready = context.state === 'suspended' ? context.resume() : Promise.resolve();
-		return ready.then(function () {
+		silence();
+		if (context.state === 'suspended') context.resume();
+		return ensureBuffers().then(function () {
 			if (mine !== token) return 0;
-			silence();
-			var gap = 0.14;
 			var cursor = context.currentTime + 0.05;
 			notes.forEach(function (note) {
 				var dur = scheduleNote(note, cursor);
-				cursor += dur + gap;
+				cursor += dur + GAP;
 			});
-			return Math.ceil((cursor - gap - context.currentTime) * 1000) + 40;
+			return Math.ceil((cursor - GAP - context.currentTime) * 1000) + 40;
 		}).catch(function () {
 			return 0;
 		});
