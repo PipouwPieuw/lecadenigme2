@@ -33,7 +33,7 @@
 		"alien4": {
 			"names": [
 				"Occupode",
-				"Aracholage",
+				"Arackolage",
 				"Demygale",
 				"Mimicuisse",
 				"Voitourelle"
@@ -42,7 +42,7 @@
 		},
 		"alien5": {
 			"names": [
-				"Tarbagel",
+				"Tarbaguel",
 				"Sacadonut",
 				"Troudbalour",
 				"Pivortex",
@@ -64,20 +64,41 @@
 		"alien7": {
 			"names": [
 				"Periscopain",
-				"Boulazaide"
+				"Boulazaide",
+				"Supernovache",
+				"Voitouktouque",
+				"Gentimyde"
 			],
 			"description": "Calme et Zen, fan de jus de citron au petit dej, de zest de citron au déjeuner, de graines de citron au dîner pour bien s'ouvrir les chakras et tout ce qui peut s'ouvrir chez elle."
 		},
 		"alien8": {
-			"names": ["Snobenouille"],
+			"names": [
+				"Snobenouille",
+				"Frimoustache",
+				"Tonduvet",
+				"Sackrebouille",
+				"Tulhipster"
+			],
 			"description": "Une classe à la British mais impossible de le prendre au sérieux lorsqu'il vous parle en scrutant votre vision périphérique à vous, a du mal à anticiper les poteaux dans la rue."
 		},
 		"alien9": {
-			"names": ["Videtanche"],
+			"names": [
+				"Videtanche",
+				"Bouffonceday",
+				"Gazodrome",
+				"Brulaijai",
+				"Jalouche"
+			],
 			"description": "La cousine bercée trop près du mur du Covid-19. Enjouée pour un rien."
 		},
 		"alien10": {
-			"names": ["Flottopets"],
+			"names": [
+				"Flottopets",
+				"Alaramasque",
+				"Flantome",
+				"Januskoure",
+				"Dramackouine"
+			],
 			"description": "A tenté le régime comme j'aime qui a trop bien marché, même son âme a été éliminée, au moins il n'a pas à être remboursé."
 		}
 	},

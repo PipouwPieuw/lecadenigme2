@@ -353,6 +353,7 @@ body.ah_puzzle {
 	width: 100%;
 	height: auto;
 	display: block;
+	pointer-events: none;
 }
 
 .placement_slot {
