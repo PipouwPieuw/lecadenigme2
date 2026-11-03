@@ -272,14 +272,18 @@ body.ah_puzzle {
 .dossier_tag .tag_symbols,
 .dossier_tag .tag_input {
 	position: absolute;
-	left: 50%;
+	inset: 0;
+	/* left: 50%;
 	top: 42%;
 	width: 76%;
-	transform: translate(-50%, -50%);
-	font-size: 0.75rem;
+	transform: translate(-50%, -50%); */
+	font-size: 1.75rem;
 	letter-spacing: 0.08em;
 	color: #1a1020;
 	text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .dossier_tag .tag_symbols {
