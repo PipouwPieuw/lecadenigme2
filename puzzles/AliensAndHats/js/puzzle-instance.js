@@ -1,11 +1,11 @@
 /**
  * Aliens & Hats — puzzle instance (v2).
- * Same blob for Ravabulle and Troncadelle; page order differs per role.
+ * Same blob for Ravabulle and Troncadelle; both books use the same page order.
  */
 (function (global) {
 	'use strict';
 
-	var GENERATOR_VERSION = 4;
+	var GENERATOR_VERSION = 5;
 
 	var RAV_SYMBOL_CHARS = '◈◇△▷○●□■◆★☆⌁∇⊛∿';
 	var TRON_SYMBOL_CHARS = '⟦⟧⟨⟩╬╳◐◑◒◓⬡⬢⬣⌖⌗※⊹⊰⊱';
@@ -186,20 +186,16 @@
 			});
 		}
 
-		var ravPageOrder = shuffle(rng, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-		var tronPageOrder = shuffle(rng, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-		while (tronPageOrder.join() === ravPageOrder.join()) {
-			tronPageOrder = shuffle(rng, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-		}
+		var pageOrder = shuffle(rng, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
 		return {
 			seed: seed,
 			generator_version: GENERATOR_VERSION,
 			guests: guests,
-			rav_page_order: ravPageOrder,
-			tron_page_order: tronPageOrder,
-			password_half_rav: buildPasswordHalf(guests, ravPageOrder, 'letter_rav'),
-			password_half_tron: buildPasswordHalf(guests, tronPageOrder, 'letter_tron')
+			rav_page_order: pageOrder,
+			tron_page_order: pageOrder.slice(),
+			password_half_rav: buildPasswordHalf(guests, pageOrder, 'letter_rav'),
+			password_half_tron: buildPasswordHalf(guests, pageOrder, 'letter_tron')
 		};
 	}
 

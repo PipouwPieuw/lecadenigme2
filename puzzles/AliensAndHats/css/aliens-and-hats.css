@@ -18,6 +18,11 @@ body.ah_puzzle {
 	overflow: hidden;
 }
 
+body.ah_book_locked .grab_piece,
+body.ah_book_locked .tag_input {
+	pointer-events: none;
+}
+
 .visually-hidden {
 	position: absolute;
 	width: 1px;
@@ -120,6 +125,10 @@ body.ah_puzzle {
 	object-fit: contain;
 }
 
+#book_cover.book_cover--back #btn_open_book img {
+	transform: scaleX(-1);
+}
+
 #book_open {
 	display: flex;
 	flex-direction: column;
@@ -165,6 +174,10 @@ body.ah_puzzle {
 	position: relative;
 	height: 100%;
 	z-index: 1;
+}
+
+.book_page--dossier {
+	overflow: hidden;
 }
 
 .book_page--drop-hover {
@@ -254,6 +267,10 @@ body.ah_puzzle {
 	overflow: hidden;
 }
 
+.page_scene--dossier[hidden] {
+	display: none !important;
+}
+
 .dossier_tag {
 	position: relative;
 	flex: 0 0 auto;
@@ -332,6 +349,33 @@ body.ah_puzzle {
 
 .spread_letter {
 	pointer-events: none;
+}
+
+.page_scene--dossier.dossier_scene--enter .dossier_tag--species {
+	animation: ah_dossier_from_top 0.55s ease both;
+}
+
+.page_scene--dossier.dossier_scene--enter .species_description {
+	animation: ah_dossier_from_right 0.55s ease 0.2s both;
+}
+
+.page_scene--dossier.dossier_scene--enter .dossier_tag--name {
+	animation: ah_dossier_from_bottom 0.55s ease 0.4s both;
+}
+
+@keyframes ah_dossier_from_top {
+	from { transform: translateY(-70vh); }
+	to { transform: none; }
+}
+
+@keyframes ah_dossier_from_right {
+	from { transform: translateX(80vw); }
+	to { transform: none; }
+}
+
+@keyframes ah_dossier_from_bottom {
+	from { transform: translateY(70vh); }
+	to { transform: none; }
 }
 
 .hat_fixed_bw {
@@ -510,7 +554,10 @@ body.ah_puzzle {
 
 @media (prefers-reduced-motion: reduce) {
 	.page_scene.page_scene--fade-out,
-	.page_letter.page_letter--fade-in {
+	.page_letter.page_letter--fade-in,
+	.page_scene--dossier.dossier_scene--enter .dossier_tag--species,
+	.page_scene--dossier.dossier_scene--enter .species_description,
+	.page_scene--dossier.dossier_scene--enter .dossier_tag--name {
 		animation: none;
 	}
 

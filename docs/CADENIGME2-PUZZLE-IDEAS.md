@@ -45,7 +45,7 @@ When authoring a concept below, the **On-screen UI** subsection is the contract 
 
 | Working title | Voice core | Primary interaction |
 |---------------|------------|---------------------|
-| [Ghost Dictaphone Society](#ghost-dictaphone-society) | Listen → describe vowels and contours → name the spirit | Audio encode + icon offering |
+| [Ghost Dictaphone Society](#ghost-dictaphone-society) | Listen → describe vowels and contours → describe hand gestures | Audio encode + numbered gestures |
 | [Twin Apothecary](#twin-apothecary) | Symptom marks ↔ jar sigils | Two-slot tray, shelf pad |
 | [Elevator of Unlikely Floors](#elevator-of-unlikely-floors) | Narrative manifest ↔ symbol logic | Sequence building |
 | [Archive of Lost Gestures](#archive-of-lost-gestures) | Spatial / body description | Pose matching |
@@ -69,63 +69,62 @@ When authoring a concept below, the **On-screen UI** subsection is the contract 
 
 ### One-line pitch
 
-A paranormal club archives **wax-cylinder ghosts**. **Troncadelle** plays each cylinder’s ghost vowels; **Ravabulle** rebuilds the series on a CRT and reads back the spirit’s **type and desire**; Troncadelle then sets that ghost and offering on the loaded cylinder. Implementation: [`CADENIGME2/GhostDictaphoneSociety/`](../CADENIGME2/GhostDictaphoneSociety/README.txt).
+A paranormal club archives **wax-cylinder ghosts**. **Troncadelle** plays each cylinder’s ghost vowels; **Ravabulle** rebuilds the series and watches four hand-gesture clips on a CRT; Troncadelle then selects those four gestures, in any order, on the loaded cylinder. Implementation: [`puzzles/GhostDictaphoneSociety/`](../puzzles/GhostDictaphoneSociety/README.txt).
 
 ### Fantasy & tone
 
-Cozy-spooky, not horror. A miss stays silent: the entry strip does not reset, and Troncadelle’s screen stays dark. No clock. Cylinders can be replayed freely.
+Cozy-spooky, not horror. A miss stays silent: the entry strip does not reset, and Troncadelle’s screen stays dark. No clock. Cylinders and gesture reels can be replayed freely.
 
 ### Co-op split (voice-only)
 
 | Player | Screen | Partner does not get |
 |--------|--------|----------------------|
-| **Troncadelle** | **Cylinder bank** (I–VIII), dictaphone with play/stop, **12 ghost** toggles and **24 offering** toggles, small CRT on the machine | Vowel sequences, Ravabulle’s spirit list, Ravabulle’s password half |
-| **Ravabulle** | Central **CRT**, vowel row, contour row, duration row, four-note strip | Cylinder audio, the icon grid, Troncadelle’s password half |
+| **Troncadelle** | **Cylinder bank** (I–VIII), dictaphone with play/stop, **25 numbered gesture** toggles, small CRT on the machine | Vowel sequences, the gesture footage, Ravabulle’s password half |
+| **Ravabulle** | Central **CRT**, vowel row, contour row, duration row, four-note strip, eight replay slots | Cylinder audio, the gesture numbers, Troncadelle’s password half |
 
-**Notebook (session-agnostic):** names of the six contours and the two durations, eight **blank lines** (one per cylinder numeral) for a recap, and the rule that the archive word is **Ravabulle’s half then Troncadelle’s**. It does not list which spirit wants what.
+**Notebook (session-agnostic):** names of the six contours and the two durations, eight **blank lines** (one per cylinder numeral) for a recap, a drawing key numbered **1–25** for the hand gestures, and the rule that the archive word is **Ravabulle’s half then Troncadelle’s**. The on-screen buttons are only numbers. Ravabulle’s page does not show those numbers.
 
 ### On-screen UI (HTML scope)
 
-- **Troncadelle:** drag a cylinder onto the dictaphone (keyboard: select + **Placer**). **Lecture / Stop** plays a synthesized vowel series. No waveform. Twelve ghost buttons (one at a time) and twenty-four item buttons (several at once). The loaded cylinder **remembers** its toggles. A neutral **Réglé** mark shows that a cylinder has a selection; it is not a correctness check. The small CRT shows a password half only when **every** cylinder’s ghost and item set match.
-- **Ravabulle:** CRT in the center. Three button rows — vowels **A E I O U**, contour curves (flat low, flat high, rise, fall, arch, valley), duration **dot / dash**. A four-slot strip with listen, backspace, and clear. Committing a fourth note that matches a cylinder adds that spirit to the CRT, labelled with the cylinder’s Roman numeral, and clears the strip. The register stays in numeral order. A miss changes nothing. The password half appears on the glass when all eight spirits are found; **the list stays**, including the latest spirit.
+- **Troncadelle:** drag a cylinder onto the dictaphone (keyboard: select + **Placer**). **Lecture / Stop** plays the recorded vowel series. No waveform. Twenty-five gesture buttons. The loaded cylinder stores up to four; a fifth press does nothing until one is turned off. The loaded cylinder **remembers** its set. Each cylinder shows that set as four digits, `_ _ _ _` until a number is chosen, including while it sits in the bank. The digits are not a correctness check. The small CRT shows a password half only when **every** cylinder’s four gestures match, in any order.
+- **Ravabulle:** CRT in the center. Three button rows — vowels **A E I O U**, contour curves (flat low, flat high, rise, fall, arch, valley), duration **dot / dash**. A four-slot strip with listen, backspace, and clear. Committing a fourth note that matches a cylinder clears the strip, plays four slowed gesture clips (CCTV grade, short VHS tear between clips), and enables that cylinder’s replay slot, labelled with its Roman numeral. A miss changes nothing. The password half appears under the slots when all eight cylinders are found; **the slots stay**.
 
-A desire is one category. The correct offering is **exactly** the items in that category (all of them, and no others).
+The correct set is exactly those four gestures. Order does not matter. The same gesture may appear on another cylinder; the set of four does not repeat.
 
 ### Co-op flow (reflective)
 
 1. Troncadelle names a cylinder aloud (**I–VIII**) and plays it.
 2. They describe each sound: vowel, contour, and short or long. Ravabulle can replay the strip they are building.
-3. When four notes match, the CRT names the cylinder numeral, the spirit, and the desire. Ravabulle says them aloud. The list stays in numeral order, so a later correction still points at the right cylinder.
-4. Troncadelle loads that cylinder and sets its ghost and items. Nothing on that screen says whether the choice is right.
-5. Repeat at their own pace. Ravabulle’s half appears after the eighth spirit. Troncadelle’s half appears only when all eight cylinders are right together.
+3. When four notes match, the CRT plays that cylinder’s four gestures. Ravabulle describes the hands. The replay slot stays in numeral order, so a later correction still points at the right cylinder.
+4. Troncadelle loads that cylinder and selects the four numbers. Nothing on that screen says whether the choice is right.
+5. Repeat at their own pace. Ravabulle’s half appears after the eighth reel. Troncadelle’s half appears only when all eight cylinders are right together.
 
 ### Instance variation
 
 Per game / seed (same seed on both pages):
 
 - The **four-note sequence** on each cylinder (vowel × contour × duration).
-- Which **8 of 12** ghost types are used (the other four stay on the board as decoys).
-- Which **desire category** belongs to each cylinder (categories may repeat).
+- Which **four of 25** gestures belong to each cylinder, and the order the clips play.
 - The two **password halves**.
 
-Ghost and item **button order** stays fixed so printed icons and the notebook do not change per session.
+Gesture **button order** stays 1–25 so a printed drawing key does not change per session.
 
 ### Win condition & password
 
-- **Ravabulle:** eight matched spirits → half on the CRT; the spirit list remains.
-- **Troncadelle:** silent check after every toggle. Success only when each cylinder has the right ghost **and** the exact item set. Half appears on the dictaphone screen.
+- **Ravabulle:** eight matched cylinders → half under the monitor; the replay slots remain.
+- **Troncadelle:** silent check after every toggle. Success only when each cylinder has exactly its four gestures. Half appears on the dictaphone screen.
 - Players join the halves in notebook order: Ravabulle, then Troncadelle. Lowercase letters only.
 
 ### Design intent
 
-- The voice work is **describing a sung vowel**: pitch contour and length, not charades.
-- Troncadelle’s icons are the spoken payoff (type and desire), not a second cipher.
-- Replay-friendly: sound never runs ahead of the player, and a wrong strip or a wrong offering does not wipe earlier work.
+- The first voice channel is **describing a sung vowel**: pitch contour and length.
+- The second is **describing a hand**. Numbers stay on Troncadelle’s side.
+- Replay-friendly: sound and footage never run ahead of the player, and a wrong strip or a wrong set does not wipe earlier work.
 
 ### Open questions
 
-- [ ] Final illustrated icons replace the placeholder silhouettes. Captions can stay until the art is readable on its own.
-- [ ] Whether a later version should allow a desire that spans more than one category. The prototype uses exactly one category per spirit.
+- [ ] Button icons can replace the numbers once the art matches the clips. Until then the notebook drawing key is required.
+- [ ] Whether a later version should make gesture order part of the code. The prototype treats the four gestures as a set.
 
 ---
 

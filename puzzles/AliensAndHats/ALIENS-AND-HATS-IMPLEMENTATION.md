@@ -44,7 +44,7 @@ Open:
 | Name tag (`tag01`–`tag03`) | Empty tag + text field | Tron-script code, not editable |
 | Description | Same species text on both sides | Same species text on both sides |
 | Validates | `hat_id` and typed guest `name` | `alien` + `alien_variant` and typed `species_name` |
-| Page order | `instance.rav_page_order` | `instance.tron_page_order` |
+| Page order | `instance.rav_page_order` (same sequence as Troncadelle) | `instance.tron_page_order` (same sequence as Ravabulle) |
 | Password half | `password_half_rav` (10 letters, Rav page order) | `password_half_tron` |
 
 ## Book spread DOM
@@ -102,13 +102,22 @@ While dragging, the piece keeps its current pixel box; `.grab_piece--dragging` a
 - The left `.book_page--portrait` accepts drop; item snaps to `.placement_slot`. The dossier page does not.
 - Hit-testing uses `document.elementsFromPoint` (dragged piece stays visible; `pointer-events: none` on drag).
 - Invalid drop → restore pre-drag position.
-- Drop on occupied slot → swap (slot↔slot or pool↔slot with swap to pool).
+- Drop on occupied slot → swap (slot↔slot, or pool↔slot). The piece that returns to the pool takes the pool position of the piece that replaced it.
 - Pool: seeded **shuffle**, then **≥3 columns** (round-robin, count grows if needed for height); even vertical spread, centered in column (no jitter); layout runs after images decode; all pieces clamped in bounds; `#grab_pool { overflow: hidden }`.
-- Silent validation when all 10 slots are filled **and** all 10 text fields for this role are non-empty. Typed answers are trim + case-insensitive, with internal whitespace collapsed. Accents must match the catalog. A wrong placement or word leaves pieces and text in place.
+- Silent check when all 10 slots are filled. If every placement is correct, navigation and dragging lock, `valid.mp3` plays after one second, and about 1.5 seconds later the right-hand pages appear. The open spread animates: species tag from above, description from the right, name tag from below, each with `swap.mp3`. Navigation stays locked until that entrance ends. Other spreads already show their dossier. A wrong full set stays silent.
+- After the dossiers are visible, pieces can still move and the entrance does not play again. The puzzle solves only when the placements are still correct **and** all 10 text fields for this role are non-empty and match. Typed answers are trim + case-insensitive, with internal whitespace collapsed. Accents must match the catalog. A wrong word leaves pieces and text in place.
+- Every completed drop (page, pool, rejected drop, or swap) plays `swap.mp3` once. Turning a page, or opening the book from either cover, plays one of `page1.mp3`–`page5.mp3` at random. Closing onto either cover plays `close.mp3`.
+
+## Book navigation
+
+- Left and Right arrows turn spreads. They are ignored while a text field is focused, while the dossier entrance is playing, or while the password dialog is open.
+- Left arrow or **Page précédente** on the first spread closes onto the front cover. Right arrow on that cover opens the book again at the spread that was left.
+- Right arrow or **Page suivante** on the last spread closes onto the back cover (`#book_cover.book_cover--back`, the cover image mirrored). Left arrow or a click on that cover opens the last spread.
+- **Fermer le livre** closes onto the front cover and keeps the current spread.
 
 ## Password reveal
 
-- On a full correct book: other spreads show their letter immediately; the **current spread** fades both pages, then shows **one** centered letter.
+- On a full correct book the same pause runs again: lock, `valid.mp3` after one second, then about 1.5 seconds later the password half. Other spreads show their letter immediately; the **current spread** fades both pages, then shows **one** centered letter.
 - Modal shows the full 10-character half for this role.
 - Navigate the 10 spreads to read each letter.
 

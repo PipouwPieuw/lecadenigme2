@@ -50,7 +50,7 @@ Related docs: [`CADENIGME-PRODUCT.md`](CADENIGME-PRODUCT.md), [`CADENIGME2-DESIG
 
 ### Aliens & hats (and similar puzzles)
 
-- **Instance (v2)** defines 10 guests (`alien`, `variant`, `hat_id`, `name`, `tag_rav`, `tag_tron`, `tag_art`, `letter_rav`, `letter_tron`), `rav_page_order`, `tron_page_order`, `password_half_rav`, `password_half_tron` — see [`CADENIGME2-DESIGN.md`](CADENIGME2-DESIGN.md) and [`CADENIGME2/AliensAndHats/ALIENS-AND-HATS-IMPLEMENTATION.md`](../CADENIGME2/AliensAndHats/ALIENS-AND-HATS-IMPLEMENTATION.md).
+- **Instance (generator v3)** defines 10 guests (`alien`, `alien_variant`, `hat_id`, `name`, `species_name`, `species_description`, `species_code`, `species_tag_art`, `name_code`, `name_tag_art`, `letter_rav`, `letter_tron`), `rav_page_order`, `tron_page_order`, `password_half_rav`, `password_half_tron` — see [`CADENIGME2-DESIGN.md`](CADENIGME2-DESIGN.md) and [`../puzzles/AliensAndHats/ALIENS-AND-HATS-IMPLEMENTATION.md`](../puzzles/AliensAndHats/ALIENS-AND-HATS-IMPLEMENTATION.md).
 - **In-puzzle** completion (10 slots, local validation, password **half** reveal) stays **local-only** on the device; validation logic reads the **shared instance** (fetched at page load).
 - **Chapter password** (full word for next chapter) may be **computed from the instance** or generated alongside it; each player submits at the gate — **two submissions** required to advance.
 
@@ -93,15 +93,18 @@ Single document per room, e.g. table `game_sessions` with primary key `id` (UUID
           "alien": "alien3",
           "alien_variant": 2,
           "hat_id": "hat07",
-          "tag_art": "tag02",
-          "tag_rav": "◈◇△",
-          "tag_tron": "⟦⟩╬",
+          "species_name": "espece3",
+          "species_description": "Description de l'espèce 3.",
+          "species_code": "◈◇△",
+          "species_tag_art": "tag05",
+          "name_code": "⟦⟩╬",
+          "name_tag_art": "tag02",
           "letter_rav": "q",
           "letter_tron": "m"
         }
       ],
       "rav_page_order": [3, 0, 7, 1, 9, 2, 8, 4, 6, 5],
-      "tron_page_order": [1, 8, 0, 5, 3, 9, 2, 7, 4, 6],
+      "tron_page_order": [3, 0, 7, 1, 9, 2, 8, 4, 6, 5],
       "password_half_rav": "…10 chars…",
       "password_half_tron": "…10 chars…"
     }
