@@ -37,6 +37,7 @@
 		puzzleSolved: false,
 		dossierRevealed: false,
 		dossierAnimating: false,
+		stage2: false,
 		pageRevealed: {}
 	};
 
@@ -611,9 +612,16 @@
 		};
 	}
 
-	function readSeed() {
-		var m = window.location.search.match(/[?&]seed=(\d+)/);
-		return m ? m[1] : undefined;
+	var STAGE2_INSTANCE_SEED = 42;
+
+	function readLaunch() {
+		var search = window.location.search;
+		var stage2 = /[?&]seed=stage2(?:&|$)/i.test(search);
+		var numeric = search.match(/[?&]seed=(\d+)/);
+		return {
+			seed: stage2 ? STAGE2_INSTANCE_SEED : (numeric ? numeric[1] : undefined),
+			stage2: stage2
+		};
 	}
 
 	function el(id) {
@@ -932,6 +940,13 @@
 	}
 
 	function layoutPoolInColumns(pieces) {
+		var poolPieces = [];
+		pieces.forEach(function (piece) {
+			if (piece.classList.contains('grab_piece--pool')) {
+				poolPieces.push(piece);
+			}
+		});
+		pieces = poolPieces;
 		var pool = el('grab_pool');
 		var poolW = pool.clientWidth;
 		var poolH = pool.clientHeight;
@@ -1587,15 +1602,43 @@
 			});
 	}
 
+	function applyStage2() {
+		for (var i = 0; i < 10; i += 1) {
+			var guest = guestAtPage(i);
+			var piece = state.role === 'ravabulle'
+				? document.querySelector('.grab_piece[data-hat-id="' + guest.hat_id + '"]')
+				: document.querySelector(
+					'.grab_piece[data-alien="' + guest.alien + '"][data-alien-variant="' + guest.alien_variant + '"]'
+				);
+			var slot = document.querySelector(
+				'.book_page--portrait[data-page-index="' + i + '"] .placement_slot'
+			);
+			if (piece && slot) {
+				placeInBookSlot(piece, slot);
+			}
+		}
+		state.dossierRevealed = true;
+		updateInstructions();
+		document.querySelectorAll('.page_scene--dossier').forEach(function (scene) {
+			scene.hidden = false;
+		});
+		openBook();
+	}
+
 	function startUi() {
 		preloadSounds();
 		bindChrome(state.role);
 		renderPool();
 		renderBook();
+		if (state.stage2) {
+			applyStage2();
+		}
 	}
 
 	function init(options) {
 		state.role = options.role;
+		var launch = readLaunch();
+		state.stage2 = !options.instance && !options.seed && launch.stage2;
 		loadJson('data/book-layout.json').then(function (layout) {
 			state.layout = layout;
 			if (options.instance) {
@@ -1605,7 +1648,7 @@
 			}
 			loadJson('data/catalog.json').then(function (catalog) {
 				state.instance = global.AliensAndHatsInstance.createInstance(
-					options.seed || readSeed(),
+					options.seed || launch.seed,
 					catalog
 				);
 				startUi();

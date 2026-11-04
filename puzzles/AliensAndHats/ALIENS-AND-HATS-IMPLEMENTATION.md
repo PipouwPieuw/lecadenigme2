@@ -17,6 +17,8 @@ Open:
 
 **Both players must use the same `seed`** (until session sync exists) so the instance matches.
 
+`?seed=stage2` opens the book already at step 2 of seed **42**: correct portraits placed, right-hand pages visible, text fields empty. No entrance animation.
+
 ## File map
 
 | File | Role |
