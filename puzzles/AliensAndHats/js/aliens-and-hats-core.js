@@ -16,8 +16,16 @@
 	// Matches the dossier entrance delays in aliens-and-hats.css.
 	var DOSSIER_SWAP_DELAYS_MS = [0, 200, 400];
 	var PAGE_SOUND_IDS = ['page1', 'page2', 'page3', 'page4', 'page5', 'page6'];
+	var SOUND_IDS = PAGE_SOUND_IDS.concat(['close', 'swap', 'valid']);
+	// Page-turn files start with a quiet lead-in. Cut below this fraction of peak.
+	var PAGE_ONSET_RATIO = 0.012;
+	var PAGE_PREROLL_SEC = 0.012;
+	var PAGE_FADE_SEC = 0.004;
 	var poolLayoutPass = 0;
 	var lastPageSound = -1;
+	var audioCtx = null;
+	var soundBuffers = {};
+	var soundLoading = {};
 
 	var state = {
 		role: null,
@@ -36,12 +44,147 @@
 		return 'assets/' + folder + '/' + file + '.png';
 	}
 
-	function playSound(id) {
+	function getAudioContext() {
+		if (audioCtx) {
+			return audioCtx;
+		}
+		var Ctx = window.AudioContext || window.webkitAudioContext;
+		if (!Ctx) {
+			return null;
+		}
+		audioCtx = new Ctx();
+		return audioCtx;
+	}
+
+	function isPageSound(id) {
+		return PAGE_SOUND_IDS.indexOf(id) !== -1;
+	}
+
+	function trimLeadingSilence(ctx, buffer) {
+		var channels = buffer.numberOfChannels;
+		var length = buffer.length;
+		var data = [];
+		var peak = 0;
+		var c;
+		var i;
+		for (c = 0; c < channels; c += 1) {
+			data[c] = buffer.getChannelData(c);
+			for (i = 0; i < length; i += 1) {
+				var level = Math.abs(data[c][i]);
+				if (level > peak) {
+					peak = level;
+				}
+			}
+		}
+		if (peak < 0.001) {
+			return buffer;
+		}
+		var threshold = peak * PAGE_ONSET_RATIO;
+		var onset = 0;
+		for (i = 0; i < length; i += 1) {
+			var heard = false;
+			for (c = 0; c < channels; c += 1) {
+				if (Math.abs(data[c][i]) >= threshold) {
+					heard = true;
+					break;
+				}
+			}
+			if (heard) {
+				onset = i;
+				break;
+			}
+		}
+		var start = onset - Math.floor(buffer.sampleRate * PAGE_PREROLL_SEC);
+		if (start < Math.floor(buffer.sampleRate * 0.02)) {
+			return buffer;
+		}
+		var trimmedLength = length - start;
+		var trimmed = ctx.createBuffer(channels, trimmedLength, buffer.sampleRate);
+		var fade = Math.min(Math.floor(buffer.sampleRate * PAGE_FADE_SEC), trimmedLength);
+		for (c = 0; c < channels; c += 1) {
+			var slice = data[c].subarray(start);
+			var out = trimmed.getChannelData(c);
+			out.set(slice);
+			for (i = 0; i < fade; i += 1) {
+				out[i] *= i / fade;
+			}
+		}
+		return trimmed;
+	}
+
+	function preloadSound(id) {
+		if (soundBuffers[id]) {
+			return Promise.resolve(soundBuffers[id]);
+		}
+		if (soundLoading[id]) {
+			return soundLoading[id];
+		}
+		var ctx = getAudioContext();
+		if (!ctx) {
+			return Promise.resolve(null);
+		}
+		soundLoading[id] = fetch('assets/sounds/' + id + '.mp3')
+			.then(function (response) {
+				if (!response.ok) {
+					throw new Error(id);
+				}
+				return response.arrayBuffer();
+			})
+			.then(function (bytes) {
+				return ctx.decodeAudioData(bytes);
+			})
+			.then(function (buffer) {
+				if (isPageSound(id)) {
+					buffer = trimLeadingSilence(ctx, buffer);
+				}
+				soundBuffers[id] = buffer;
+				return buffer;
+			})
+			.catch(function () {
+				return null;
+			});
+		return soundLoading[id];
+	}
+
+	function preloadSounds() {
+		SOUND_IDS.forEach(preloadSound);
+	}
+
+	function playHtmlAudio(id) {
 		var audio = new Audio('assets/sounds/' + id + '.mp3');
 		var pending = audio.play();
 		if (pending && typeof pending.catch === 'function') {
 			pending.catch(function () {});
 		}
+	}
+
+	function playBuffer(ctx, buffer) {
+		var source = ctx.createBufferSource();
+		source.buffer = buffer;
+		source.connect(ctx.destination);
+		source.start();
+	}
+
+	function playSound(id) {
+		var ctx = getAudioContext();
+		if (!ctx) {
+			playHtmlAudio(id);
+			return;
+		}
+		if (ctx.state === 'suspended') {
+			ctx.resume();
+		}
+		if (soundBuffers[id]) {
+			playBuffer(ctx, soundBuffers[id]);
+			return;
+		}
+		preloadSound(id).then(function (buffer) {
+			if (buffer && audioCtx) {
+				playBuffer(audioCtx, buffer);
+				return;
+			}
+			playHtmlAudio(id);
+		});
 	}
 
 	function playPageTurn() {
@@ -1445,6 +1588,7 @@
 	}
 
 	function startUi() {
+		preloadSounds();
 		bindChrome(state.role);
 		renderPool();
 		renderBook();
