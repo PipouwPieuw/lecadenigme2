@@ -18,7 +18,7 @@
 				"Lamicanine",
 				"Mangedaichu"
 			],
-			"description": "A l'air effrayant et vorace mais est juste effrayé d'être affamé. Sa structure en accordéon lui permet d'évacuer de l'air à un débit olympique. Sa salive sent le sapin par une douce nuit d'été où chantent les cigales."
+			"description": "Ouvert, l'individu a lair effrayant et vorace mais est juste effrayé d'être affamé. Fermé, il y a de grandes chances qu'il soit en train de réfléchir au sens de son existence. Sa structure en accordéon lui permet d'évacuer de l'air à un débit olympique. Sa salive sent le sapin par une douce nuit d'été où chantent les cigales."
 		},
 		"alien3": {
 			"names": [
@@ -31,6 +31,7 @@
 			"description": "À l'instar de l'autruche, ses yeux sont plus gros que son cerveau. Voit de loin et voit très bien, fera un excellent espion une fois adulte mais se contente de voyeurisme pour le moment."
 		},
 		"alien4": {
+			"sex": "female",
 			"names": [
 				"Occupode",
 				"Arackolage",
@@ -49,7 +50,7 @@
 				"Anucleaire"
 
 			],
-			"description": "A roulé sa bosse et a roulé tout court, ne rate jamais une occasion pour se prendre une cuite et se réveiller le lendemain au creux de tentacules différents."
+			"description": "Souvent confondus avec des donuts au glaçage éclatant, les individus de cette espèce prolifèrent dans les kermesses et autres fêtes foraines de village ou ils se font lancer sur des plots et en redemandent derechef."
 		},
 		"alien6": {
 			"names": [
@@ -59,7 +60,7 @@
 				"Grandibulle",
 				"Hydratique"
 			],
-			"description": "Les métisses d'Ibiza constituent son plat le plus goutu. Dites jamais que je vous ai dit ça ou Mélissa me tue."
+			"description": "Les biologistes du monde entier se sont penchés sur la question, mais personne n'a encore réussi à comprendre ni le sens ni le fonctionnement de cette bestiole fort étrange. Reste que sa constitution singulière en fait une parfaite lampe à lave."
 		},
 		"alien7": {
 			"names": [
@@ -69,9 +70,10 @@
 				"Voitouktouque",
 				"Gentimyde"
 			],
-			"description": "Calme et Zen, fan de jus de citron au petit dej, de zest de citron au déjeuner, de graines de citron au dîner pour bien s'ouvrir les chakras et tout ce qui peut s'ouvrir chez elle."
+			"description": "Une espèce calme et zen, friande de jus de citron au petit déjeuner, de zeste de citron au déjeuner et de graines de citron au dîner. Là est peut-être le secret de la jeunesse éternelle, mais nous ne le sauront jamais car ces individus refusent catégoriquement de donner leur âge."
 		},
 		"alien8": {
+			"sex": "male",
 			"names": [
 				"Snobenouille",
 				"Frimoustache",
@@ -79,7 +81,7 @@
 				"Sackrebouille",
 				"Tulhipster"
 			],
-			"description": "Une classe à la British mais impossible de le prendre au sérieux lorsqu'il vous parle en scrutant votre vision périphérique à vous, a du mal à anticiper les poteaux dans la rue."
+			"description": "Les mâles de cette espèce arborent, non sans fierté, une classe à la British tout à fait authentique. Il est cependant impossible de les prendre au sérieux lorsqu'ils s'adressent à vous alors que leur regard est rivé côté cour et côté jardin en même temps."
 		},
 		"alien9": {
 			"names": [
@@ -89,7 +91,7 @@
 				"Brulaijai",
 				"Jalouche"
 			],
-			"description": "La cousine bercée trop près du mur du Covid-19. Enjouée pour un rien."
+			"description": "Ne vous fiez pas à cette expression benête et innocente car ce que vous voyez là n'est pas un visage mais quelque chose de bien moins convenable. Ne tenant pas à choquer notre lectorat avec des termes peu distingués, nous  dirons simplement que cet individu possède 5 anus. Un pour chaque occasion."
 		},
 		"alien10": {
 			"names": [
@@ -99,86 +101,90 @@
 				"Januskoure",
 				"Dramackouine"
 			],
-			"description": "A tenté le régime comme j'aime qui a trop bien marché, même son âme a été éliminée, au moins il n'a pas à être remboursé."
+			"description": "Ce que vous voyez ci-contre est en fait la fusion de deux individus. Cette espèce vit en tandem, et bien que d'aucuns pourraient être touchés par l'expression de profonde détresse qui semble se lire dans chacun de leurs regards, le consensus est qu'après tout, c'est bien normal, le mariage c'est la même chose."
 		}
 	},
-	"guests": [
-		"Jean-Marie",
-		"Godefroy",
-		"Boniface",
-		"Leonard",
-		"Lilian",
-		"Jasmin",
-		"Dylan",
-		"Alceste",
-		"Neo",
-		"Roland",
-		"Ross",
-		"Joshua",
-		"Axel",
-		"Javier",
-		"Zakarias",
-		"Matsumoto",
-		"Wilson",
-		"Siegfried",
-		"Philibert",
-		"Walcaud",
-		"Theodon",
-		"Childebert",
-		"Eudes",
-		"Eustache",
-		"Gontrand",
-		"Josselin",
-		"Nolwen",
-		"Bondi",
-		"Bernarde",
-		"Anasthesie",
-		"Chantal",
-		"Lorraine",
-		"Marie-France",
-		"Sakurazaki",
-		"Ada",
-		"Hildegarde",
-		"Ursula",
-		"Carlota",
-		"Chelsea",
-		"Piper",
-		"Bethany",
-		"Juanita",
-		"Gervaise",
-		"Giselle",
-		"Marlene",
-		"Micheline",
-		"Yvone",
-		"Paulette",
-		"Rita",
-		"Jacqueline",
-		"Therese",
-		"Colette",
-		"Quiterie",
-		"Xavier",
-		"Zelie",
-		"Anouk",
-		"Viviane",
-		"Gwenola",
-		"Fanchon",
-		"Yolande",
-		"Jacques",
-		"Felix",
-		"Zenaide",
-		"Katell",
-		"Octave",
-		"Wenceslas",
-		"Felicite",
-		"Prosper",
-		"Hyacinthe",
-		"Monique",
-		"Beatrix",
-		"Kenza",
-		"Violette",
-		"Wanda",
-		"Prune",
-		"Yves",
-		"Apolline"
-	]
+	"guests": {
+		"female": [
+			"Bernarde",
+			"Anasthesie",
+			"Chantal",
+			"Lorraine",
+			"Marie-France",
+			"Ada",
+			"Hildegarde",
+			"Ursula",
+			"Carlota",
+			"Chelsea",
+			"Piper",
+			"Bethany",
+			"Juanita",
+			"Gervaise",
+			"Giselle",
+			"Marlene",
+			"Micheline",
+			"Yvone",
+			"Paulette",
+			"Rita",
+			"Jacqueline",
+			"Therese",
+			"Colette",
+			"Quiterie",
+			"Zelie",
+			"Anouk",
+			"Viviane",
+			"Gwenola",
+			"Fanchon",
+			"Yolande",
+			"Zenaide",
+			"Katell",
+			"Felicite",
+			"Monique",
+			"Beatrix",
+			"Kenza",
+			"Violette",
+			"Wanda",
+			"Prune",
+			"Apolline"
+		],
+		"male": [
+			"Jean-Marie",
+			"Godefroy",
+			"Boniface",
+			"Leonard",
+			"Lilian",
+			"Jasmin",
+			"Dylan",
+			"Alceste",
+			"Neo",
+			"Roland",
+			"Ross",
+			"Joshua",
+			"Axel",
+			"Javier",
+			"Zakarias",
+			"Matsumoto",
+			"Wilson",
+			"Siegfried",
+			"Philibert",
+			"Walcaud",
+			"Theodon",
+			"Childebert",
+			"Eudes",
+			"Eustache",
+			"Gontrand",
+			"Josselin",
+			"Nolwen",
+			"Bondi",
+			"Xavier",
+			"Jacques",
+			"Felix",
+			"Octave",
+			"Wenceslas",
+			"Prosper",
+			"Yves",
+			"Hyacinthe",
+			"Sakurazaki"
+		]
+	}
 }

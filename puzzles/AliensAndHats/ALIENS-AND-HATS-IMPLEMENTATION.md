@@ -127,8 +127,8 @@ While dragging, the piece keeps its current pixel box; `.grab_piece--dragging` a
 
 Edit `data/catalog.json` (loaded before `createInstance`):
 
-- `species.alien1` … `species.alien10` — `names` (array of labels; the seed picks one, and that is what Troncadelle types) and `description` (shown on both sides)
-- `guests` — Latin names. Ten are drawn from the list for each seed (what Ravabulle types)
+- `species.alien1` … `species.alien10` — `names` (array of labels; the seed picks one, and that is what Troncadelle types), `description` (shown on both sides), and optional `sex` (`"female"` or `"male"`; omitted species can take either)
+- `guests.female` and `guests.male` — Latin names. A female-only species draws from `female`, a male-only species from `male`, and the others from both lists. Ten names are drawn per seed, with no repeat (what Ravabulle types). `alien4` is female; `alien8` is male.
 
 `SHOW_PLAIN_LABELS` in `js/aliens-and-hats-core.js` is temporary. While it is `true`, Ravabulle’s species tag and Troncadelle’s name tag show those Latin words instead of the symbol codes. Set it to `false` when the hand-drawn symbols are ready. Symbol strings are still generated.
 

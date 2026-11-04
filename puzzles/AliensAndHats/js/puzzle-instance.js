@@ -5,7 +5,7 @@
 (function (global) {
 	'use strict';
 
-	var GENERATOR_VERSION = 5;
+	var GENERATOR_VERSION = 6;
 
 	var RAV_SYMBOL_CHARS = '◈◇△▷○●□■◆★☆⌁∇⊛∿';
 	var TRON_SYMBOL_CHARS = '⟦⟧⟨⟩╬╳◐◑◒◓⬡⬢⬣⌖⌗※⊹⊰⊱';
@@ -100,22 +100,64 @@
 			}
 			byAlien[key] = {
 				names: names,
-				description: entry.description || ("Description de l'espèce " + (i + 1) + '.')
+				description: entry.description || ("Description de l'espèce " + (i + 1) + '.'),
+				sex: entry.sex === 'female' || entry.sex === 'male' ? entry.sex : ''
 			};
 		}
 		return byAlien;
 	}
 
-	function guestNamePool(nameList) {
-		var source = (nameList && nameList.length) ? nameList : DEFAULT_NAMES;
+	function uniqueLabels(list) {
 		var unique = [];
+		var source = list || [];
 		for (var i = 0; i < source.length; i += 1) {
 			var label = String(source[i] || '').trim();
 			if (label && unique.indexOf(label) === -1) {
 				unique.push(label);
 			}
 		}
-		return unique.length >= 10 ? unique : DEFAULT_NAMES.slice();
+		return unique;
+	}
+
+	function guestNamePools(guests) {
+		if (Array.isArray(guests)) {
+			var flat = uniqueLabels(guests);
+			return { female: flat.slice(), male: flat.slice() };
+		}
+		var source = guests || {};
+		var female = uniqueLabels(source.female);
+		var male = uniqueLabels(source.male);
+		if (!female.length && !male.length) {
+			return { female: DEFAULT_NAMES.slice(), male: DEFAULT_NAMES.slice() };
+		}
+		return { female: female, male: male };
+	}
+
+	function pickFrom(rng, pool, used) {
+		var available = [];
+		for (var i = 0; i < pool.length; i += 1) {
+			if (used.indexOf(pool[i]) === -1) {
+				available.push(pool[i]);
+			}
+		}
+		if (!available.length) {
+			return null;
+		}
+		var name = available[Math.floor(rng() * available.length)];
+		used.push(name);
+		return name;
+	}
+
+	function pickGuestName(rng, sex, pools, used) {
+		var combined = pools.female.concat(pools.male);
+		if (sex === 'female' || sex === 'male') {
+			var primary = sex === 'female' ? pools.female : pools.male;
+			var fallback = sex === 'female' ? pools.male : pools.female;
+			return pickFrom(rng, primary, used)
+				|| pickFrom(rng, fallback, used)
+				|| ('invite' + (used.length + 1));
+		}
+		return pickFrom(rng, combined, used) || ('invite' + (used.length + 1));
 	}
 
 	function randomLetters(rng, count) {
@@ -137,7 +179,7 @@
 
 	/**
 	 * @param {number|string} [seed]
-	 * @param {{ species?: Object, guests?: string[] }} [catalog]
+	 * @param {{ species?: Object, guests?: { female?: string[], male?: string[] } | string[] }} [catalog]
 	 */
 	function createInstance(seed, catalog) {
 		if (seed === undefined || seed === null || seed === '') {
@@ -147,8 +189,9 @@
 		}
 
 		var species = speciesMeta(catalog);
+		var pools = guestNamePools(catalog && catalog.guests);
+		var usedNames = [];
 		var rng = mulberry32(seed);
-		var names = sampleUnique(rng, guestNamePool(catalog && catalog.guests), 10);
 
 		var speciesCodes = uniqueStrings(rng, RAV_SYMBOL_CHARS, 10);
 		var nameCodes = uniqueStrings(rng, TRON_SYMBOL_CHARS, 10);
@@ -171,7 +214,7 @@
 			var meta = species[alienKey];
 			guests.push({
 				guest_id: g,
-				name: names[g],
+				name: pickGuestName(rng, meta.sex, pools, usedNames),
 				alien: alienKey,
 				alien_variant: 1 + Math.floor(rng() * 5),
 				hat_id: hatIds[g],
