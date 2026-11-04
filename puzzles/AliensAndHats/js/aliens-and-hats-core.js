@@ -1036,12 +1036,14 @@
 			/* ignore */
 		}
 
+		var droppedOnPage = false;
 		if (drag.hoverPage) {
 			var slot = drag.hoverPage.querySelector('.placement_slot');
 			if (slot) {
 				var originSlot = drag.rest.type === 'slot' ? drag.rest.slot : null;
 				var poolRest = drag.rest.type === 'pool' ? drag.rest : null;
 				snapToSlot(piece, slot, originSlot, poolRest);
+				droppedOnPage = true;
 			} else {
 				restoreRest(piece, drag.rest);
 			}
@@ -1054,7 +1056,9 @@
 		} else {
 			restoreRest(piece, drag.rest);
 		}
-		playSound('swap');
+		if (droppedOnPage) {
+			playSound('swap');
+		}
 		drag = null;
 	}
 
