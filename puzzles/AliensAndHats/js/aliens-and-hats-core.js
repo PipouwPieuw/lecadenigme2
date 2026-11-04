@@ -15,7 +15,7 @@
 	var SOLVE_FOLLOW_DELAY_MS = 1500;
 	// Matches the dossier entrance delays in aliens-and-hats.css.
 	var DOSSIER_SWAP_DELAYS_MS = [0, 200, 400];
-	var PAGE_SOUND_IDS = ['page1', 'page2', 'page3', 'page4', 'page5'];
+	var PAGE_SOUND_IDS = ['page1', 'page2', 'page3', 'page4', 'page5', 'page6'];
 	var poolLayoutPass = 0;
 	var lastPageSound = -1;
 
