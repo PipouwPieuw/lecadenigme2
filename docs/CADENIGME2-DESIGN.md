@@ -50,7 +50,7 @@ Design and implementation must assume partners only know what is said aloud plus
 
 ### Aliens & hats — instance shape (v2)
 
-- **10 canonical guests** — each with a **name** drawn from the `guests` list in `data/catalog.json`, unique **alien** species (each `alien1`…`alien10` once), unique **hat** in book (`hat01`…`hat16`, 10 used), **variant** `1`…`5`, **`species_name`** (one label drawn from that species’ `names` array) / **`species_description`**, **`species_code`** + **`species_tag_art`** (`tag04`–`tag06`), **`name_code`** + **`name_tag_art`** (`tag01`–`tag03`), **`letter_rav`** / **`letter_tron`** (password glyphs). Until the hand-drawn symbols exist, the tags show the Latin species name and guest name (`SHOW_PLAIN_LABELS` in the puzzle script).
+- **10 canonical guests** — each with a **name** drawn from the `guests` list in `data/catalog.json`, unique **alien** species (each `alien1`…`alien10` once), unique **hat** in book (`hat01`…`hat30`, 10 used), **variant** `1`…`5`, **`species_name`** (one label drawn from that species’ `names` array) / **`species_description`**, **`species_code`** + **`species_tag_art`** (`tag04`–`tag06`), **`name_code`** + **`name_tag_art`** (`tag01`–`tag03`), **`letter_rav`** / **`letter_tron`** (password glyphs). Until the hand-drawn symbols exist, the tags show the Latin species name and guest name (`SHOW_PLAIN_LABELS` in the puzzle script).
 - **`rav_page_order`** / **`tron_page_order`** — the **same** permutation of `guest_id`. Page 1 on both books is the same guest, so the B&W alien and the B&W hat can be paired before the dossiers appear.
 - **`password_half_rav`** / **`password_half_tron`** — 10 lowercase letters each, read in **that player’s page order** (not the same string).
 - Tag art may repeat inside its set; the generator uses each of `tag01`…`tag03` and each of `tag04`…`tag06` at least once.
@@ -134,7 +134,7 @@ Early art lives under `puzzles/AliensAndHats/assets/`:
 | Folder | Contents (current) |
 |--------|-------------------|
 | `aliens/` | `alien1` … `alien10`, variants `-1` … `-5` per alien |
-| `hats/` | `hat01` … `hat16` |
+| `hats/` | `hat01` … `hat30` |
 | `misc/` | `bookfront`, `bookopen`, `tag01` … `tag06` (more may be added) |
 
 **Tags:** species codes use `tag04`–`tag06`; name codes use `tag01`–`tag03`. Strings are unique per species or guest; art may repeat inside its set (≥1 of each sprite in that set).

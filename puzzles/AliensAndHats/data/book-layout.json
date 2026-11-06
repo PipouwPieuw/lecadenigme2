@@ -45,7 +45,21 @@
 			"hat13": { "widthPx": 0, "heightPx": 100 },
 			"hat14": { "widthPx": 0, "heightPx": 100 },
 			"hat15": { "widthPx": 0, "heightPx": 120 },
-			"hat16": { "widthPx": 0, "heightPx": 100 }
+			"hat16": { "widthPx": 0, "heightPx": 100 },
+			"hat17": { "widthPx": 0, "heightPx": 100 },
+			"hat18": { "widthPx": 0, "heightPx": 80 },
+			"hat19": { "widthPx": 0, "heightPx": 100 },
+			"hat20": { "widthPx": 0, "heightPx": 85 },
+			"hat21": { "widthPx": 0, "heightPx": 100 },
+			"hat22": { "widthPx": 0, "heightPx": 100 },
+			"hat23": { "widthPx": 0, "heightPx": 120 },
+			"hat24": { "widthPx": 0, "heightPx": 190 },
+			"hat25": { "widthPx": 0, "heightPx": 110 },
+			"hat26": { "widthPx": 0, "heightPx": 100 },
+			"hat27": { "widthPx": 0, "heightPx": 120 },
+			"hat28": { "widthPx": 0, "heightPx": 100 },
+			"hat29": { "widthPx": 0, "heightPx": 120 },
+			"hat30": { "widthPx": 0, "heightPx": 120 }
 		}
 	},
 	"rav_hat_on_alien": {
@@ -68,8 +82,18 @@
 			"hat09": { "widthPct": 80, "marginBottomPct": -50 },
 			"hat12": { "widthPct": 60, "marginBottomPct": -60 },
 			"hat14": { "widthPct": 70, "marginBottomPct": -70 },
-			"hat15": { "widthPct": 50, "marginBottomPct": -70 },
-			"hat16": { "widthPct": 50, "marginBottomPct": -70 }
+			"hat15": { "widthPct": 50, "marginBottomPct": -60 },
+			"hat16": { "widthPct": 50, "marginBottomPct": -70 },
+			"hat18": { "widthPct": 70, "marginBottomPct": -70 },
+			"hat19": { "widthPct": 70, "marginBottomPct": -70 },
+			"hat20": { "widthPct": 80, "marginBottomPct": -50 },
+			"hat21": { "widthPct": 80, "marginBottomPct": -50 },
+			"hat22": { "widthPct": 70, "marginBottomPct": -60 },
+			"hat24": { "widthPct": 60, "marginBottomPct": -80 },
+			"hat25": { "widthPct": 50, "marginBottomPct": -45 },
+			"hat26": { "widthPct": 70, "marginBottomPct": -70 },
+			"hat28": { "widthPct": 85, "marginBottomPct": -70 },
+			"hat29": { "widthPct": 90, "marginBottomPct": -85 }
 		},
 		"alien2": {
 			"widthPct": 70,
@@ -88,7 +112,21 @@
 			"hat12": { "widthPct": 80, "marginBottomPct": -17 },
 			"hat13": { "widthPct": 90, "marginBottomPct": -40 },
 			"hat14": { "widthPct": 90, "marginBottomPct": -30 },
-			"hat16": { "widthPct": 70, "marginBottomPct": -36 }
+			"hat16": { "widthPct": 70, "marginBottomPct": -36 },
+			"hat17": { "widthPct": 90, "marginBottomPct": -40 },
+			"hat18": { "widthPct": 110, "marginBottomPct": -20 },
+			"hat19": { "widthPct": 100, "marginBottomPct": -35 },
+			"hat20": { "widthPct": 100, "marginBottomPct": -20 },
+			"hat21": { "widthPct": 100, "marginBottomPct": -20 },
+			"hat22": { "widthPct": 100, "marginBottomPct": -26 },
+			"hat23": { "widthPct": 90, "marginBottomPct": -40 },
+			"hat24": { "widthPct": 80, "marginBottomPct": -64 },
+			"hat25": { "widthPct": 70, "marginBottomPct": -15 },
+			"hat26": { "widthPct": 100, "marginBottomPct": -35 },
+			"hat27": { "widthPct": 100, "marginBottomPct": -35 },
+			"hat28": { "widthPct": 100, "marginBottomPct": -35 },
+			"hat29": { "widthPct": 120, "marginBottomPct": -60 },
+			"hat30": { "widthPct": 90, "marginBottomPct": -45 }
 		},
 		"alien3": {
 			"widthPct": 90,
@@ -103,7 +141,20 @@
 			"hat09": { "widthPct": 100, "marginBottomPct": 10 },
 			"hat14": { "widthPct": 100, "marginBottomPct": 0 },
 			"hat15": { "widthPct": 80, "marginBottomPct": -10 },
-			"hat16": { "widthPct": 80, "marginBottomPct": -10 }
+			"hat16": { "widthPct": 80, "marginBottomPct": -10 },
+			"hat18": { "widthPct": 110, "marginBottomPct": 20 },
+			"hat19": { "widthPct": 100, "marginBottomPct": -10 },
+			"hat20": { "widthPct": 100, "marginBottomPct": 10 },
+			"hat21": { "widthPct": 100, "marginBottomPct": 10 },
+			"hat22": { "widthPct": 100, "marginBottomPct": -5 },
+			"hat23": { "widthPct": 90, "marginBottomPct": -20 },
+			"hat24": { "widthPct": 90, "marginBottomPct": -52 },
+			"hat25": { "widthPct": 80, "marginBottomPct": 5 },
+			"hat26": { "widthPct": 100, "marginBottomPct": -10 },
+			"hat27": { "widthPct": 100, "marginBottomPct": -20 },
+			"hat28": { "widthPct": 100, "marginBottomPct": -10 },
+			"hat29": { "widthPct": 120, "marginBottomPct": -45 },
+			"hat30": { "widthPct": 90, "marginBottomPct": -20 }
 		},
 		"alien4": {
 			"widthPct": 100,
@@ -117,7 +168,17 @@
 			"hat08": { "widthPct": 100, "marginBottomPct": -20 },
 			"hat11": { "widthPct": 80, "marginBottomPct": -45 },
 			"hat15": { "widthPct": 85, "marginBottomPct": -40 },
-			"hat16": { "widthPct": 90, "marginBottomPct": -45 }
+			"hat16": { "widthPct": 90, "marginBottomPct": -45 },
+			"hat18": { "widthPct": 110, "marginBottomPct": -40 },
+			"hat20": { "widthPct": 100, "marginBottomPct": -30 },
+			"hat21": { "widthPct": 100, "marginBottomPct": -30 },
+			"hat23": { "widthPct": 100, "marginBottomPct": -60 },
+			"hat24": { "widthPct": 75, "marginBottomPct": -70 },
+			"hat25": { "widthPct": 85, "marginBottomPct": -30 },
+			"hat27": { "widthPct": 110, "marginBottomPct": -50 },
+			"hat28": { "widthPct": 100, "marginBottomPct": -47 },
+			"hat29": { "widthPct": 120, "marginBottomPct": -65 },
+			"hat30": { "widthPct": 100, "marginBottomPct": -50 }
 		},
 		"alien5": {
 			"widthPct": 80,
@@ -132,7 +193,19 @@
 			"hat08": { "widthPct": 100, "marginBottomPct": 0 },
 			"hat09": { "widthPct": 100, "marginBottomPct": -8 },
 			"hat10": { "widthPct": 80, "marginBottomPct": -35 },
-			"hat16": { "widthPct": 70, "marginBottomPct": -33 }
+			"hat16": { "widthPct": 55, "marginBottomPct": -30 },
+			"hat18": { "widthPct": 100, "marginBottomPct": -5 },
+			"hat19": { "widthPct": 90, "marginBottomPct": -25 },
+			"hat20": { "widthPct": 100, "marginBottomPct": -10 },
+			"hat21": { "widthPct": 100, "marginBottomPct": -10 },
+			"hat22": { "widthPct": 90, "marginBottomPct": -20 },
+			"hat24": { "widthPct": 80, "marginBottomPct": -60 },
+			"hat25": { "widthPct": 80, "marginBottomPct": -15 },
+			"hat26": { "widthPct": 90, "marginBottomPct": -25 },
+			"hat27": { "widthPct": 100, "marginBottomPct": -35 },
+			"hat28": { "widthPct": 100, "marginBottomPct": -25 },
+			"hat29": { "widthPct": 120, "marginBottomPct": -55 },
+			"hat30": { "widthPct": 80, "marginBottomPct": -40 }
 		},
 		"alien6": {
 			"widthPct": 65,
@@ -149,7 +222,18 @@
 			"hat09": { "widthPct": 90, "marginBottomPct": -30 },
 			"hat13": { "widthPct": 85, "marginBottomPct": -45 },
 			"hat14": { "widthPct": 85, "marginBottomPct": -45 },
-			"hat16": { "widthPct": 55, "marginBottomPct": -30 }
+			"hat16": { "widthPct": 55, "marginBottomPct": -30 },
+			"hat18": { "widthPct": 90, "marginBottomPct": -15 },
+			"hat19": { "widthPct": 85, "marginBottomPct": -30 },
+			"hat20": { "widthPct": 85, "marginBottomPct": -30 },
+			"hat21": { "widthPct": 85, "marginBottomPct": -30 },
+			"hat22": { "widthPct": 85, "marginBottomPct": -15 },
+			"hat24": { "widthPct": 75, "marginBottomPct": -70 },
+			"hat25": { "widthPct": 65, "marginBottomPct": -20 },
+			"hat26": { "widthPct": 85, "marginBottomPct": -30 },
+			"hat27": { "widthPct": 80, "marginBottomPct": -40 },
+			"hat28": { "widthPct": 85, "marginBottomPct": -30 },
+			"hat29": { "widthPct": 100, "marginBottomPct": -60 }
 		},
 		"alien7": {
 			"widthPct": 100,
@@ -167,8 +251,19 @@
 			"hat11": { "widthPct": 90, "marginBottomPct": -20 },
 			"hat12": { "widthPct": 100, "marginBottomPct": -15 },
 			"hat14": { "widthPct": 110, "marginBottomPct": -25 },
-			"hat15": { "widthPct": 80, "marginBottomPct": -30 },
-			"hat16": { "widthPct": 80, "marginBottomPct": -25 }
+			"hat15": { "widthPct": 80, "marginBottomPct": -25 },
+			"hat16": { "widthPct": 80, "marginBottomPct": -25 },
+			"hat18": { "widthPct": 110, "marginBottomPct": 0 },
+			"hat19": { "widthPct": 110, "marginBottomPct": -25 },
+			"hat20": { "widthPct": 120, "marginBottomPct": -5 },
+			"hat21": { "widthPct": 120, "marginBottomPct": -5 },
+			"hat22": { "widthPct": 120, "marginBottomPct": -20 },
+			"hat24": { "widthPct": 90, "marginBottomPct": -60 },
+			"hat25": { "widthPct": 80, "marginBottomPct": -10 },
+			"hat26": { "widthPct": 110, "marginBottomPct": -25 },
+			"hat27": { "widthPct": 120, "marginBottomPct": -35 },
+			"hat28": { "widthPct": 120, "marginBottomPct": -25 },
+			"hat29": { "widthPct": 130, "marginBottomPct": -50 }
 		},
 		"alien8": {
 			"widthPct": 100,
@@ -187,7 +282,18 @@
 			"hat12": { "widthPct": 70, "marginBottomPct": 0 },
 			"hat14": { "widthPct": 100, "marginBottomPct": -20 },
 			"hat15": { "widthPct": 70, "marginBottomPct": -20 },
-			"hat16": { "widthPct": 70, "marginBottomPct": -20 }
+			"hat16": { "widthPct": 70, "marginBottomPct": -20 },
+			"hat18": { "widthPct": 100, "marginBottomPct": 5 },
+			"hat19": { "widthPct": 100, "marginBottomPct": -20 },
+			"hat20": { "widthPct": 120, "marginBottomPct": -5 },
+			"hat21": { "widthPct": 120, "marginBottomPct": -15 },
+			"hat22": { "widthPct": 100, "marginBottomPct": -10 },
+			"hat24": { "widthPct": 90, "marginBottomPct": -60 },
+			"hat25": { "widthPct": 70, "marginBottomPct": -5 },
+			"hat26": { "widthPct": 100, "marginBottomPct": -20 },
+			"hat27": { "widthPct": 110, "marginBottomPct": -33 },
+			"hat28": { "widthPct": 100, "marginBottomPct": -18 },
+			"hat29": { "widthPct": 130, "marginBottomPct": -51 }
 		},
 		"alien9": {
 			"widthPct": 100,
@@ -197,13 +303,24 @@
 			"hat02": { "widthPct": 80, "marginBottomPct": -20 },
 			"hat03": { "widthPct": 85, "marginBottomPct": -64 },
 			"hat04": { "widthPct": 90, "marginBottomPct": -40 },
+			"hat05": { "widthPct": 100, "marginBottomPct": -20 },
 			"hat07": { "widthPct": 70, "marginBottomPct": -40 },
 			"hat08": { "widthPct": 100, "marginBottomPct": -20 },
 			"hat09": { "widthPct": 100, "marginBottomPct": -15 },
 			"hat11": { "widthPct": 80, "marginBottomPct": -25 },
 			"hat12": { "widthPct": 80, "marginBottomPct": -16 },
-			"hat15": { "widthPct": 85, "marginBottomPct": -40 },
-			"hat16": { "widthPct": 80, "marginBottomPct": -35 }
+			"hat15": { "widthPct": 85, "marginBottomPct": -25 },
+			"hat16": { "widthPct": 80, "marginBottomPct": -35 },
+			"hat18": { "widthPct": 110, "marginBottomPct": -15 },
+			"hat19": { "widthPct": 100, "marginBottomPct": -30 },
+			"hat20": { "widthPct": 100, "marginBottomPct": -30 },
+			"hat21": { "widthPct": 100, "marginBottomPct": -30 },
+			"hat22": { "widthPct": 100, "marginBottomPct": -20 },
+			"hat24": { "widthPct": 85, "marginBottomPct": -64 },
+			"hat25": { "widthPct": 85, "marginBottomPct": -15 },
+			"hat26": { "widthPct": 100, "marginBottomPct": -30 },
+			"hat28": { "widthPct": 120, "marginBottomPct": -35 },
+			"hat29": { "widthPct": 120, "marginBottomPct": -60 }
 		},
 		"alien10": {
 			"widthPct": 80,
@@ -219,8 +336,15 @@
 			"hat08": { "widthPct": 100, "marginBottomPct": -57 },
 			"hat09": { "widthPct": 90, "marginBottomPct": -52 },
 			"hat12": { "widthPct": 80, "marginBottomPct": -57 },
-			"hat16": { "widthPct": 60, "marginBottomPct": -72 }
-
+			"hat16": { "widthPct": 60, "marginBottomPct": -72 },
+			"hat20": { "widthPct": 90, "marginBottomPct": -64 },
+			"hat21": { "widthPct": 90, "marginBottomPct": -64 },
+			"hat22": { "widthPct": 90, "marginBottomPct": -65 },
+			"hat24": { "widthPct": 57, "marginBottomPct": -80 },
+			"hat25": { "widthPct": 80, "marginBottomPct": -60 },
+			"hat27": { "widthPct": 90, "marginBottomPct": -70 },
+			"hat28": { "widthPct": 100, "marginBottomPct": -72 },
+			"hat29": { "widthPct": 100, "marginBottomPct": -90 }
 		}
 	},
 	"rav_alien_on_page": {
@@ -231,6 +355,7 @@
 		"hat01": { "widthPct": 80, "marginBottomPct": -38 },
 		"hat02": { "widthPct": 80, "marginBottomPct": -36 },
 		"hat03": { "widthPct": 80, "marginBottomPct": -40 },
+		"hat24": { "widthPct": 80, "marginBottomPct": -40 },
 		"hat04": { "widthPct": 80, "marginBottomPct": -37 },
 		"hat05": { "widthPct": 80, "marginBottomPct": -39 },
 		"hat06": { "widthPct": 80, "marginBottomPct": -35 },

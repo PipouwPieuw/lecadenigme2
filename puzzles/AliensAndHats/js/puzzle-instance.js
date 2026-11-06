@@ -5,7 +5,7 @@
 (function (global) {
 	'use strict';
 
-	var GENERATOR_VERSION = 6;
+	var GENERATOR_VERSION = 8;
 
 	var RAV_SYMBOL_CHARS = '◈◇△▷○●□■◆★☆⌁∇⊛∿';
 	var TRON_SYMBOL_CHARS = '⟦⟧⟨⟩╬╳◐◑◒◓⬡⬢⬣⌖⌗※⊹⊰⊱';
@@ -18,7 +18,7 @@
 	];
 
 	var HAT_IDS = [];
-	for (var h = 1; h <= 16; h += 1) {
+	for (var h = 1; h <= 30; h += 1) {
 		HAT_IDS.push('hat' + (h < 10 ? '0' : '') + h);
 	}
 
@@ -51,6 +51,93 @@
 
 	function sampleUnique(rng, list, count) {
 		return shuffle(rng, list).slice(0, count);
+	}
+
+	function hatPools(catalog) {
+		var raw = (catalog && catalog.hat_groups) || [];
+		var claimed = {};
+		var groups = [];
+		for (var i = 0; i < raw.length; i += 1) {
+			if (!Array.isArray(raw[i])) {
+				continue;
+			}
+			var members = [];
+			for (var j = 0; j < raw[i].length; j += 1) {
+				var id = String(raw[i][j] || '').trim();
+				if (HAT_IDS.indexOf(id) === -1 || claimed[id]) {
+					continue;
+				}
+				claimed[id] = true;
+				members.push(id);
+			}
+			if (members.length > 1) {
+				groups.push(members);
+			} else if (members.length === 1) {
+				delete claimed[members[0]];
+			}
+		}
+		var lones = [];
+		for (var h = 0; h < HAT_IDS.length; h += 1) {
+			if (!claimed[HAT_IDS[h]]) {
+				lones.push(HAT_IDS[h]);
+			}
+		}
+		return { groups: groups, lones: lones };
+	}
+
+	function pickHats(rng, catalog, count) {
+		var pools = hatPools(catalog);
+		var groups = [];
+		for (var g = 0; g < pools.groups.length; g += 1) {
+			groups.push({ members: pools.groups[g], picked: [], open: true });
+		}
+		var lones = pools.lones.slice();
+		var chosen = [];
+
+		function units() {
+			var list = [];
+			for (var i = 0; i < lones.length; i += 1) {
+				list.push({ type: 'lone', index: i });
+			}
+			for (var n = 0; n < groups.length; n += 1) {
+				if (groups[n].open && groups[n].picked.length < groups[n].members.length) {
+					list.push({ type: 'group', index: n });
+				}
+			}
+			return list;
+		}
+
+		while (chosen.length < count) {
+			var available = units();
+			if (!available.length) {
+				for (var r = 0; r < groups.length; r += 1) {
+					if (groups[r].picked.length < groups[r].members.length) {
+						groups[r].open = true;
+					}
+				}
+				available = units();
+				if (!available.length) {
+					break;
+				}
+			}
+			var unit = available[Math.floor(rng() * available.length)];
+			if (unit.type === 'lone') {
+				chosen.push(lones.splice(unit.index, 1)[0]);
+				continue;
+			}
+			var group = groups[unit.index];
+			var remaining = [];
+			for (var m = 0; m < group.members.length; m += 1) {
+				if (group.picked.indexOf(group.members[m]) === -1) {
+					remaining.push(group.members[m]);
+				}
+			}
+			var hat = remaining[Math.floor(rng() * remaining.length)];
+			group.picked.push(hat);
+			group.open = false;
+			chosen.push(hat);
+		}
+		return chosen;
 	}
 
 	function uniqueStrings(rng, charset, count) {
@@ -204,7 +291,7 @@
 			speciesArtByAlien[ALIEN_KEYS[s]] = speciesTagArts[s];
 		}
 		var alienKeys = sampleUnique(rng, ALIEN_KEYS, 10);
-		var hatIds = sampleUnique(rng, HAT_IDS, 10);
+		var hatIds = pickHats(rng, catalog, 10);
 		var lettersRav = randomLetters(rng, 10);
 		var lettersTron = randomLetters(rng, 10);
 
@@ -244,6 +331,7 @@
 
 	global.AliensAndHatsInstance = {
 		GENERATOR_VERSION: GENERATOR_VERSION,
+		HAT_IDS: HAT_IDS,
 		createInstance: createInstance,
 		createDevInstance: createInstance
 	};

@@ -40,7 +40,7 @@ Open:
 
 | | Ravabulle | Troncadelle |
 |---|-----------|-------------|
-| Pool | 16 colored hats | 50 colored aliens (10×5 variants) |
+| Pool | 30 colored hats | 50 colored aliens (10×5 variants) |
 | Left page | B&W alien + hat slot | B&W hat + alien slot |
 | Species tag (`tag04`–`tag06`) | Rav-script code, not editable | Empty tag + text field |
 | Name tag (`tag01`–`tag03`) | Empty tag + text field | Tron-script code, not editable |
@@ -71,7 +71,7 @@ The right page is not a drop target.
 
 **Troncadelle:** B&W hat fixed in `.portrait_hat`; colored alien drops into the body slot below.
 
-Cover: `#btn_open_book` opens only. When open, `#btn_close_book` in `#book_nav` calls `closeBook()`.
+Cover: `#btn_open_book` opens only. The open book has no close button.
 
 ## Instance fields (`guests[]`)
 
@@ -93,7 +93,7 @@ Page index `p` (0–9) → guest `instance.guests[page_order[p]]`.
 
 **Book (scales with the page):** `alien_species_size.book` — `widthPct` / `heightPct` relative to **`.portrait_body`** (`0` = auto). Merged with optional `rav_alien_on_page` frame `widthPct`. Applies to Rav B&W aliens and Tron placed aliens.
 
-**Rav placed hats:** `rav_hat_on_alien` — alien-level `widthPct` / `marginBottomPct` = empty head layer. Per `hat01`…`hat16` (or `default`): **`widthPct`** = `.portrait_hat` width (% of `.portrait_body`); **`marginBottomPct`** = head offset (`--ah-hat-offset-y`). The grab piece fills the layer (`widthPct: 100`); optional **`heightPct`** on the hat entry only. Removing the hat restores alien-level layer values.
+**Rav placed hats:** `rav_hat_on_alien` — alien-level `widthPct` / `marginBottomPct` = empty head layer. Per `hat01`…`hat30` (or `default`): **`widthPct`** = `.portrait_hat` width (% of `.portrait_body`); **`marginBottomPct`** = head offset (`--ah-hat-offset-y`). The grab piece fills the layer (`widthPct: 100`); optional **`heightPct`** on the hat entry only. Removing the hat restores alien-level layer values.
 
 Px and pct can coexist; **pct is preferred on book**; px on pool.
 
@@ -105,17 +105,18 @@ While dragging, the piece keeps its current pixel box; `.grab_piece--dragging` a
 - Hit-testing uses `document.elementsFromPoint` (dragged piece stays visible; `pointer-events: none` on drag).
 - Invalid drop → restore pre-drag position.
 - Drop on occupied slot → swap (slot↔slot, or pool↔slot). The piece that returns to the pool takes the pool position of the piece that replaced it.
-- Pool: seeded **shuffle**, then **≥3 columns** (round-robin, count grows if needed for height); even vertical spread, centered in column (no jitter); layout runs after images decode; all pieces clamped in bounds; `#grab_pool { overflow: hidden }`.
-- Silent check when all 10 slots are filled. If every placement is correct, navigation and dragging lock, `valid.mp3` plays after one second, and about 1.5 seconds later the right-hand pages appear. The open spread animates: species tag from above, description from the right, name tag from below, each with `swap.mp3`. Navigation stays locked until that entrance ends. Other spreads already show their dossier. A wrong full set stays silent.
-- After the dossiers are visible, pieces can still move and the entrance does not play again. The puzzle solves only when the placements are still correct **and** all 10 text fields for this role are non-empty and match. Typed answers are trim + case-insensitive, with internal whitespace collapsed. Accents must match the catalog. A wrong word leaves pieces and text in place.
+- Pool: seeded **shuffle**, then **≥3 columns** (round-robin, count grows if needed for height); even vertical spread, centered in column (no jitter); a hat wider than its column scales down, keeping its proportions; layout runs after images decode; all pieces clamped in bounds; `#grab_pool { overflow: hidden }`.
+- Silent check when all 10 slots are filled. If every placement is correct, navigation locks, `valid.mp3` plays after one second, and about 1.5 seconds later the right-hand pages appear. The open spread animates: species tag from above, description from the right, name tag from below, each with `swap.mp3`. Navigation stays locked until that entrance ends. Other spreads already show their dossier. A wrong full set stays silent.
+- When the dossiers appear, dragging stops for good and placed hats and aliens stay put. The piece box slides off the left of the screen and is then hidden; its column keeps its width, so the book does not move. `?seed=stage2` starts in this state with the box already hidden. The puzzle solves only when the placements are still correct **and** all 10 text fields for this role are non-empty and match. Typed answers are trim + case-insensitive, with internal whitespace collapsed. Accents must match the catalog. A wrong word leaves pieces and text in place.
 - A drop that lands on a page plays `swap.mp3` once, including a swap onto an occupied slot. Reordering in the pool, returning a piece to the pool, and a rejected drop stay silent. Turning a page, or opening the book from either cover, plays one of `page1.mp3`–`page6.mp3` at random. Those clips are decoded ahead of time and started after their quiet lead-in, so the rustle lines up with the turn. Closing onto either cover plays `close.mp3`.
 
 ## Book navigation
 
 - Left and Right arrows turn spreads. They are ignored while a text field is focused, while the dossier entrance is playing, or while the password dialog is open.
-- Left arrow or **Page précédente** on the first spread closes onto the front cover. Right arrow on that cover opens the book again at the spread that was left.
-- Right arrow or **Page suivante** on the last spread closes onto the back cover (`#book_cover.book_cover--back`, the cover image mirrored). Left arrow or a click on that cover opens the last spread.
-- **Fermer le livre** closes onto the front cover and keeps the current spread.
+- The outer colored borders of the open book are transparent buttons. The left border goes to the previous spread; the right border goes to the next. Hover and keyboard focus show a gold wash and a pointer. They are disabled during the dossier entrance.
+- Left arrow or the left border on the first spread closes onto the front cover. Right arrow on that cover opens the book again at the spread that was left.
+- Right arrow or the right border on the last spread closes onto the back cover (`#book_cover.book_cover--back`, the cover image mirrored). Left arrow or a click on that cover opens the last spread.
+- Each left page shows its number, 1–10, in the bottom-left of the white area. The number stays when the password letter replaces the page.
 
 ## Password reveal
 
@@ -129,6 +130,7 @@ Edit `data/catalog.json` (loaded before `createInstance`):
 
 - `species.alien1` … `species.alien10` — `names` (array of labels; the seed picks one, and that is what Troncadelle types), `description` (shown on both sides), and optional `sex` (`"female"` or `"male"`; omitted species can take either)
 - `guests.female` and `guests.male` — Latin names. A female-only species draws from `female`, a male-only species from `male`, and the others from both lists. Ten names are drawn per seed, with no repeat (what Ravabulle types). `alien4` is female; `alien8` is male.
+- `hat_groups` — arrays of similar hat ids (`hat01`…`hat30`). Each array is one pick, on equal footing with each unlisted hat. The book uses one hat from a group, then that group is skipped. If ten hats are still needed after every group and lone hat has been used, used groups with a hat left are opened again. Hats missing from the list stay groupless. The grab box still holds all thirty hats; the twenty that are not in the book are decoys.
 
 `SHOW_PLAIN_LABELS` in `js/aliens-and-hats-core.js` is temporary. While it is `true`, Ravabulle’s species tag and Troncadelle’s name tag show those Latin words instead of the symbol codes. Set it to `false` when the hand-drawn symbols are ready. Symbol strings are still generated.
 
@@ -139,9 +141,11 @@ Symbol codes stay seed-generated. They are not stored in the catalog. Reload the
 Edit `data/book-layout.json`:
 
 - `alien_species_size.pool` — px; `.book` — `%` of portrait body per `alien1`…`alien10`
-- `hat_size.pool` — grab-box hat `widthPx`, `heightPx` per `hat01`…`hat16` (`0` = auto)
+- `hat_size.pool` — grab-box hat `widthPx`, `heightPx` per `hat01`…`hat30` (`0` = auto)
 - `rav_alien_on_page` — B&W alien frame width (`widthPct` on `.alien_fixed_bw`)
 - `rav_hat_on_alien` — head layer (`widthPct`, `marginBottomPct`) + placed hat `widthPx`/`heightPx` (`default` and per `hatNN` under each alien)
 - `tron_hat_on_page` — Tron **empty** page: B&W hat layer (`widthPct` default **80**, `marginBottomPct`). When a colored alien is placed, hat layer uses **`rav_hat_on_alien`** for that **placed alien species** + page **`hat_id`** (same pairing as Rav); alien uses `alien_species_size.book`. Removing the alien restores `tron_hat_on_page`.
 
 Reload puzzle after edits.
+
+`hat-preview.html` is a layout check, not a player page. It shows every hat on every alien variant (`alien1-1` … `alien10-5`) with the same portrait placement as the book. Filters narrow the grid to one species, variant, or hat.

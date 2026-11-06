@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Aperçu des chapeaux — Aliens &amp; chapeaux</title>
+	<link rel="stylesheet" href="css/aliens-and-hats.css">
+	<script src="js/puzzle-instance.js"></script>
+	<script src="js/aliens-and-hats-core.js"></script>
+</head>
+<body>
+	<main id="hat_preview">
+		<h1 class="visually-hidden">Aperçu des chapeaux sur chaque variante d'alien</h1>
+		<form class="hat_preview_bar">
+			<label>
+				Espèce
+				<select id="hat_preview_species"></select>
+			</label>
+			<label>
+				Variante
+				<select id="hat_preview_variant"></select>
+			</label>
+			<label>
+				Chapeau
+				<select id="hat_preview_hat"></select>
+			</label>
+		</form>
+		<div id="hat_preview_grid"></div>
+	</main>
+	<script>
+		AliensAndHatsCore.init({ preview: 'hats' });
+	</script>
+</body>
+</html>

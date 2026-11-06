@@ -22,6 +22,7 @@
 	var PAGE_PREROLL_SEC = 0.012;
 	var PAGE_FADE_SEC = 0.004;
 	var poolLayoutPass = 0;
+	var poolColumnWidth = 0;
 	var lastPageSound = -1;
 	var audioCtx = null;
 	var soundBuffers = {};
@@ -598,6 +599,26 @@
 		return { width: POOL_PIECE_MAX_HEIGHT_PX, height: POOL_PIECE_MAX_HEIGHT_PX };
 	}
 
+	function fitPoolHatToColumn(piece) {
+		if (!piece.classList.contains('grab_piece--hat') || poolColumnWidth < 1) {
+			return;
+		}
+		var size = pieceLayoutSize(piece);
+		var maxWidth = Math.max(48, poolColumnWidth - 8);
+		if (size.width <= maxWidth) {
+			return;
+		}
+		var scale = maxWidth / size.width;
+		var img = piece.querySelector('img');
+		if (!img) {
+			return;
+		}
+		img.style.width = Math.round(size.width * scale) + 'px';
+		img.style.height = Math.round(size.height * scale) + 'px';
+		img.style.maxWidth = img.style.width;
+		img.style.maxHeight = img.style.height;
+	}
+
 	function pieceLayoutSize(piece) {
 		var w = piece.offsetWidth;
 		var h = piece.offsetHeight;
@@ -630,6 +651,7 @@
 
 	function tagArtImg(art) {
 		var img = document.createElement('img');
+		img.draggable = false;
 		img.src = assetPath('misc', art);
 		img.alt = '';
 		img.setAttribute('aria-hidden', 'true');
@@ -699,6 +721,7 @@
 			var alienWrap = document.createElement('div');
 			alienWrap.className = 'alien_figure alien_fixed_bw';
 			var alienImg = document.createElement('img');
+			alienImg.draggable = false;
 			alienImg.src = assetPath('aliens', guest.alien + '-' + guest.alien_variant);
 			alienImg.alt = 'Invité';
 			alienImg.className = 'alien_img alien_img--grayscale';
@@ -720,6 +743,7 @@
 			var hatWrap = document.createElement('div');
 			hatWrap.className = 'hat_fixed_bw';
 			var hatImg = document.createElement('img');
+			hatImg.draggable = false;
 			hatImg.src = assetPath('hats', guest.hat_id);
 			hatImg.alt = '';
 			hatImg.className = 'hat_img hat_img--grayscale';
@@ -742,6 +766,12 @@
 		scene.className = 'page_scene';
 		scene.appendChild(buildPortraitStack(pageIndex));
 		page.appendChild(scene);
+
+		var number = document.createElement('p');
+		number.className = 'page_number';
+		number.textContent = String(pageIndex + 1);
+		number.setAttribute('aria-label', 'Page ' + (pageIndex + 1));
+		page.appendChild(number);
 		return page;
 	}
 
@@ -797,6 +827,17 @@
 		return page;
 	}
 
+	function buildTurnButton(delta) {
+		var button = document.createElement('button');
+		button.type = 'button';
+		button.className = 'book_turn book_turn--' + (delta < 0 ? 'prev' : 'next');
+		button.setAttribute('aria-label', delta < 0 ? 'Page précédente' : 'Page suivante');
+		button.addEventListener('click', function () {
+			goSpread(delta);
+		});
+		return button;
+	}
+
 	function renderBook() {
 		var container = el('book_spreads');
 		container.innerHTML = '';
@@ -820,6 +861,8 @@
 			letter.textContent = letterAtPage(s);
 			letter.setAttribute('aria-hidden', 'true');
 			spread.appendChild(letter);
+			spread.appendChild(buildTurnButton(-1));
+			spread.appendChild(buildTurnButton(1));
 
 			container.appendChild(spread);
 		}
@@ -835,6 +878,7 @@
 		piece.setAttribute('role', 'button');
 		piece.setAttribute('aria-label', 'Chapeau ' + hatId);
 		var img = document.createElement('img');
+		img.draggable = false;
 		img.src = assetPath('hats', hatId);
 		img.alt = '';
 		piece.appendChild(img);
@@ -851,6 +895,7 @@
 		piece.setAttribute('role', 'button');
 		piece.setAttribute('aria-label', alienKey + ' variante ' + variant);
 		var img = document.createElement('img');
+		img.draggable = false;
 		img.src = assetPath('aliens', alienKey + '-' + variant);
 		img.alt = '';
 		piece.appendChild(img);
@@ -933,6 +978,7 @@
 		piece.style.position = 'absolute';
 		pool.appendChild(piece);
 		applyPoolPieceSize(piece);
+		fitPoolHatToColumn(piece);
 		var size = pieceLayoutSize(piece);
 		var pos = clampPoolPosition(left, top, size.width, size.height);
 		piece.style.left = pos.left + 'px';
@@ -963,6 +1009,10 @@
 		poolLayoutPass = 0;
 
 		var columnCount = poolColumnCount(pieces.length, poolH);
+		poolColumnWidth = poolW / columnCount;
+		pieces.forEach(function (piece) {
+			fitPoolHatToColumn(piece);
+		});
 		var columns = [];
 		var colIndex;
 		for (colIndex = 0; colIndex < columnCount; colIndex += 1) {
@@ -997,9 +1047,9 @@
 		poolLayoutPass = 0;
 		var pieces = [];
 		if (state.role === 'ravabulle') {
-			for (var h = 1; h <= 16; h += 1) {
-				var hatId = 'hat' + (h < 10 ? '0' : '') + h;
-				pieces.push(buildHatPiece(hatId));
+			var hatIds = global.AliensAndHatsInstance.HAT_IDS;
+			for (var h = 0; h < hatIds.length; h += 1) {
+				pieces.push(buildHatPiece(hatIds[h]));
 			}
 		} else {
 			for (var a = 1; a <= 10; a += 1) {
@@ -1115,6 +1165,9 @@
 	}
 
 	function onPointerDown(e) {
+		if (state.dossierRevealed || state.puzzleSolved) {
+			return;
+		}
 		var piece = e.target.closest('.grab_piece');
 		if (!piece || e.button !== 0) {
 			return;
@@ -1306,9 +1359,46 @@
 		setBookLocked(false);
 	}
 
+	function lockPlacements() {
+		document.body.classList.add('ah_placements_locked');
+		document.querySelectorAll('.grab_piece').forEach(function (piece) {
+			piece.tabIndex = -1;
+		});
+	}
+
+	function dismissObjectBox(immediate) {
+		var box = el('object_box');
+		if (!box || box.classList.contains('object_box--gone') || box.classList.contains('object_box--leaving')) {
+			return;
+		}
+		var finished = false;
+		function hide() {
+			if (finished) {
+				return;
+			}
+			finished = true;
+			box.classList.add('object_box--gone');
+			box.setAttribute('aria-hidden', 'true');
+			box.inert = true;
+		}
+		if (immediate || motionReduced()) {
+			hide();
+			return;
+		}
+		box.classList.add('object_box--leaving');
+		box.addEventListener('transitionend', function (e) {
+			if (e.propertyName !== 'transform') {
+				return;
+			}
+			hide();
+		});
+		window.setTimeout(hide, 800);
+	}
+
 	function showDossierPages() {
 		state.dossierRevealed = true;
-		updateInstructions();
+		lockPlacements();
+		dismissObjectBox(false);
 		var current = document.querySelector('.book_spread:not([hidden]) .page_scene--dossier');
 		var animate = current && !motionReduced();
 		document.querySelectorAll('.page_scene--dossier').forEach(function (scene) {
@@ -1519,18 +1609,9 @@
 
 	function updateSpreadNav() {
 		var locked = state.dossierAnimating;
-		el('btn_spread_prev').disabled = locked;
-		el('btn_spread_next').disabled = locked;
-		el('btn_close_book').disabled = locked;
-		el('spread_indicator').textContent = 'Pages ' + (state.currentSpread + 1) + ' / 10';
-	}
-
-	function updateInstructions() {
-		var text = 'Glissez un élément vers la page de gauche (toute la page accepte le dépôt).';
-		if (state.dossierRevealed) {
-			text += ' Décrivez les étiquettes à votre partenaire pour remplir l\'étiquette vide.';
-		}
-		el('dnd_instructions').textContent = text;
+		document.querySelectorAll('.book_turn').forEach(function (button) {
+			button.disabled = locked;
+		});
 	}
 
 	function onBookKeyDown(e) {
@@ -1565,28 +1646,25 @@
 		goSpread(e.key === 'ArrowRight' ? 1 : -1);
 	}
 
-	function bindChrome(role) {
+	function bindChrome() {
 		document.body.classList.add('ah_puzzle');
-		el('object_box_title').textContent = role === 'ravabulle'
-			? 'Chapeaux à placer'
-			: 'Aliens à placer';
-		updateInstructions();
 
 		el('btn_open_book').addEventListener('click', function () {
 			if (!state.bookOpen) {
 				openBook();
 			}
 		});
-		el('btn_close_book').addEventListener('click', function () {
-			closeBook('front');
-		});
-		el('btn_spread_prev').addEventListener('click', function () { goSpread(-1); });
-		el('btn_spread_next').addEventListener('click', function () { goSpread(1); });
 		el('btn_dismiss_reveal').addEventListener('click', function () {
 			el('password_reveal').hidden = true;
 		});
 		document.addEventListener('pointerdown', onPointerDown);
 		document.addEventListener('keydown', onBookKeyDown);
+		document.addEventListener('dragstart', function (e) {
+			var shell = el('puzzle_shell');
+			if (e.target && e.target.tagName === 'IMG' && shell && shell.contains(e.target)) {
+				e.preventDefault();
+			}
+		});
 	}
 
 	function loadJson(url) {
@@ -1618,7 +1696,8 @@
 			}
 		}
 		state.dossierRevealed = true;
-		updateInstructions();
+		lockPlacements();
+		dismissObjectBox(true);
 		document.querySelectorAll('.page_scene--dossier').forEach(function (scene) {
 			scene.hidden = false;
 		});
@@ -1627,7 +1706,7 @@
 
 	function startUi() {
 		preloadSounds();
-		bindChrome(state.role);
+		bindChrome();
 		renderPool();
 		renderBook();
 		if (state.stage2) {
@@ -1635,7 +1714,139 @@
 		}
 	}
 
+	function fillPreviewSelect(select, options, allLabel) {
+		var all = document.createElement('option');
+		all.value = '';
+		all.textContent = allLabel;
+		select.appendChild(all);
+		options.forEach(function (option) {
+			var node = document.createElement('option');
+			node.value = option.value;
+			node.textContent = option.label;
+			select.appendChild(node);
+		});
+	}
+
+	function applyHatPreviewFilter() {
+		var species = el('hat_preview_species').value;
+		var variant = el('hat_preview_variant').value;
+		var hat = el('hat_preview_hat').value;
+		document.querySelectorAll('.hat_preview_row').forEach(function (row) {
+			var speciesMatch = !species || row.dataset.alien === species;
+			var variantMatch = !variant || row.dataset.variant === variant;
+			row.hidden = !(speciesMatch && variantMatch);
+		});
+		document.querySelectorAll('.hat_preview_cell').forEach(function (cell) {
+			cell.hidden = !!hat && cell.dataset.hatId !== hat;
+		});
+	}
+
+	function buildPreviewPortrait(alienKey, variant, hatId) {
+		var stack = document.createElement('div');
+		stack.className = 'portrait_stack';
+		var body = document.createElement('div');
+		body.className = 'portrait_body';
+		var hatLayer = document.createElement('div');
+		hatLayer.className = 'portrait_hat';
+
+		var alienWrap = document.createElement('div');
+		alienWrap.className = 'alien_figure alien_fixed_bw';
+		var alienImg = document.createElement('img');
+		alienImg.draggable = false;
+		alienImg.src = assetPath('aliens', alienKey + '-' + variant);
+		alienImg.alt = '';
+		alienImg.className = 'alien_img alien_img--grayscale';
+		applySizeEntryToElement(alienWrap, alienBookSizeEntry(alienKey), alienImg);
+		alienWrap.appendChild(alienImg);
+		body.appendChild(alienWrap);
+
+		var piece = document.createElement('div');
+		piece.className = 'grab_piece grab_piece--placed grab_piece--hat';
+		var hatImg = document.createElement('img');
+		hatImg.draggable = false;
+		hatImg.src = assetPath('hats', hatId);
+		hatImg.alt = '';
+		piece.appendChild(hatImg);
+		var hatSlot = document.createElement('div');
+		hatSlot.className = 'placement_slot placement_slot--hat';
+		hatSlot.appendChild(piece);
+		hatLayer.appendChild(hatSlot);
+
+		var offsetPct = ravHatHeadOffsetPct(alienKey, hatId);
+		if (offsetPct !== undefined) {
+			hatLayer.style.setProperty('--ah-hat-offset-y', offsetPct + '%');
+		}
+		var layerWidthPct = ravHatLayerWidthPct(alienKey, hatId);
+		if (layerWidthPct) {
+			hatLayer.style.width = layerWidthPct + '%';
+		}
+		applyRavPlacedHatSize(piece, alienKey, hatId);
+
+		body.appendChild(hatLayer);
+		stack.appendChild(body);
+		return stack;
+	}
+
+	function renderHatPreview() {
+		document.body.classList.add('ah_hat_preview');
+		var hatIds = global.AliensAndHatsInstance.HAT_IDS;
+		var speciesOptions = [];
+		var variantOptions = [];
+		for (var s = 1; s <= 10; s += 1) {
+			speciesOptions.push({ value: 'alien' + s, label: 'alien' + s });
+		}
+		for (var v = 1; v <= 5; v += 1) {
+			variantOptions.push({ value: String(v), label: 'Variante ' + v });
+		}
+		fillPreviewSelect(el('hat_preview_species'), speciesOptions, 'Toutes les espèces');
+		fillPreviewSelect(el('hat_preview_variant'), variantOptions, 'Toutes les variantes');
+		fillPreviewSelect(el('hat_preview_hat'), hatIds.map(function (hatId) {
+			return { value: hatId, label: hatId };
+		}), 'Tous les chapeaux');
+		['hat_preview_species', 'hat_preview_variant', 'hat_preview_hat'].forEach(function (id) {
+			el(id).addEventListener('change', applyHatPreviewFilter);
+		});
+
+		var grid = el('hat_preview_grid');
+		for (var a = 1; a <= 10; a += 1) {
+			var alienKey = 'alien' + a;
+			for (var variant = 1; variant <= 5; variant += 1) {
+				var row = document.createElement('section');
+				row.className = 'hat_preview_row';
+				row.dataset.alien = alienKey;
+				row.dataset.variant = String(variant);
+				var title = document.createElement('h2');
+				title.textContent = alienKey + ' — variante ' + variant;
+				row.appendChild(title);
+				var cells = document.createElement('div');
+				cells.className = 'hat_preview_cells';
+				hatIds.forEach(function (hatId) {
+					var cell = document.createElement('figure');
+					cell.className = 'hat_preview_cell';
+					cell.dataset.hatId = hatId;
+					var stage = document.createElement('div');
+					stage.className = 'hat_preview_stage';
+					stage.appendChild(buildPreviewPortrait(alienKey, variant, hatId));
+					var caption = document.createElement('figcaption');
+					caption.textContent = hatId;
+					cell.appendChild(stage);
+					cell.appendChild(caption);
+					cells.appendChild(cell);
+				});
+				row.appendChild(cells);
+				grid.appendChild(row);
+			}
+		}
+	}
+
 	function init(options) {
+		if (options.preview === 'hats') {
+			loadJson('data/book-layout.json').then(function (layout) {
+				state.layout = layout;
+				renderHatPreview();
+			});
+			return;
+		}
 		state.role = options.role;
 		var launch = readLaunch();
 		state.stage2 = !options.instance && !options.seed && launch.stage2;

@@ -104,6 +104,19 @@
 			"description": "Ce que vous voyez ci-contre est en fait la fusion de deux individus. Cette espèce vit en tandem, et bien que d'aucuns pourraient être touchés par l'expression de profonde détresse qui semble se lire dans chacun de leurs regards, le consensus est qu'après tout, c'est bien normal, le mariage c'est la même chose."
 		}
 	},
+	"hat_groups": [
+		["hat01", "hat20", "hat21"],
+		["hat06", "hat13", "hat23", "hat30"],
+		["hat10", "hat11"],
+		["hat03", "hat24"],
+		["hat05", "hat08", "hat09", "hat18"],
+		["hat12", "hat17"],
+		["hat04", "hat19", "hat26"],
+		["hat25", "hat15"],
+		["hat27", "hat29"],
+		["hat16", "hat28"]
+
+	],
 	"guests": {
 		"female": [
 			"Bernarde",
