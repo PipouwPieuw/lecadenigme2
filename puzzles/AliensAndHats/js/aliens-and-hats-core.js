@@ -4,10 +4,6 @@
 (function (global) {
 	'use strict';
 
-	// Temporary: tags show the Latin species and guest names.
-	// Set to false when hand-drawn symbol codes replace them.
-	var SHOW_PLAIN_LABELS = true;
-
 	var POOL_PIECE_MAX_HEIGHT_PX = 200;
 	var POOL_MIN_COLUMNS = 3;
 	var POOL_EDGE_PAD = 4;
@@ -658,7 +654,39 @@
 		return img;
 	}
 
-	function buildCodedTag(className, art, symbols, accessibleLabel) {
+	function foldLatinLetter(ch) {
+		var stripped = ch.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+		return stripped.toUpperCase();
+	}
+
+	function buildGlyphRow(text) {
+		var row = document.createElement('span');
+		row.className = 'tag_glyphs';
+		row.setAttribute('aria-hidden', 'true');
+		var raw = String(text || '');
+		for (var i = 0; i < raw.length; i += 1) {
+			var ch = raw.charAt(i);
+			if (ch === ' ' || ch === '-' || ch === "'" || ch === '\u2019') {
+				var gap = document.createElement('span');
+				gap.className = 'tag_glyph_gap';
+				row.appendChild(gap);
+				continue;
+			}
+			var letter = foldLatinLetter(ch);
+			if (!/^[A-Z]$/.test(letter)) {
+				continue;
+			}
+			var img = document.createElement('img');
+			img.draggable = false;
+			img.className = 'tag_glyph';
+			img.src = assetPath('glyphs', letter);
+			img.alt = '';
+			row.appendChild(img);
+		}
+		return row;
+	}
+
+	function buildCodedTag(className, art, label, accessibleLabel) {
 		var wrap = document.createElement('div');
 		wrap.className = className;
 		wrap.appendChild(tagArtImg(art));
@@ -666,10 +694,7 @@
 		hidden.className = 'visually-hidden';
 		hidden.textContent = accessibleLabel;
 		wrap.appendChild(hidden);
-		var span = document.createElement('span');
-		span.className = 'tag_symbols' + (SHOW_PLAIN_LABELS ? ' tag_symbols--plain' : '');
-		span.textContent = symbols;
-		wrap.appendChild(span);
+		wrap.appendChild(buildGlyphRow(label));
 		return wrap;
 	}
 
@@ -788,8 +813,8 @@
 			scene.appendChild(buildCodedTag(
 				'dossier_tag dossier_tag--species',
 				guest.species_tag_art,
-				SHOW_PLAIN_LABELS ? guest.species_name : guest.species_code,
-				SHOW_PLAIN_LABELS ? 'Espèce' : "Code d'espèce"
+				guest.species_name,
+				'Espèce'
 			));
 		} else {
 			scene.appendChild(buildInputTag(
@@ -818,8 +843,8 @@
 			scene.appendChild(buildCodedTag(
 				'dossier_tag dossier_tag--name',
 				guest.name_tag_art,
-				SHOW_PLAIN_LABELS ? guest.name : guest.name_code,
-				SHOW_PLAIN_LABELS ? 'Nom' : 'Code du nom'
+				guest.name,
+				'Nom'
 			));
 		}
 

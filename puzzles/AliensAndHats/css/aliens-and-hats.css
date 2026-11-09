@@ -317,7 +317,7 @@ body.ah_placements_locked .grab_piece {
 .page_scene--dossier {
 	display: flex;
 	flex-direction: column;
-	justify-content: space-between;
+	justify-content: flex-start;
 	align-items: center;
 	gap: 0.35rem;
 	overflow: hidden;
@@ -330,8 +330,9 @@ body.ah_placements_locked .grab_piece {
 .dossier_tag {
 	position: relative;
 	flex: 0 0 auto;
-	width: 300px;
-	max-width: 90%;
+	/* width: 300px; */
+	width: 90%;
+	/* max-width: 90%; */
 	z-index: 6;
 	pointer-events: none;
 }
@@ -364,6 +365,40 @@ body.ah_placements_locked .grab_piece {
 	pointer-events: none;
 }
 
+.dossier_tag .tag_glyphs {
+	position: absolute;
+	left: 14%;
+	right: 14%;
+	top: 18%;
+	bottom: 18%;
+	display: flex;
+	/* flex-wrap: nowrap; */
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 0 2px;
+	pointer-events: none;
+}
+
+.dossier_tag .tag_glyph {
+	/* flex: 1 1 0; */
+	flex: 0 0 30px;
+	width: 30px;
+	height: 30px;
+	min-width: 0;
+	object-fit: contain;
+}
+
+.dossier_tag .tag_glyph_gap {
+	flex: 0.45 0.45 0;
+	width: 0;
+	min-width: 0;
+}
+
+.dossier_tag--name {
+	margin-top: auto;
+}
+
 .dossier_tag .tag_symbols--plain {
 	letter-spacing: 0.01em;
 	font-size: 0.68rem;
@@ -389,15 +424,13 @@ body.ah_placements_locked .grab_piece {
 }
 
 .species_description {
-	flex: 1 1 auto;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+	flex: 0 1 auto;
+	display: block;
 	min-height: 0;
 	width: 86%;
-	margin: 0;
+	margin: 0.75rem 0 0;
 	overflow: auto;
-	text-align: center;
+	text-align: left;
 	color: #1a1020;
 	font-size: 0.85rem;
 	line-height: 1.35;

@@ -29,6 +29,7 @@ Open:
 | `css/aliens-and-hats.css` | Layout (⅓ pool, ⅔ book), portrait stack, dossier |
 | `data/book-layout.json` | Per-species sizes and hat-on-head offsets |
 | `data/catalog.json` | Guest names, species names, and species descriptions (placeholders until authored) |
+| `data/glyph-seasons.json` | Six glyph-to-letter charts. The page still shows season 1 only |
 
 ## `init({ role, seed?, instance? })`
 
@@ -115,7 +116,7 @@ While dragging, the piece keeps its current pixel box; `.grab_piece--dragging` a
 - Left and Right arrows turn spreads. They are ignored while a text field is focused, while the dossier entrance is playing, or while the password dialog is open.
 - The outer colored borders of the open book are transparent buttons. The left border goes to the previous spread; the right border goes to the next. Hover and keyboard focus show a gold wash and a pointer. They are disabled during the dossier entrance.
 - Left arrow or the left border on the first spread closes onto the front cover. Right arrow on that cover opens the book again at the spread that was left.
-- Right arrow or the right border on the last spread closes onto the back cover (`#book_cover.book_cover--back`, the cover image mirrored). Left arrow or a click on that cover opens the last spread.
+- Right arrow or the right border on the last spread closes onto the back cover (`#book_cover.book_cover--back`, the cover image mirrored). Left arrow or a click on that cover opens the last spread. The season icon belongs on this cover once the art exists; the page does not draw it yet.
 - Each left page shows its number, 1–10, in the bottom-left of the white area. The number stays when the password letter replaces the page.
 
 ## Password reveal
@@ -132,9 +133,60 @@ Edit `data/catalog.json` (loaded before `createInstance`):
 - `guests.female` and `guests.male` — Latin names. A female-only species draws from `female`, a male-only species from `male`, and the others from both lists. Ten names are drawn per seed, with no repeat (what Ravabulle types). `alien4` is female; `alien8` is male.
 - `hat_groups` — arrays of similar hat ids (`hat01`…`hat30`). Each array is one pick, on equal footing with each unlisted hat. The book uses one hat from a group, then that group is skipped. If ten hats are still needed after every group and lone hat has been used, used groups with a hat left are opened again. Hats missing from the list stay groupless. The grab box still holds all thirty hats; the twenty that are not in the book are decoys.
 
-`SHOW_PLAIN_LABELS` in `js/aliens-and-hats-core.js` is temporary. While it is `true`, Ravabulle’s species tag and Troncadelle’s name tag show those Latin words instead of the symbol codes. Set it to `false` when the hand-drawn symbols are ready. Symbol strings are still generated.
+Coded tags (Ravabulle’s species tag and Troncadelle’s name tag) show the Latin word as a row of images from `assets/glyphs/A.png`–`Z.png`, one glyph per letter. A space or hyphen is a gap. The text fields stay ordinary letters. Symbol strings are still generated. The page still reads every glyph as season 1 (the file name). The other charts below are not applied yet.
 
 Symbol codes stay seed-generated. They are not stored in the catalog. Reload the puzzle after edits.
+
+## Seasons
+
+Six seasons. Each has its own icon (art still to come) and its own chart in `data/glyph-seasons.json`. A chart is a full substitution: every glyph stands for one Latin letter, and every letter is used once.
+
+The seed will pick the season of a book from the **partner’s** three seasons. Ravabulle’s book uses season 4, 5, or 6. Troncadelle’s book uses season 1, 2, or 3. The player who sees the glyphs does not hold the chart for that season. The icon of the book’s own season is shown on the **back cover**, so the partner can match it to one column of their notebook. The open pages do not need to print the season name.
+
+Each physical notebook:
+
+- Mentions the seasons and gives a little lore for each. That prose stays in the notebook.
+- Prints every glyph once. Under it, three letters, one per season this notebook holds, each letter next to that season’s icon.
+
+| Notebook | Seasons printed under each glyph | Seasons the partner’s book may use |
+|----------|-----------------------------------|------------------------------------|
+| Ravabulle | 1, 2, 3 | 4, 5, 6 |
+| Troncadelle | 4, 5, 6 | 1, 2, 3 |
+
+Season 1 keeps the current reading: glyph `A.png` is the letter A, and so on through Z. The same glyph never stands for the same letter in two seasons, so the three letters under one glyph are always different.
+
+The on-screen wheel is not built. When it is, it replaces the piece box after the dossiers appear. Lining a glyph up with a letter replaces that glyph on every tag of that screen. A reset puts the glyphs back. A wrong lining-up stays silent.
+
+Index 0 of each `map` string is glyph A. Read down a column for one glyph, or across a row for one season.
+
+| Glyph | 1 | 2 | 3 | 4 | 5 | 6 |
+|-------|---|---|---|---|---|---|
+| A | A | V | O | D | Q | K |
+| B | B | U | L | Q | Y | C |
+| C | C | T | N | S | X | E |
+| D | D | B | Y | H | P | T |
+| E | E | J | M | U | A | G |
+| F | F | L | X | O | M | Q |
+| G | G | Q | J | T | D | L |
+| H | H | C | S | W | R | F |
+| I | I | X | R | V | L | N |
+| J | J | H | B | I | T | U |
+| K | K | E | P | N | U | V |
+| L | L | D | E | C | V | W |
+| M | M | S | F | B | W | J |
+| N | N | O | A | Y | H | B |
+| O | O | G | C | E | Z | Y |
+| P | P | F | H | G | I | D |
+| Q | Q | W | Z | R | N | S |
+| R | R | Z | Q | P | B | H |
+| S | S | N | G | Z | O | X |
+| T | T | P | D | F | K | M |
+| U | U | R | W | J | E | I |
+| V | V | I | T | X | S | P |
+| W | W | K | I | L | F | O |
+| X | X | M | U | A | G | Z |
+| Y | Y | A | K | M | C | R |
+| Z | Z | Y | V | K | J | A |
 
 ## Layout JSON
 

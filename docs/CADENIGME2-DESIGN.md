@@ -50,7 +50,7 @@ Design and implementation must assume partners only know what is said aloud plus
 
 ### Aliens & hats — instance shape (v2)
 
-- **10 canonical guests** — each with a **name** drawn from the `guests` list in `data/catalog.json`, unique **alien** species (each `alien1`…`alien10` once), unique **hat** in book (`hat01`…`hat30`, 10 used), **variant** `1`…`5`, **`species_name`** (one label drawn from that species’ `names` array) / **`species_description`**, **`species_code`** + **`species_tag_art`** (`tag04`–`tag06`), **`name_code`** + **`name_tag_art`** (`tag01`–`tag03`), **`letter_rav`** / **`letter_tron`** (password glyphs). Until the hand-drawn symbols exist, the tags show the Latin species name and guest name (`SHOW_PLAIN_LABELS` in the puzzle script).
+- **10 canonical guests** — each with a **name** drawn from the gendered lists in `data/catalog.json`, unique **alien** species (each `alien1`…`alien10` once), unique **hat** in book (`hat01`…`hat30`, 10 used), **variant** `1`…`5`, **`species_name`** (one label drawn from that species’ `names` array) / **`species_description`**, **`species_code`** + **`species_tag_art`** (`tag04`–`tag06`), **`name_code`** + **`name_tag_art`** (`tag01`–`tag03`), **`letter_rav`** / **`letter_tron`** (password glyphs). Coded tags show the Latin word as glyph images (`assets/glyphs/A.png`–`Z.png`). The page still reads them as season 1.
 - **`rav_page_order`** / **`tron_page_order`** — the **same** permutation of `guest_id`. Page 1 on both books is the same guest, so the B&W alien and the B&W hat can be paired before the dossiers appear.
 - **`password_half_rav`** / **`password_half_tron`** — 10 lowercase letters each, read in **that player’s page order** (not the same string).
 - Tag art may repeat inside its set; the generator uses each of `tag01`…`tag03` and each of `tag04`…`tag06` at least once.
@@ -78,20 +78,20 @@ Two guest books, **one guest per open spread**, in the **same page order** on bo
 
 ### Co-op flow
 
-1. **Pair spreads** by reading the shared species description (and, when the wheels exist, by translating codes).
-2. **Species:** Ravabulle reads the species code. Troncadelle types the species name.
-3. **Name:** Troncadelle reads the name code. Ravabulle types the guest name.
-4. **Tron → Rav:** describe the B&W **hat** → Rav places the matching **colored hat** (16 in pool, 6 decoys).
+1. **Pair spreads** by reading the shared species description (and, once seasons are in play, by translating glyphs).
+2. **Species:** Ravabulle reads the species glyphs. Troncadelle types the species name.
+3. **Name:** Troncadelle reads the name glyphs. Ravabulle types the guest name.
+4. **Tron → Rav:** describe the B&W **hat** → Rav places the matching **colored hat** (30 in pool, 20 decoys).
 5. **Rav → Tron:** describe the B&W **alien** (species + variant) → Tron places the matching **colored alien** (50 in pool).
 
 ### Co-op split (voice-only)
 
 | Player | Pool | Left page | Right page shows | Player types |
 |--------|------|-----------|------------------|--------------|
-| **Ravabulle** | 16 **hats** (all; 10 used in solution) | B&W **alien** + hat slot | Species **code** (`tag04`–`tag06`), description, empty name tag (`tag01`–`tag03`) | Guest **name** |
-| **Troncadelle** | 50 **aliens** (10×5 variants) | B&W **hat** + alien slot | Empty species tag, description, name **code** | **Species** name |
+| **Ravabulle** | 30 **hats** (all; 10 used in solution) | B&W **alien** + hat slot | Species **glyphs** (`tag04`–`tag06`), description, empty name tag (`tag01`–`tag03`) | Guest **name** |
+| **Troncadelle** | 50 **aliens** (10×5 variants) | B&W **hat** + alien slot | Empty species tag, description, name **glyphs** | **Species** name |
 
-Tags are **not** draggable. The species name is not in Ravabulle’s page text. The guest name is not in Troncadelle’s page text. Descriptions are the same on both sides. Symbol strings are seed-generated; a printed wheel only matches one seed.
+Tags are **not** draggable. The species name is not in Ravabulle’s page text. The guest name is not in Troncadelle’s page text. Descriptions are the same on both sides. Glyphs are the Latin letters of the word; which letter a glyph stands for depends on the book’s season.
 
 ### Screen layout (both sides, same structure)
 
@@ -105,7 +105,7 @@ Follow **Viewport & layout (v2 — all puzzles)** above (no document scroll).
 | **Book area** | **~⅔** of viewport | Cover closed or book open; this column is the book’s *stage*, not necessarily filled edge-to-edge. |
 
 - The **book** is **centred** in the right-hand column (or aligned consistently) and **scaled to fit** the available height/width — it must **not** be forced to stretch to the full ⅔ if that would make spreads illegible or taller than the viewport.
-- **Book cover** — click opens the book **inline** in the book area (no full-screen overlay); the object box stays usable. Leaving through the last page shows the same cover mirrored. Arrow keys turn pages; at the first page Left closes to the front cover, and at the last page Right closes to the mirrored cover.
+- **Book cover** — click opens the book **inline** in the book area (no full-screen overlay); the object box stays usable. Leaving through the last page shows the same cover mirrored, with that book’s **season icon** on the back. Arrow keys turn pages; at the first page Left closes to the front cover, and at the last page Right closes to the mirrored cover.
 - **Pages** — **10 double-page spreads** (one guest each). Turn pages while the pool remains available. One **placement slot** on the **left** page (hat or alien). The **left page** is the drop target; the item **snaps** to the slot. The right page does not accept drops.
 - **Left page** — portrait only, in the same place as before the tag was removed (the old tag band stays empty). Rav: B&W alien with hat slot on the head. Tron: B&W hat with alien slot in the body.
 - **Right page** — blank until every portrait is correct. Then the open page animates in (species tag from above, description from the right, name tag from below) and the other pages show the same content. Species tag at the top, species description in the middle, name tag at the bottom. The empty tag is a text field on the sprite.
@@ -116,8 +116,8 @@ Follow **Viewport & layout (v2 — all puzzles)** above (no document scroll).
 
 | Component | Role |
 |-----------|------|
-| **Translation wheels** (one per notebook, still physical) | Map Rav-script species codes and Tron-script name codes to the Latin words players type |
-| **Notebook** (per player) | TBD: wheel instructions, alien roster, flavour; must not duplicate the partner’s secret layout |
+| **Season charts** (printed in each notebook) | Six seasons, one icon each. Each notebook shows every glyph once, with three letters underneath, each letter tied to one of that notebook’s season icons. Ravabulle’s notebook holds seasons 1–3; Troncadelle’s holds seasons 4–6. The reader does not have the chart for their own book’s season |
+| **Notebook** (per player) | Season lore, the three-season chart, and anything else that must not duplicate the partner’s secret layout |
 
 ### Win condition & password
 
@@ -135,11 +135,12 @@ Early art lives under `puzzles/AliensAndHats/assets/`:
 |--------|-------------------|
 | `aliens/` | `alien1` … `alien10`, variants `-1` … `-5` per alien |
 | `hats/` | `hat01` … `hat30` |
-| `misc/` | `bookfront`, `bookopen`, `tag01` … `tag06` (more may be added) |
+| `glyphs/` | `A.png` … `Z.png` |
+| `misc/` | `bookfront`, `bookopen`, `tag01` … `tag06`. Season icons are not drawn yet |
 
 **Tags:** species codes use `tag04`–`tag06`; name codes use `tag01`–`tag03`. Strings are unique per species or guest; art may repeat inside its set (≥1 of each sprite in that set).
 
-**Code:** `puzzles/AliensAndHats/` — `ravabulle.html`, `troncadelle.html`, shared `js/aliens-and-hats-core.js`, `data/catalog.json` for names and descriptions, `data/book-layout.json` for asset tuning.
+**Code:** `puzzles/AliensAndHats/` — `ravabulle.html`, `troncadelle.html`, shared `js/aliens-and-hats-core.js`, `data/catalog.json` for names and descriptions, `data/book-layout.json` for asset tuning, `data/glyph-seasons.json` for the six charts. The charts and the back-cover icon are documented; the page still treats every glyph as season 1.
 
 ### Interaction notes (for implementation)
 

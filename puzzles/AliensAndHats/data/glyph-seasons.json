@@ -1,0 +1,19 @@
+{
+  "letters": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  "notebooks": {
+    "ravabulle": [1, 2, 3],
+    "troncadelle": [4, 5, 6]
+  },
+  "book_season_pool": {
+    "ravabulle": [4, 5, 6],
+    "troncadelle": [1, 2, 3]
+  },
+  "seasons": [
+    { "id": 1, "notebook": "ravabulle", "map": "ABCDEFGHIJKLMNOPQRSTUVWXYZ" },
+    { "id": 2, "notebook": "ravabulle", "map": "VUTBJLQCXHEDSOGFWZNPRIKMAY" },
+    { "id": 3, "notebook": "ravabulle", "map": "OLNYMXJSRBPEFACHZQGDWTIUKV" },
+    { "id": 4, "notebook": "troncadelle", "map": "DQSHUOTWVINCBYEGRPZFJXLAMK" },
+    { "id": 5, "notebook": "troncadelle", "map": "QYXPAMDRLTUVWHZINBOKESFGCJ" },
+    { "id": 6, "notebook": "troncadelle", "map": "KCETGQLFNUVWJBYDSHXMIPOZRA" }
+  ]
+}
