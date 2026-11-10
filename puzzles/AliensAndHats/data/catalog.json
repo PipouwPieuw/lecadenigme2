@@ -8,7 +8,7 @@
 				"Poulpocuse",
 				"Chturlhute"
 			],
-			"description": "Contrairement à ce que pourrait laisser penser son apparence, cette espèce ne vit pas dans l'eau mais dans les arbres. Il n'est pas rare de voir ces créatures se balancer de branche en branche à l'aide de leurs multiples tentacules."
+			"description": "Contrairement à ce que pourrait laisser penser son apparence, cette espèce ne vit pas dans l'eau mais dans les arbres. Il n'est pas rare de voir ces créatures se balancer de branche en branche à l'aide de leurs multiples tentacules et de les entendre hurler APANYAAAAAN."
 		},
 		"alien2": {
 			"names": [
@@ -18,7 +18,7 @@
 				"Lamicanine",
 				"Mangedaichu"
 			],
-			"description": "Ouvert, l'individu a lair effrayant et vorace mais est juste effrayé d'être affamé. Fermé, il y a de grandes chances qu'il soit en train de réfléchir au sens de son existence. Sa structure en accordéon lui permet d'évacuer de l'air à un débit olympique. Sa salive sent le sapin par une douce nuit d'été où chantent les cigales."
+			"description": "Ouvert, l'individu a l'air effrayant et vorace mais est juste effrayé d'être affamé. Fermé, il y a de grandes chances qu'il soit en train de réfléchir au sens de son existence. Sa structure en accordéon lui permet d'évacuer de l'air à un débit olympique."
 		},
 		"alien3": {
 			"names": [
@@ -28,7 +28,7 @@
 				"Puppiye",
 				"Palmoral"
 			],
-			"description": "À l'instar de l'autruche, ses yeux sont plus gros que son cerveau. Voit de loin et voit très bien, fera un excellent espion une fois adulte mais se contente de voyeurisme pour le moment."
+			"description": "À l'instar de l'autruche, ses yeux sont plus gros que son cerveau. Contrairement à l'autruche, ce specimen ne peut ni courir ni faire de la politique. Voit de loin et voit très bien, fera un excellent espion une fois adulte mais se contente de voyeurisme pour le moment."
 		},
 		"alien4": {
 			"sex": "female",
@@ -39,7 +39,7 @@
 				"Mimicuisse",
 				"Voitourelle"
 			],
-			"description": "Une espèce exclusivement femelle, elle vit dans la paix et la sérénité la plus totale. Reines des legs days même à un âge avancé, elles sont des partenaires idéales pour les hyrox."
+			"description": "Une espèce exclusivement femelle, elle vit dans la paix et la sérénité la plus totale. Reines des legs days même à un âge avancé, ces individus feraient des partenaires idéales pour les hyrox. Le seul problème étant qu'elles font la taille de 6 églises et 14 tracteurs et empilés. "
 		},
 		"alien5": {
 			"names": [
@@ -50,7 +50,7 @@
 				"Anucleaire"
 
 			],
-			"description": "Souvent confondus avec des donuts au glaçage éclatant, les individus de cette espèce prolifèrent dans les kermesses et autres fêtes foraines de village ou ils se font lancer sur des plots et en redemandent derechef."
+			"description": "Souvent confondus avec des donuts au glaçage éclatant, les individus de cette espèce prolifèrent dans les kermesses et autres fêtes foraines de village ou ils se font lancer sur des plots et en redemandent derechef. Ont développé une phobie irrationnelle envers Homer Simpson."
 		},
 		"alien6": {
 			"names": [
@@ -70,7 +70,7 @@
 				"Voitouktouque",
 				"Gentimyde"
 			],
-			"description": "Une espèce calme et zen, friande de jus de citron au petit déjeuner, de zeste de citron au déjeuner et de graines de citron au dîner. Là est peut-être le secret de la jeunesse éternelle, mais nous ne le sauront jamais car ces individus refusent catégoriquement de donner leur âge."
+			"description": "Une espèce calme et zen, friande de jus de citron au petit déjeuner, de zeste de citron au déjeuner et de graines de citron au dîner. Là est peut-être le secret de la jeunesse éternelle, mais nous ne le saurons jamais car ces individus refusent de donner leur âge."
 		},
 		"alien8": {
 			"sex": "male",
@@ -91,7 +91,7 @@
 				"Brulaijai",
 				"Jalouche"
 			],
-			"description": "Ne vous fiez pas à cette expression benête et innocente car ce que vous voyez là n'est pas un visage mais quelque chose de bien moins convenable. Ne tenant pas à choquer notre lectorat avec des termes peu distingués, nous  dirons simplement que cet individu possède 5 anus. Un pour chaque occasion."
+			"description": "Ne vous fiez pas à cette expression benête et innocente car ce que vous voyez là n'est pas un visage. Ne tenant pas à choquer notre lectorat avec des termes peu distingués, nous  dirons simplement que cet individu possède 5 anus. Un pour chaque occasion."
 		},
 		"alien10": {
 			"names": [
@@ -101,7 +101,7 @@
 				"Januskoure",
 				"Dramackouine"
 			],
-			"description": "Ce que vous voyez ci-contre est en fait la fusion de deux individus. Cette espèce vit en tandem, et bien que d'aucuns pourraient être touchés par l'expression de profonde détresse qui semble se lire dans chacun de leurs regards, le consensus est qu'après tout, c'est bien normal, le mariage c'est la même chose."
+			"description": "Ce que vous voyez ci-contre est la fusion de deux individus vivant en tandem. Bien que d'aucuns pourraient être touchés par l'expression de profonde détresse qui semble se lire dans leur regard, le consensus est qu'après tout, c'est bien normal, le mariage c'est la même chose."
 		}
 	},
 	"hat_groups": [

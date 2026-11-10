@@ -29,7 +29,7 @@ Open:
 | `css/aliens-and-hats.css` | Layout (⅓ pool, ⅔ book), portrait stack, dossier |
 | `data/book-layout.json` | Per-species sizes and hat-on-head offsets |
 | `data/catalog.json` | Guest names, species names, and species descriptions (placeholders until authored) |
-| `data/glyph-seasons.json` | Six glyph-to-letter charts. The page still shows season 1 only |
+| `data/glyph-seasons.json` | Six glyph-to-letter charts and the season names shown on the back cover |
 
 ## `init({ role, seed?, instance? })`
 
@@ -108,7 +108,7 @@ While dragging, the piece keeps its current pixel box; `.grab_piece--dragging` a
 - Drop on occupied slot → swap (slot↔slot, or pool↔slot). The piece that returns to the pool takes the pool position of the piece that replaced it.
 - Pool: seeded **shuffle**, then **≥3 columns** (round-robin, count grows if needed for height); even vertical spread, centered in column (no jitter); a hat wider than its column scales down, keeping its proportions; layout runs after images decode; all pieces clamped in bounds; `#grab_pool { overflow: hidden }`.
 - Silent check when all 10 slots are filled. If every placement is correct, navigation locks, `valid.mp3` plays after one second, and about 1.5 seconds later the right-hand pages appear. The open spread animates: species tag from above, description from the right, name tag from below, each with `swap.mp3`. Navigation stays locked until that entrance ends. Other spreads already show their dossier. A wrong full set stays silent.
-- When the dossiers appear, dragging stops for good and placed hats and aliens stay put. The piece box slides off the left of the screen and is then hidden; its column keeps its width, so the book does not move. `?seed=stage2` starts in this state with the box already hidden. The puzzle solves only when the placements are still correct **and** all 10 text fields for this role are non-empty and match. Typed answers are trim + case-insensitive, with internal whitespace collapsed. Accents must match the catalog. A wrong word leaves pieces and text in place.
+- When the dossiers appear, dragging stops for good and placed hats and aliens stay put. The piece box is replaced by the translation wheel, flush with the left edge of the screen. `?seed=stage2` starts in this state with the wheel already showing. The puzzle solves only when the placements are still correct **and** all 10 text fields for this role are non-empty and match. Typed answers are trim + case-insensitive, with internal whitespace collapsed. Accents must match the catalog. A wrong word leaves pieces and text in place.
 - A drop that lands on a page plays `swap.mp3` once, including a swap onto an occupied slot. Reordering in the pool, returning a piece to the pool, and a rejected drop stay silent. Turning a page, or opening the book from either cover, plays one of `page1.mp3`–`page6.mp3` at random. Those clips are decoded ahead of time and started after their quiet lead-in, so the rustle lines up with the turn. Closing onto either cover plays `close.mp3`.
 
 ## Book navigation
@@ -116,7 +116,7 @@ While dragging, the piece keeps its current pixel box; `.grab_piece--dragging` a
 - Left and Right arrows turn spreads. They are ignored while a text field is focused, while the dossier entrance is playing, or while the password dialog is open.
 - The outer colored borders of the open book are transparent buttons. The left border goes to the previous spread; the right border goes to the next. Hover and keyboard focus show a gold wash and a pointer. They are disabled during the dossier entrance.
 - Left arrow or the left border on the first spread closes onto the front cover. Right arrow on that cover opens the book again at the spread that was left.
-- Right arrow or the right border on the last spread closes onto the back cover (`#book_cover.book_cover--back`, the cover image mirrored). Left arrow or a click on that cover opens the last spread. The season icon belongs on this cover once the art exists; the page does not draw it yet.
+- Right arrow or the right border on the last spread closes onto the back cover (`assets/misc/bookback.png`). The current season’s `name` is centered on that cover. Left arrow or a click on that cover opens the last spread.
 - Each left page shows its number, 1–10, in the bottom-left of the white area. The number stays when the password letter replaces the page.
 
 ## Password reveal
@@ -133,15 +133,15 @@ Edit `data/catalog.json` (loaded before `createInstance`):
 - `guests.female` and `guests.male` — Latin names. A female-only species draws from `female`, a male-only species from `male`, and the others from both lists. Ten names are drawn per seed, with no repeat (what Ravabulle types). `alien4` is female; `alien8` is male.
 - `hat_groups` — arrays of similar hat ids (`hat01`…`hat30`). Each array is one pick, on equal footing with each unlisted hat. The book uses one hat from a group, then that group is skipped. If ten hats are still needed after every group and lone hat has been used, used groups with a hat left are opened again. Hats missing from the list stay groupless. The grab box still holds all thirty hats; the twenty that are not in the book are decoys.
 
-Coded tags (Ravabulle’s species tag and Troncadelle’s name tag) show the Latin word as a row of images from `assets/glyphs/A.png`–`Z.png`, one glyph per letter. A space or hyphen is a gap. The text fields stay ordinary letters. Symbol strings are still generated. The page still reads every glyph as season 1 (the file name). The other charts below are not applied yet.
+Coded tags (Ravabulle’s species tag and Troncadelle’s name tag) show the Latin word as a row of images from `assets/glyphs/1.png`–`26.png` (glyph 1 is the symbol that used to be file A, glyph 26 the one that used to be Z). Each letter is drawn with the glyph whose season chart entry is that letter. A space or hyphen is a gap. The text fields stay ordinary letters. The wheel uses the pixel-art copies in `assets/glyphs/wheel/`, shown at 48×48. Symbol strings are still generated.
 
 Symbol codes stay seed-generated. They are not stored in the catalog. Reload the puzzle after edits.
 
 ## Seasons
 
-Six seasons. Each has its own icon (art still to come) and its own chart in `data/glyph-seasons.json`. A chart is a full substitution: every glyph stands for one Latin letter, and every letter is used once.
+Six seasons. Each has a `name` (empty until authored) and its own chart in `data/glyph-seasons.json`. A chart is a full substitution: every glyph stands for one Latin letter, and every letter is used once.
 
-The seed will pick the season of a book from the **partner’s** three seasons. Ravabulle’s book uses season 4, 5, or 6. Troncadelle’s book uses season 1, 2, or 3. The player who sees the glyphs does not hold the chart for that season. The icon of the book’s own season is shown on the **back cover**, so the partner can match it to one column of their notebook. The open pages do not need to print the season name.
+The seed picks the season of a book from the **partner’s** three seasons. Ravabulle’s book uses season 4, 5, or 6. Troncadelle’s book uses season 1, 2, or 3. The player who sees the glyphs does not hold the chart for that season. The book’s season name is centered on the **back cover**. The open pages do not print it.
 
 Each physical notebook:
 
@@ -153,40 +153,40 @@ Each physical notebook:
 | Ravabulle | 1, 2, 3 | 4, 5, 6 |
 | Troncadelle | 4, 5, 6 | 1, 2, 3 |
 
-Season 1 keeps the current reading: glyph `A.png` is the letter A, and so on through Z. The same glyph never stands for the same letter in two seasons, so the three letters under one glyph are always different.
+Season 1’s chart is `WEQDZKYBOXTURFISCVJHLGAPNM`. It is not A–Z. The same glyph never stands for the same letter in two seasons, so the three letters under one glyph are always different.
 
-The on-screen wheel is not built. When it is, it replaces the piece box after the dossiers appear. Lining a glyph up with a letter replaces that glyph on every tag of that screen. A reset puts the glyphs back. A wrong lining-up stays silent.
+The on-screen wheel replaces the piece box after the dossiers appear. It does not look up these charts. The tags are already written with the book’s season: the glyph on the page is the one whose chart entry is the letter underneath. Lining that glyph up with a letter and pressing Valider replaces it on every tag in the book. Réinitialiser puts the glyphs back. A wrong letter stays silent.
 
-Index 0 of each `map` string is glyph A. Read down a column for one glyph, or across a row for one season.
+The row is the glyph (A is file `1.png`, Z is file `26.png`). The cell is the letter that glyph stands for in that season. Ravabulle’s notebook prints Florange, Frisquaire, and Chaufféal. Troncadelle’s prints Bruméol, Diluviette, and Ouramoufle.
 
-| Glyph | 1 | 2 | 3 | 4 | 5 | 6 |
-|-------|---|---|---|---|---|---|
-| A | A | V | O | D | Q | K |
-| B | B | U | L | Q | Y | C |
-| C | C | T | N | S | X | E |
-| D | D | B | Y | H | P | T |
-| E | E | J | M | U | A | G |
-| F | F | L | X | O | M | Q |
-| G | G | Q | J | T | D | L |
-| H | H | C | S | W | R | F |
-| I | I | X | R | V | L | N |
-| J | J | H | B | I | T | U |
-| K | K | E | P | N | U | V |
-| L | L | D | E | C | V | W |
-| M | M | S | F | B | W | J |
-| N | N | O | A | Y | H | B |
-| O | O | G | C | E | Z | Y |
-| P | P | F | H | G | I | D |
-| Q | Q | W | Z | R | N | S |
-| R | R | Z | Q | P | B | H |
-| S | S | N | G | Z | O | X |
-| T | T | P | D | F | K | M |
-| U | U | R | W | J | E | I |
-| V | V | I | T | X | S | P |
-| W | W | K | I | L | F | O |
-| X | X | M | U | A | G | Z |
-| Y | Y | A | K | M | C | R |
-| Z | Z | Y | V | K | J | A |
+| Glyph | Florange | Frisquaire | Chaufféal | Bruméol | Diluviette | Ouramoufle |
+|-------|----------|------------|-----------|---------|------------|------------|
+| A     | W        | V          | O         | D       | Q          | K          |
+| B     | E        | U          | L         | Q       | Y          | C          |
+| C     | Q        | T          | N         | S       | X          | E          |
+| D     | D        | B          | Y         | H       | P          | T          |
+| E     | Z        | J          | M         | U       | A          | G          |
+| F     | K        | L          | X         | O       | M          | Q          |
+| G     | Y        | Q          | J         | T       | D          | L          |
+| H     | B        | C          | S         | W       | R          | F          |
+| I     | O        | X          | R         | V       | L          | N          |
+| J     | X        | H          | B         | I       | T          | U          |
+| K     | T        | E          | P         | N       | U          | V          |
+| L     | U        | D          | E         | C       | V          | W          |
+| M     | R        | S          | F         | B       | W          | J          |
+| N     | F        | O          | A         | Y       | H          | B          |
+| O     | I        | G          | C         | E       | Z          | Y          |
+| P     | S        | F          | H         | G       | I          | D          |
+| Q     | C        | W          | Z         | R       | N          | S          |
+| R     | V        | Z          | Q         | P       | B          | H          |
+| S     | J        | N          | G         | Z       | O          | X          |
+| T     | H        | P          | D         | F       | K          | M          |
+| U     | L        | R          | W         | J       | E          | I          |
+| V     | G        | I          | T         | X       | S          | P          |
+| W     | A        | K          | I         | L       | F          | O          |
+| X     | P        | M          | U         | A       | G          | Z          |
+| Y     | N        | A          | K         | M       | C          | R          |
+| Z     | M        | Y          | V         | K       | J          | A          |
 
 ## Layout JSON
 

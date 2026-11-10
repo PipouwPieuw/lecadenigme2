@@ -9,11 +9,11 @@
     "troncadelle": [1, 2, 3]
   },
   "seasons": [
-    { "id": 1, "notebook": "ravabulle", "map": "ABCDEFGHIJKLMNOPQRSTUVWXYZ" },
-    { "id": 2, "notebook": "ravabulle", "map": "VUTBJLQCXHEDSOGFWZNPRIKMAY" },
-    { "id": 3, "notebook": "ravabulle", "map": "OLNYMXJSRBPEFACHZQGDWTIUKV" },
-    { "id": 4, "notebook": "troncadelle", "map": "DQSHUOTWVINCBYEGRPZFJXLAMK" },
-    { "id": 5, "notebook": "troncadelle", "map": "QYXPAMDRLTUVWHZINBOKESFGCJ" },
-    { "id": 6, "notebook": "troncadelle", "map": "KCETGQLFNUVWJBYDSHXMIPOZRA" }
+    { "id": 1, "name": "Florange", "notebook": "ravabulle", "map": "WEQDZKYBOXTURFISCVJHLGAPNM" },
+    { "id": 2, "name": "Frisquaire", "notebook": "ravabulle", "map": "VUTBJLQCXHEDSOGFWZNPRIKMAY" },
+    { "id": 3, "name": "Saunamame", "notebook": "ravabulle", "map": "OLNYMXJSRBPEFACHZQGDWTIUKV" },
+    { "id": 4, "name": "Bruméol", "notebook": "troncadelle", "map": "DQSHUOTWVINCBYEGRPZFJXLAMK" },
+    { "id": 5, "name": "Diluviette", "notebook": "troncadelle", "map": "QYXPAMDRLTUVWHZINBOKESFGCJ" },
+    { "id": 6, "name": "Ouramoufle", "notebook": "troncadelle", "map": "KCETGQLFNUVWJBYDSHXMIPOZRA" }
   ]
 }

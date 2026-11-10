@@ -86,6 +86,213 @@ body.ah_placements_locked .grab_piece {
 	pointer-events: none;
 }
 
+#object_box.object_box--wheel {
+	margin: 0;
+	flex-basis: 33.333%;
+	width: 33.333%;
+	max-width: none;
+	min-width: 400px;
+	border: none;
+	background: transparent;
+	overflow: hidden;
+}
+
+#translation_wheel[hidden] {
+	display: none !important;
+}
+
+#translation_wheel {
+	position: relative;
+	flex: 1 1 auto;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.wheel_viewport {
+	position: relative;
+	flex: 1 1 auto;
+	align-self: flex-start;
+	width: 400px;
+	max-width: 100%;
+	min-height: 0;
+	overflow: hidden;
+}
+
+.wheel_assembly {
+	position: absolute;
+	width: 800px;
+	height: 800px;
+	right: 0;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+.wheel_marker {
+	position: absolute;
+	z-index: 4;
+	top: 50%;
+	width: 0;
+	height: 0;
+	transform: translateY(-50%);
+	border-top: 12px solid transparent;
+	border-bottom: 12px solid transparent;
+	pointer-events: none;
+}
+
+.wheel_marker--glyph {
+	right: 2px;
+	border-right: 16px solid #c9a227;
+}
+
+.wheel_marker--letter {
+	left: 198px;
+	border-left: 16px solid #c9a227;
+}
+
+.wheel_ring {
+	position: absolute;
+	border-radius: 50%;
+	overflow: hidden;
+	touch-action: none;
+	cursor: grab;
+	user-select: none;
+}
+
+.wheel_spokes {
+	position: absolute;
+	inset: 0;
+	border-radius: 50%;
+	pointer-events: none;
+	z-index: 0;
+}
+
+.wheel_ring--glyphs .wheel_spokes {
+	background: repeating-conic-gradient(
+		from calc(90deg - 180deg / 26 - 0.2deg),
+		#7a6248 0deg 0.1deg,
+		transparent 0.4deg calc(360deg / 26)
+	);
+}
+
+.wheel_ring--letters .wheel_spokes {
+	background: repeating-conic-gradient(
+		from calc(90deg - 180deg / 26 - 0.2deg),
+		rgba(244, 240, 232, 0.55) 0deg 0.1deg,
+		transparent 0.4deg calc(360deg / 26)
+	);
+}
+
+.wheel_ring:focus-visible {
+	outline: 3px solid #f4f0e8;
+	outline-offset: -10px;
+}
+
+.wheel_ring--dragging {
+	cursor: grabbing;
+}
+
+.wheel_ring--glyphs {
+	inset: 0;
+	border: 3px solid #c9a227;
+	background: #f3ecdf;
+}
+
+.wheel_ring--letters {
+	width: 600px;
+	height: 600px;
+	left: 100px;
+	top: 100px;
+	border: 3px solid #8d7340;
+	background: rgba(48, 36, 68, 0.98);
+}
+
+.wheel_item {
+	position: absolute;
+	z-index: 1;
+	left: 50%;
+	top: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	pointer-events: none;
+}
+
+.wheel_ring--settling .wheel_item,
+.wheel_ring--settling .wheel_spokes {
+	transition: transform 0.18s ease;
+}
+
+.wheel_ring--glyphs .wheel_item {
+	width: 48px;
+	height: 48px;
+	margin: -24px 0 0 -24px;
+}
+
+.wheel_ring--glyphs .wheel_item img {
+	width: 48px;
+	height: 48px;
+	image-rendering: pixelated;
+}
+
+.wheel_ring--letters .wheel_item {
+	width: 36px;
+	height: 36px;
+	margin: -18px 0 0 -18px;
+	font-size: 1.35rem;
+	font-weight: 700;
+	color: #f4f0e8;
+}
+
+.wheel_item img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+}
+
+.wheel_validate {
+	position: absolute;
+	z-index: 3;
+	width: 400px;
+	height: 400px;
+	left: 200px;
+	top: 200px;
+	border-radius: 50%;
+	border: 3px solid #c9a227;
+	background: #3a2a18;
+	color: #f4f0e8;
+	font: inherit;
+	font-size: 1rem;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	padding-right: 0.45rem;
+	cursor: pointer;
+}
+
+.wheel_validate:focus-visible {
+	outline: 3px solid #f4f0e8;
+	outline-offset: 4px;
+}
+
+.wheel_reset {
+	flex: 0 0 auto;
+	align-self: flex-start;
+	margin: 0 0 0.75rem 0.75rem;
+	padding: 0.45rem 0.9rem;
+	border: 2px solid #c9a227;
+	border-radius: 8px;
+	background: #2d2440;
+	color: #f4f0e8;
+	font: inherit;
+	cursor: pointer;
+}
+
+.wheel_reset:focus-visible {
+	outline: 3px solid #f4f0e8;
+	outline-offset: 2px;
+}
+
 #grab_pool {
 	position: relative;
 	flex: 1 1 auto;
@@ -111,6 +318,7 @@ body.ah_placements_locked .grab_piece {
 }
 
 #btn_open_book {
+	position: relative;
 	border: none;
 	padding: 0;
 	background: transparent;
@@ -134,8 +342,27 @@ body.ah_placements_locked .grab_piece {
 	object-fit: contain;
 }
 
-#book_cover.book_cover--back #btn_open_book img {
-	transform: scaleX(-1);
+#book_cover.book_cover--back .season_name {
+	display: block;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	margin: 0;
+	max-width: 70%;
+	pointer-events: none;
+	color: #1c1408;
+	background: rgba(243, 236, 223, 0.92);
+	padding: 0.35rem 0.8rem;
+	border-radius: 4px;
+	font-size: 1.25rem;
+	font-weight: 700;
+	line-height: 1.2;
+	text-align: center;
+}
+
+.season_name {
+	display: none;
 }
 
 #book_open {
@@ -197,15 +424,53 @@ body.ah_placements_locked .grab_piece {
 
 .page_number {
 	position: absolute;
-	left: calc(10% + 0.55rem);
-	bottom: calc(10% + 0.4rem);
+	left: calc(13% + 0.4rem);
+    bottom: calc(7% + 0.4rem);
 	z-index: 6;
 	margin: 0;
-	font-size: 1.05rem;
-	font-weight: 600;
 	line-height: 1;
 	color: #1c1408;
 	pointer-events: none;
+}
+
+.hand_line {
+	--hand-word-gap: 0.42em;
+	/* Distance added between handwriting lines. Negative pulls the next line up into the transparent padding of the character images. */
+	--hand-line-gap: -0.55rem;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	justify-content: flex-start;
+	column-gap: var(--hand-word-gap);
+	padding-top: max(0px, calc(var(--hand-line-gap) * -1));
+}
+
+.hand_word {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: flex-end;
+	max-width: 100%;
+	margin-top: var(--hand-line-gap);
+}
+
+.hand_char {
+	display: block;
+	width: auto;
+	height: 2.15rem;
+	object-fit: fill;
+	image-rendering: auto;
+}
+
+.page_number .hand_char {
+	height: 3rem;
+}
+
+.hand_plain {
+	align-self: flex-end;
+	padding-bottom: 0.55em;
+	color: #1a1020;
+	font-size: 0.85rem;
+	line-height: 1;
 }
 
 .book_turn {
@@ -367,10 +632,10 @@ body.ah_placements_locked .grab_piece {
 
 .dossier_tag .tag_glyphs {
 	position: absolute;
-	left: 14%;
-	right: 14%;
-	top: 18%;
-	bottom: 18%;
+	left: 16%;
+	right: 16%;
+	top: 22%;
+	bottom: 22%;
 	display: flex;
 	/* flex-wrap: nowrap; */
 	flex-wrap: wrap;
@@ -380,13 +645,28 @@ body.ah_placements_locked .grab_piece {
 	pointer-events: none;
 }
 
-.dossier_tag .tag_glyph {
-	/* flex: 1 1 0; */
-	flex: 0 0 30px;
-	width: 30px;
-	height: 30px;
+.dossier_tag .tag_glyph_slot {
+	flex: 0 0 11.8%px;
+	width: 11.8%;
+	aspect-ratio: 1 / 1;
 	min-width: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+}
+
+.dossier_tag .tag_glyph {
+	width: 100%;
+	height: 100%;
 	object-fit: contain;
+}
+
+.dossier_tag .tag_glyph_letter {
+	width: auto;
+	height: 100%;
+	transform: scale(2.15);
+	object-fit: fill;
 }
 
 .dossier_tag .tag_glyph_gap {
@@ -416,11 +696,64 @@ body.ah_placements_locked .grab_piece {
 	font: inherit;
 	font-size: 0.75rem;
 	letter-spacing: 0.06em;
+	color: transparent;
+	caret-color: transparent;
 }
 
 .dossier_tag .tag_input:focus {
 	outline: 2px solid #6b5a8e;
 	outline-offset: 2px;
+}
+
+.tag_input_field {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+}
+
+.tag_input_hand {
+	position: absolute;
+	left: 16%;
+	right: 16%;
+	top: 18%;
+	bottom: 18%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+	pointer-events: none;
+}
+
+.tag_input_hand .hand_line {
+	--hand-line-gap: -0.35rem;
+	--hand-word-gap: 0.16em;
+	justify-content: center;
+	max-width: 100%;
+}
+
+.tag_input_field .hand_char,
+.tag_input_field .hand_plain {
+	width: auto;
+	height: 2rem;
+}
+
+.tag_input_caret {
+	flex: 0 0 1px;
+	width: 1px;
+	height: 1.05rem;
+	align-self: flex-end;
+	margin: 0 0.05rem 0.42rem;
+	background: #1a1020;
+	animation: tag_caret_blink 1s step-end infinite;
+}
+
+.hand_char--selected,
+.hand_plain.hand_char--selected {
+	background: rgba(107, 90, 142, 0.35);
+}
+
+@keyframes tag_caret_blink {
+	50% { opacity: 0; }
 }
 
 .species_description {
@@ -432,8 +765,6 @@ body.ah_placements_locked .grab_piece {
 	overflow: auto;
 	text-align: left;
 	color: #1a1020;
-	font-size: 0.85rem;
-	line-height: 1.35;
 }
 
 .spread_letter {
@@ -705,5 +1036,14 @@ body.ah_hat_preview {
 
 	#object_box.object_box--leaving {
 		transition: none;
+	}
+
+	.wheel_ring--settling .wheel_item,
+	.wheel_ring--settling .wheel_spokes {
+		transition: none;
+	}
+
+	.tag_input_caret {
+		animation: none;
 	}
 }

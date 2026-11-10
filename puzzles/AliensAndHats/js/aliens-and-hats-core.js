@@ -35,6 +35,7 @@
 		dossierRevealed: false,
 		dossierAnimating: false,
 		stage2: false,
+		season: null,
 		pageRevealed: {}
 	};
 
@@ -659,6 +660,161 @@
 		return stripped.toUpperCase();
 	}
 
+	function handCharacterFile(ch) {
+		if (ch >= 'a' && ch <= 'z') {
+			return ch;
+		}
+		if (ch >= 'A' && ch <= 'Z') {
+			return ch.toLowerCase() + '-upper';
+		}
+		if (ch >= '0' && ch <= '9') {
+			return ch;
+		}
+		switch (ch) {
+		case '.':
+			return 'punct-dot';
+		case ',':
+			return 'punct-comma';
+		case "'":
+		case '\u2019':
+			return 'punct-apostrophe';
+		case '-':
+		case '\u2013':
+			return 'punct-dash';
+		case '\u00e9':
+			return 'e-accent-acute';
+		case '\u00e8':
+			return 'e-accent-grave';
+		case '\u00ea':
+			return 'e-accent-circumflex';
+		case '\u00e0':
+			return 'a-accent-grave';
+		case '\u00e2':
+			return 'a-accent-circumflex';
+		case '\u00c0':
+			return 'a-upper-accent-grave';
+		case '\u00ee':
+			return 'i-accent-circumflex';
+		case '\u00f4':
+			return 'o-accent-circumflex';
+		case '\u00e7':
+			return 'c-cedilla';
+		case '\u00f9':
+			return 'u-accent-grave';
+		default:
+			return '';
+		}
+	}
+
+	function buildHandLine(text, caret) {
+		var line = document.createElement('span');
+		line.className = 'hand_line';
+		line.setAttribute('aria-hidden', 'true');
+		var word = null;
+		var caretState = caret ? {
+			index: caret.index,
+			start: caret.start,
+			end: caret.end,
+			placed: false
+		} : null;
+
+		function flushWord() {
+			if (word && word.childNodes.length) {
+				line.appendChild(word);
+			}
+			word = null;
+		}
+
+		function ensureWord() {
+			if (!word) {
+				word = document.createElement('span');
+				word.className = 'hand_word';
+			}
+			return word;
+		}
+
+		function placeCaretAt(index) {
+			if (!caretState || caretState.placed || caretState.index !== index) {
+				return;
+			}
+			caretState.placed = true;
+			var mark = document.createElement('span');
+			mark.className = 'tag_input_caret';
+			ensureWord().appendChild(mark);
+		}
+
+		function decorate(node, index) {
+			if (!caretState || caretState.start === caretState.end) {
+				return;
+			}
+			if (index >= caretState.start && index < caretState.end) {
+				node.classList.add('hand_char--selected');
+			}
+		}
+
+		var raw = String(text || '');
+		var i = 0;
+		while (i < raw.length) {
+			placeCaretAt(i);
+			var ch = raw.charAt(i);
+			if (ch === ' ' || ch === '\u00a0') {
+				var spaces = 0;
+				while (i < raw.length && (raw.charAt(i) === ' ' || raw.charAt(i) === '\u00a0')) {
+					if (spaces > 0) {
+						placeCaretAt(i);
+					}
+					spaces += 1;
+					i += 1;
+				}
+				flushWord();
+				if (spaces > 1 && line.lastChild) {
+					line.lastChild.style.marginRight = 'calc(var(--hand-word-gap) * ' + (spaces - 1) + ')';
+				}
+				continue;
+			}
+			var target = ensureWord();
+			var file = handCharacterFile(ch);
+			if (!file) {
+				var plain = document.createElement('span');
+				plain.className = 'hand_plain';
+				plain.textContent = ch;
+				decorate(plain, i);
+				target.appendChild(plain);
+				i += 1;
+				continue;
+			}
+			var img = document.createElement('img');
+			img.className = 'hand_char';
+			img.draggable = false;
+			img.src = 'assets/characters/' + file + '.png';
+			img.alt = '';
+			decorate(img, i);
+			target.appendChild(img);
+			i += 1;
+		}
+		placeCaretAt(raw.length);
+		flushWord();
+		return line;
+	}
+
+	function glyphIdForLetter(letter) {
+		var map = state.season && state.season.map;
+		var index = map ? map.indexOf(letter) : -1;
+		if (index < 0) {
+			return String(letter.charCodeAt(0) - 64);
+		}
+		return String(index + 1);
+	}
+
+	function glyphImage(id) {
+		var img = document.createElement('img');
+		img.draggable = false;
+		img.className = 'tag_glyph';
+		img.src = assetPath('glyphs', id);
+		img.alt = '';
+		return img;
+	}
+
 	function buildGlyphRow(text) {
 		var row = document.createElement('span');
 		row.className = 'tag_glyphs';
@@ -676,14 +832,47 @@
 			if (!/^[A-Z]$/.test(letter)) {
 				continue;
 			}
-			var img = document.createElement('img');
-			img.draggable = false;
-			img.className = 'tag_glyph';
-			img.src = assetPath('glyphs', letter);
-			img.alt = '';
-			row.appendChild(img);
+			var slot = document.createElement('span');
+			slot.className = 'tag_glyph_slot';
+			slot.dataset.glyph = glyphIdForLetter(letter);
+			slot.appendChild(glyphImage(slot.dataset.glyph));
+			row.appendChild(slot);
 		}
 		return row;
+	}
+
+	function showGlyphLetter(slot, letter) {
+		var file = handCharacterFile(letter);
+		if (!file) {
+			return;
+		}
+		var shown = document.createElement('img');
+		shown.className = 'tag_glyph_letter';
+		shown.draggable = false;
+		shown.src = 'assets/characters/' + file + '.png';
+		shown.alt = '';
+		slot.replaceChildren(shown);
+	}
+
+	function syncTagInputHand(input) {
+		var mirror = input.parentNode && input.parentNode.querySelector('.tag_input_hand');
+		if (!mirror) {
+			return;
+		}
+		var caret = null;
+		if (document.activeElement === input) {
+			var at = input.selectionDirection === 'backward' ? input.selectionStart : input.selectionEnd;
+			caret = {
+				index: at,
+				start: input.selectionStart,
+				end: input.selectionEnd
+			};
+		}
+		mirror.replaceChildren(buildHandLine(input.value, caret));
+	}
+
+	function restoreGlyphSlot(slot) {
+		slot.replaceChildren(glyphImage(slot.dataset.glyph));
 	}
 
 	function buildCodedTag(className, art, label, accessibleLabel) {
@@ -711,8 +900,25 @@
 		input.spellcheck = false;
 		input.dataset.pageIndex = String(pageIndex);
 		input.dataset.field = field;
-		input.addEventListener('input', tryValidate);
-		wrap.appendChild(input);
+		var fieldWrap = document.createElement('div');
+		fieldWrap.className = 'tag_input_field';
+		var mirror = document.createElement('span');
+		mirror.className = 'tag_input_hand';
+		mirror.setAttribute('aria-hidden', 'true');
+		fieldWrap.appendChild(mirror);
+		function refreshHand() {
+			syncTagInputHand(input);
+		}
+		input.addEventListener('input', function () {
+			refreshHand();
+			tryValidate();
+		});
+		input.addEventListener('keyup', refreshHand);
+		input.addEventListener('pointerup', refreshHand);
+		input.addEventListener('focus', refreshHand);
+		input.addEventListener('blur', refreshHand);
+		fieldWrap.appendChild(input);
+		wrap.appendChild(fieldWrap);
 		return wrap;
 	}
 
@@ -748,7 +954,7 @@
 			var alienImg = document.createElement('img');
 			alienImg.draggable = false;
 			alienImg.src = assetPath('aliens', guest.alien + '-' + guest.alien_variant);
-			alienImg.alt = 'Invité';
+			alienImg.alt = 'Spécimen';
 			alienImg.className = 'alien_img alien_img--grayscale';
 			applySizeEntryToElement(alienWrap, alienBookSizeEntry(guest.alien), alienImg);
 			alienWrap.appendChild(alienImg);
@@ -794,8 +1000,8 @@
 
 		var number = document.createElement('p');
 		number.className = 'page_number';
-		number.textContent = String(pageIndex + 1);
 		number.setAttribute('aria-label', 'Page ' + (pageIndex + 1));
+		number.appendChild(buildHandLine(String(pageIndex + 1)));
 		page.appendChild(number);
 		return page;
 	}
@@ -828,14 +1034,18 @@
 
 		var description = document.createElement('p');
 		description.className = 'species_description';
-		description.textContent = guest.species_description;
+		var descriptionText = document.createElement('span');
+		descriptionText.className = 'visually-hidden';
+		descriptionText.textContent = guest.species_description;
+		description.appendChild(descriptionText);
+		description.appendChild(buildHandLine(guest.species_description));
 		scene.appendChild(description);
 
 		if (state.role === 'ravabulle') {
 			scene.appendChild(buildInputTag(
 				'dossier_tag dossier_tag--name',
 				guest.name_tag_art,
-				"Nom de l'invité",
+				"Nom du spécimen",
 				pageIndex,
 				'name'
 			));
@@ -1391,6 +1601,224 @@
 		});
 	}
 
+	var WHEEL_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	var WHEEL_STEP = 360 / WHEEL_LETTERS.length;
+	var wheelBuilt = false;
+	var wheelDrag = null;
+
+	function wheelActiveIndex(steps) {
+		var index = -steps % WHEEL_LETTERS.length;
+		return (index + WHEEL_LETTERS.length) % WHEEL_LETTERS.length;
+	}
+
+	function layoutWheelRing(ring, rotation, steps) {
+		var radius = ring.classList.contains('wheel_ring--glyphs') ? 348 : 248;
+		var spokes = ring.querySelector('.wheel_spokes');
+		if (spokes) {
+			spokes.style.transform = 'rotate(' + rotation + 'deg)';
+		}
+		var items = ring.querySelectorAll('.wheel_item');
+		var activeSteps = steps === undefined ? Math.round(rotation / WHEEL_STEP) : steps;
+		var active = wheelActiveIndex(activeSteps);
+		for (var i = 0; i < items.length; i += 1) {
+			var place = i * WHEEL_STEP + rotation;
+			items[i].style.transform = 'rotate(' + place + 'deg) translateX(' + radius + 'px) rotate(' + (-place) + 'deg)';
+		}
+		if (steps === undefined) {
+			return;
+		}
+		ring.setAttribute('aria-valuenow', String(active));
+		if (ring.classList.contains('wheel_ring--glyphs')) {
+			ring.setAttribute('aria-valuetext', 'Symbole');
+			return;
+		}
+		var label = items[active] ? items[active].dataset.value : '';
+		ring.setAttribute('aria-valuetext', 'Lettre ' + label);
+	}
+
+	function settleWheelRing(ring, rotation) {
+		var steps = Math.round(rotation / WHEEL_STEP);
+		ring.dataset.steps = String(steps);
+		var snapped = steps * WHEEL_STEP;
+		if (motionReduced()) {
+			ring.classList.remove('wheel_ring--settling');
+			layoutWheelRing(ring, snapped, steps);
+			return;
+		}
+		ring.classList.add('wheel_ring--settling');
+		layoutWheelRing(ring, snapped, steps);
+		window.setTimeout(function () {
+			ring.classList.remove('wheel_ring--settling');
+		}, 220);
+	}
+
+	function pointerAngle(event, cx, cy) {
+		return Math.atan2(event.clientY - cy, event.clientX - cx) * 180 / Math.PI;
+	}
+
+	function onWheelPointerDown(event) {
+		if (event.button !== 0) {
+			return;
+		}
+		var ring = event.currentTarget;
+		var rect = ring.getBoundingClientRect();
+		wheelDrag = {
+			ring: ring,
+			pointerId: event.pointerId,
+			cx: rect.left + rect.width / 2,
+			cy: rect.top + rect.height / 2,
+			lastAngle: pointerAngle(event, rect.left + rect.width / 2, rect.top + rect.height / 2),
+			rotation: (parseInt(ring.dataset.steps, 10) || 0) * WHEEL_STEP
+		};
+		ring.classList.add('wheel_ring--dragging');
+		ring.classList.remove('wheel_ring--settling');
+		ring.setPointerCapture(event.pointerId);
+	}
+
+	function onWheelPointerMove(event) {
+		if (!wheelDrag || event.pointerId !== wheelDrag.pointerId) {
+			return;
+		}
+		var angle = pointerAngle(event, wheelDrag.cx, wheelDrag.cy);
+		var delta = angle - wheelDrag.lastAngle;
+		if (delta > 180) {
+			delta -= 360;
+		} else if (delta < -180) {
+			delta += 360;
+		}
+		wheelDrag.lastAngle = angle;
+		wheelDrag.rotation += delta;
+		layoutWheelRing(wheelDrag.ring, wheelDrag.rotation);
+	}
+
+	function onWheelPointerUp(event) {
+		if (!wheelDrag || event.pointerId !== wheelDrag.pointerId) {
+			return;
+		}
+		var ring = wheelDrag.ring;
+		var rotation = wheelDrag.rotation;
+		wheelDrag = null;
+		ring.classList.remove('wheel_ring--dragging');
+		settleWheelRing(ring, rotation);
+	}
+
+	function onWheelKeyDown(event) {
+		if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
+			return;
+		}
+		event.preventDefault();
+		event.stopPropagation();
+		var ring = event.currentTarget;
+		var steps = parseInt(ring.dataset.steps, 10) || 0;
+		steps += event.key === 'ArrowRight' ? 1 : -1;
+		settleWheelRing(ring, steps * WHEEL_STEP);
+	}
+
+	function bindWheelRing(ring) {
+		ring.dataset.steps = '0';
+		layoutWheelRing(ring, 0, 0);
+		ring.addEventListener('pointerdown', onWheelPointerDown);
+		ring.addEventListener('pointermove', onWheelPointerMove);
+		ring.addEventListener('pointerup', onWheelPointerUp);
+		ring.addEventListener('pointercancel', onWheelPointerUp);
+		ring.addEventListener('keydown', onWheelKeyDown);
+	}
+
+	function fillWheelRing(ring, values, glyphs) {
+		var spokes = document.createElement('div');
+		spokes.className = 'wheel_spokes';
+		spokes.setAttribute('aria-hidden', 'true');
+		ring.appendChild(spokes);
+		values.forEach(function (value) {
+			var item = document.createElement('span');
+			item.className = 'wheel_item';
+			item.dataset.value = value;
+			if (glyphs) {
+				var img = document.createElement('img');
+				img.draggable = false;
+				img.width = 48;
+				img.height = 48;
+				img.src = assetPath('glyphs/wheel', value);
+				img.alt = '';
+				item.appendChild(img);
+			} else {
+				item.textContent = value;
+			}
+			ring.appendChild(item);
+		});
+		bindWheelRing(ring);
+	}
+
+	function buildTranslationWheel() {
+		if (wheelBuilt) {
+			return;
+		}
+		var glyphs = el('wheel_ring_glyphs');
+		var letters = el('wheel_ring_letters');
+		if (!glyphs || !letters) {
+			return;
+		}
+		wheelBuilt = true;
+		var seed = state.instance && state.instance.seed ? state.instance.seed : 1;
+		var rng = mulberry32(seed);
+		var glyphIds = [];
+		for (var n = 1; n <= WHEEL_LETTERS.length; n += 1) {
+			glyphIds.push(String(n));
+		}
+		fillWheelRing(glyphs, shuffleList(glyphIds, rng), true);
+		fillWheelRing(letters, WHEEL_LETTERS.split(''), false);
+		el('btn_wheel_validate').addEventListener('click', applyWheelMatch);
+		el('btn_wheel_reset').addEventListener('click', resetWheelMatches);
+	}
+
+	function wheelValue(ring) {
+		var items = ring.querySelectorAll('.wheel_item');
+		var index = wheelActiveIndex(parseInt(ring.dataset.steps, 10) || 0);
+		return items[index] ? items[index].dataset.value : '';
+	}
+
+	function setWheelStatus(message) {
+		var status = el('wheel_status');
+		if (status) {
+			status.textContent = message;
+		}
+	}
+
+	function applyWheelMatch() {
+		var glyph = wheelValue(el('wheel_ring_glyphs'));
+		var letter = wheelValue(el('wheel_ring_letters'));
+		if (!glyph || !letter) {
+			return;
+		}
+		document.querySelectorAll('.tag_glyph_slot').forEach(function (slot) {
+			if (slot.dataset.glyph === glyph) {
+				showGlyphLetter(slot, letter);
+			}
+		});
+		setWheelStatus('Symbole remplacé.');
+	}
+
+	function resetWheelMatches() {
+		document.querySelectorAll('.tag_glyph_slot').forEach(restoreGlyphSlot);
+		setWheelStatus('Symboles rétablis.');
+	}
+
+	function showTranslationWheel() {
+		var box = el('object_box');
+		var pool = el('grab_pool');
+		var wheel = el('translation_wheel');
+		if (!box || !wheel) {
+			return;
+		}
+		if (pool) {
+			pool.hidden = true;
+		}
+		box.classList.add('object_box--wheel');
+		box.setAttribute('aria-label', 'Roue de traduction');
+		wheel.hidden = false;
+		buildTranslationWheel();
+	}
+
 	function dismissObjectBox(immediate) {
 		var box = el('object_box');
 		if (!box || box.classList.contains('object_box--gone') || box.classList.contains('object_box--leaving')) {
@@ -1423,7 +1851,7 @@
 	function showDossierPages() {
 		state.dossierRevealed = true;
 		lockPlacements();
-		dismissObjectBox(false);
+		showTranslationWheel();
 		var current = document.querySelector('.book_spread:not([hidden]) .page_scene--dossier');
 		var animate = current && !motionReduced();
 		document.querySelectorAll('.page_scene--dossier').forEach(function (scene) {
@@ -1600,6 +2028,14 @@
 		playPageTurn();
 	}
 
+	function setCoverImage(side) {
+		var img = el('btn_open_book') && el('btn_open_book').querySelector('img');
+		if (!img) {
+			return;
+		}
+		img.src = side === 'back' ? 'assets/misc/bookback.png' : 'assets/misc/bookfront.png';
+	}
+
 	function closeBook(side) {
 		if (state.dossierAnimating) {
 			return;
@@ -1609,6 +2045,7 @@
 		el('book_open').hidden = true;
 		el('book_cover').hidden = false;
 		el('book_cover').classList.toggle('book_cover--back', state.coverSide === 'back');
+		setCoverImage(state.coverSide);
 		el('btn_open_book').setAttribute('aria-expanded', 'false');
 		playSound('close');
 	}
@@ -1644,6 +2081,9 @@
 			return;
 		}
 		if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') {
+			return;
+		}
+		if (e.target && e.target.closest && e.target.closest('.wheel_ring')) {
 			return;
 		}
 		var tag = e.target && e.target.tagName;
@@ -1722,7 +2162,7 @@
 		}
 		state.dossierRevealed = true;
 		lockPlacements();
-		dismissObjectBox(true);
+		showTranslationWheel();
 		document.querySelectorAll('.page_scene--dossier').forEach(function (scene) {
 			scene.hidden = false;
 		});
@@ -1864,6 +2304,29 @@
 		}
 	}
 
+	function pickBookSeason(chart, seed) {
+		var pool = chart && chart.book_season_pool && chart.book_season_pool[state.role];
+		if (!pool || !pool.length || !chart.seasons) {
+			return null;
+		}
+		var rng = mulberry32(seed || 1);
+		var id = pool[Math.floor(rng() * pool.length)];
+		for (var i = 0; i < chart.seasons.length; i += 1) {
+			if (chart.seasons[i].id === id) {
+				return chart.seasons[i];
+			}
+		}
+		return null;
+	}
+
+	function applySeasonLabel() {
+		var label = el('season_name');
+		if (!label) {
+			return;
+		}
+		label.textContent = state.season && state.season.name ? state.season.name : '';
+	}
+
 	function init(options) {
 		if (options.preview === 'hats') {
 			loadJson('data/book-layout.json').then(function (layout) {
@@ -1877,18 +2340,25 @@
 		state.stage2 = !options.instance && !options.seed && launch.stage2;
 		loadJson('data/book-layout.json').then(function (layout) {
 			state.layout = layout;
+			var ready;
 			if (options.instance) {
 				state.instance = options.instance;
-				startUi();
-				return;
+				ready = Promise.resolve();
+			} else {
+				ready = loadJson('data/catalog.json').then(function (catalog) {
+					state.instance = global.AliensAndHatsInstance.createInstance(
+						options.seed || launch.seed,
+						catalog
+					);
+				});
 			}
-			loadJson('data/catalog.json').then(function (catalog) {
-				state.instance = global.AliensAndHatsInstance.createInstance(
-					options.seed || launch.seed,
-					catalog
-				);
-				startUi();
+			return ready.then(function () {
+				return loadJson('data/glyph-seasons.json');
 			});
+		}).then(function (chart) {
+			state.season = pickBookSeason(chart, state.instance && state.instance.seed);
+			applySeasonLabel();
+			startUi();
 		});
 	}
 
