@@ -17,6 +17,8 @@
 	var PAGE_ONSET_RATIO = 0.012;
 	var PAGE_PREROLL_SEC = 0.012;
 	var PAGE_FADE_SEC = 0.004;
+	// Longest catalog name is Voitouktouque. The tag letter size is tuned to that width.
+	var TAG_INPUT_MAX = 13;
 	var poolLayoutPass = 0;
 	var poolColumnWidth = 0;
 	var lastPageSound = -1;
@@ -660,6 +662,33 @@
 		return stripped.toUpperCase();
 	}
 
+	function lettersOnly(value) {
+		var raw = String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+		var out = '';
+		for (var i = 0; i < raw.length; i += 1) {
+			var ch = raw.charAt(i).toUpperCase();
+			if (ch >= 'A' && ch <= 'Z') {
+				out += ch;
+			}
+		}
+		return out;
+	}
+
+	function sanitizeTagInput(input) {
+		var start = input.selectionStart || 0;
+		var end = input.selectionEnd || 0;
+		var next = lettersOnly(input.value).slice(0, TAG_INPUT_MAX);
+		var nextStart = Math.min(TAG_INPUT_MAX, lettersOnly(input.value.slice(0, start)).length);
+		var nextEnd = Math.min(TAG_INPUT_MAX, lettersOnly(input.value.slice(0, end)).length);
+		if (input.value === next) {
+			return;
+		}
+		input.value = next;
+		if (document.activeElement === input) {
+			input.setSelectionRange(nextStart, nextEnd);
+		}
+	}
+
 	function handCharacterFile(ch) {
 		if (ch >= 'a' && ch <= 'z') {
 			return ch;
@@ -851,6 +880,7 @@
 		shown.draggable = false;
 		shown.src = 'assets/characters/' + file + '.png';
 		shown.alt = '';
+		slot.dataset.shownLetter = letter;
 		slot.replaceChildren(shown);
 	}
 
@@ -872,6 +902,7 @@
 	}
 
 	function restoreGlyphSlot(slot) {
+		delete slot.dataset.shownLetter;
 		slot.replaceChildren(glyphImage(slot.dataset.glyph));
 	}
 
@@ -898,6 +929,7 @@
 		input.setAttribute('autocomplete', 'off');
 		input.setAttribute('autocapitalize', 'off');
 		input.spellcheck = false;
+		input.maxLength = TAG_INPUT_MAX;
 		input.dataset.pageIndex = String(pageIndex);
 		input.dataset.field = field;
 		var fieldWrap = document.createElement('div');
@@ -906,13 +938,26 @@
 		mirror.className = 'tag_input_hand';
 		mirror.setAttribute('aria-hidden', 'true');
 		fieldWrap.appendChild(mirror);
+		var composing = false;
 		function refreshHand() {
 			syncTagInputHand(input);
 		}
-		input.addEventListener('input', function () {
+		function commitInput() {
+			if (composing) {
+				return;
+			}
+			sanitizeTagInput(input);
 			refreshHand();
 			tryValidate();
+		}
+		input.addEventListener('compositionstart', function () {
+			composing = true;
 		});
+		input.addEventListener('compositionend', function () {
+			composing = false;
+			commitInput();
+		});
+		input.addEventListener('input', commitInput);
 		input.addEventListener('keyup', refreshHand);
 		input.addEventListener('pointerup', refreshHand);
 		input.addEventListener('focus', refreshHand);
@@ -1526,7 +1571,7 @@
 	}
 
 	function normalizeAnswer(value) {
-		return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+		return lettersOnly(value).toLowerCase();
 	}
 
 	function typedAnswer(pageIndex) {
@@ -1605,6 +1650,7 @@
 	var WHEEL_STEP = 360 / WHEEL_LETTERS.length;
 	var wheelBuilt = false;
 	var wheelDrag = null;
+	var wheelHistory = [];
 
 	function wheelActiveIndex(steps) {
 		var index = -steps % WHEEL_LETTERS.length;
@@ -1615,7 +1661,7 @@
 		var radius = ring.classList.contains('wheel_ring--glyphs') ? 348 : 248;
 		var spokes = ring.querySelector('.wheel_spokes');
 		if (spokes) {
-			spokes.style.transform = 'rotate(' + rotation + 'deg)';
+			spokes.style.transform = 'rotate(' + (rotation + WHEEL_STEP / 2) + 'deg)';
 		}
 		var items = ring.querySelectorAll('.wheel_item');
 		var activeSteps = steps === undefined ? Math.round(rotation / WHEEL_STEP) : steps;
@@ -1734,15 +1780,21 @@
 			item.className = 'wheel_item';
 			item.dataset.value = value;
 			if (glyphs) {
-				var img = document.createElement('img');
-				img.draggable = false;
-				img.width = 48;
-				img.height = 48;
-				img.src = assetPath('glyphs/wheel', value);
-				img.alt = '';
-				item.appendChild(img);
+				var glyphImg = document.createElement('img');
+				glyphImg.draggable = false;
+				glyphImg.width = 48;
+				glyphImg.height = 48;
+				glyphImg.src = assetPath('glyphs', value);
+				glyphImg.alt = '';
+				item.appendChild(glyphImg);
 			} else {
-				item.textContent = value;
+				var letterImg = document.createElement('img');
+				letterImg.draggable = false;
+				letterImg.width = 50;
+				letterImg.height = 50;
+				letterImg.src = 'assets/characters/' + handCharacterFile(value) + '.png';
+				letterImg.alt = '';
+				item.appendChild(letterImg);
 			}
 			ring.appendChild(item);
 		});
@@ -1768,7 +1820,8 @@
 		fillWheelRing(glyphs, shuffleList(glyphIds, rng), true);
 		fillWheelRing(letters, WHEEL_LETTERS.split(''), false);
 		el('btn_wheel_validate').addEventListener('click', applyWheelMatch);
-		el('btn_wheel_reset').addEventListener('click', resetWheelMatches);
+		el('btn_wheel_reset').addEventListener('click', undoWheelMatch);
+		updateUndoButton();
 	}
 
 	function wheelValue(ring) {
@@ -1784,23 +1837,53 @@
 		}
 	}
 
+	function updateUndoButton() {
+		var button = el('btn_wheel_reset');
+		if (button) {
+			button.hidden = wheelHistory.length === 0;
+		}
+	}
+
 	function applyWheelMatch() {
 		var glyph = wheelValue(el('wheel_ring_glyphs'));
 		var letter = wheelValue(el('wheel_ring_letters'));
 		if (!glyph || !letter) {
 			return;
 		}
+		var changed = [];
 		document.querySelectorAll('.tag_glyph_slot').forEach(function (slot) {
-			if (slot.dataset.glyph === glyph) {
-				showGlyphLetter(slot, letter);
+			if (slot.dataset.glyph !== glyph || slot.dataset.shownLetter === letter) {
+				return;
 			}
+			changed.push({
+				slot: slot,
+				letter: slot.dataset.shownLetter || ''
+			});
+			showGlyphLetter(slot, letter);
 		});
+		if (!changed.length) {
+			return;
+		}
+		wheelHistory.push(changed);
+		updateUndoButton();
 		setWheelStatus('Symbole remplacé.');
 	}
 
-	function resetWheelMatches() {
-		document.querySelectorAll('.tag_glyph_slot').forEach(restoreGlyphSlot);
-		setWheelStatus('Symboles rétablis.');
+	function undoWheelMatch() {
+		var entry = wheelHistory.pop();
+		if (!entry) {
+			updateUndoButton();
+			return;
+		}
+		entry.forEach(function (item) {
+			if (item.letter) {
+				showGlyphLetter(item.slot, item.letter);
+			} else {
+				restoreGlyphSlot(item.slot);
+			}
+		});
+		updateUndoButton();
+		setWheelStatus(wheelHistory.length ? 'Dernière correspondance annulée.' : 'Symboles rétablis.');
 	}
 
 	function showTranslationWheel() {
@@ -2324,7 +2407,13 @@
 		if (!label) {
 			return;
 		}
-		label.textContent = state.season && state.season.name ? state.season.name : '';
+		if (!state.season || !state.season.id) {
+			label.removeAttribute('src');
+			label.alt = '';
+			return;
+		}
+		label.src = 'assets/seasons/' + state.season.id + '.png';
+		label.alt = state.season.alt || '';
 	}
 
 	function init(options) {

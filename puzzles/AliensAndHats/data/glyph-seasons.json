@@ -9,11 +9,11 @@
     "troncadelle": [1, 2, 3]
   },
   "seasons": [
-    { "id": 1, "name": "Florange", "notebook": "ravabulle", "map": "WEQDZKYBOXTURFISCVJHLGAPNM" },
-    { "id": 2, "name": "Frisquaire", "notebook": "ravabulle", "map": "VUTBJLQCXHEDSOGFWZNPRIKMAY" },
-    { "id": 3, "name": "Saunamame", "notebook": "ravabulle", "map": "OLNYMXJSRBPEFACHZQGDWTIUKV" },
-    { "id": 4, "name": "Bruméol", "notebook": "troncadelle", "map": "DQSHUOTWVINCBYEGRPZFJXLAMK" },
-    { "id": 5, "name": "Diluviette", "notebook": "troncadelle", "map": "QYXPAMDRLTUVWHZINBOKESFGCJ" },
-    { "id": 6, "name": "Ouramoufle", "notebook": "troncadelle", "map": "KCETGQLFNUVWJBYDSHXMIPOZRA" }
+    { "id": 1, "name": "Florange", "alt": "", "notebook": "ravabulle", "map": "WEQDZKYBOXTURFISCVJHLGAPNM" },
+    { "id": 2, "name": "Frisquaire", "alt": "", "notebook": "ravabulle", "map": "VUTBJLQCXHEDSOGFWZNPRIKMAY" },
+    { "id": 3, "name": "Tempétuvial", "alt": "", "notebook": "ravabulle", "map": "OLNYMXJSRBPEFACHZQGDWTIUKV" },
+    { "id": 4, "name": "Bruméol", "alt": "", "notebook": "troncadelle", "map": "DQSHUOTWVINCBYEGRPZFJXLAMK" },
+    { "id": 5, "name": "Diluvior", "alt": "", "notebook": "troncadelle", "map": "QYXPAMDRLTUVWHZINBOKESFGCJ" },
+    { "id": 6, "name": "Ouramoufle", "alt": "", "notebook": "troncadelle", "map": "KCETGQLFNUVWJBYDSHXMIPOZRA" }
   ]
 }

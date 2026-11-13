@@ -29,7 +29,7 @@ Open:
 | `css/aliens-and-hats.css` | Layout (⅓ pool, ⅔ book), portrait stack, dossier |
 | `data/book-layout.json` | Per-species sizes and hat-on-head offsets |
 | `data/catalog.json` | Guest names, species names, and species descriptions (placeholders until authored) |
-| `data/glyph-seasons.json` | Six glyph-to-letter charts and the season names shown on the back cover |
+| `data/glyph-seasons.json` | Six glyph-to-letter charts. The back cover shows `assets/seasons/{id}.png` for the book's season |
 
 ## `init({ role, seed?, instance? })`
 
@@ -116,7 +116,7 @@ While dragging, the piece keeps its current pixel box; `.grab_piece--dragging` a
 - Left and Right arrows turn spreads. They are ignored while a text field is focused, while the dossier entrance is playing, or while the password dialog is open.
 - The outer colored borders of the open book are transparent buttons. The left border goes to the previous spread; the right border goes to the next. Hover and keyboard focus show a gold wash and a pointer. They are disabled during the dossier entrance.
 - Left arrow or the left border on the first spread closes onto the front cover. Right arrow on that cover opens the book again at the spread that was left.
-- Right arrow or the right border on the last spread closes onto the back cover (`assets/misc/bookback.png`). The current season’s `name` is centered on that cover. Left arrow or a click on that cover opens the last spread.
+- Right arrow or the right border on the last spread closes onto the back cover (`assets/misc/bookback.png`). The current season’s emblem (`assets/seasons/{id}.png`) is centered in the cover’s hexagon. Left arrow or a click on that cover opens the last spread.
 - Each left page shows its number, 1–10, in the bottom-left of the white area. The number stays when the password letter replaces the page.
 
 ## Password reveal
@@ -133,7 +133,7 @@ Edit `data/catalog.json` (loaded before `createInstance`):
 - `guests.female` and `guests.male` — Latin names. A female-only species draws from `female`, a male-only species from `male`, and the others from both lists. Ten names are drawn per seed, with no repeat (what Ravabulle types). `alien4` is female; `alien8` is male.
 - `hat_groups` — arrays of similar hat ids (`hat01`…`hat30`). Each array is one pick, on equal footing with each unlisted hat. The book uses one hat from a group, then that group is skipped. If ten hats are still needed after every group and lone hat has been used, used groups with a hat left are opened again. Hats missing from the list stay groupless. The grab box still holds all thirty hats; the twenty that are not in the book are decoys.
 
-Coded tags (Ravabulle’s species tag and Troncadelle’s name tag) show the Latin word as a row of images from `assets/glyphs/1.png`–`26.png` (glyph 1 is the symbol that used to be file A, glyph 26 the one that used to be Z). Each letter is drawn with the glyph whose season chart entry is that letter. A space or hyphen is a gap. The text fields stay ordinary letters. The wheel uses the pixel-art copies in `assets/glyphs/wheel/`, shown at 48×48. Symbol strings are still generated.
+Coded tags (Ravabulle’s species tag and Troncadelle’s name tag) show the Latin word as a row of images from `assets/glyphs/1.png`–`26.png` (glyph 1 is the symbol that used to be file A, glyph 26 the one that used to be Z). Each letter is drawn with the glyph whose season chart entry is that letter. A space or hyphen is a gap. The text fields stay ordinary letters. The wheel shows the same handwritten glyphs as the book, at 48×48, and the handwritten capitals from `assets/characters/`, at 50×50. Symbol strings are still generated.
 
 Symbol codes stay seed-generated. They are not stored in the catalog. Reload the puzzle after edits.
 
@@ -141,7 +141,7 @@ Symbol codes stay seed-generated. They are not stored in the catalog. Reload the
 
 Six seasons. Each has a `name` (empty until authored) and its own chart in `data/glyph-seasons.json`. A chart is a full substitution: every glyph stands for one Latin letter, and every letter is used once.
 
-The seed picks the season of a book from the **partner’s** three seasons. Ravabulle’s book uses season 4, 5, or 6. Troncadelle’s book uses season 1, 2, or 3. The player who sees the glyphs does not hold the chart for that season. The book’s season name is centered on the **back cover**. The open pages do not print it.
+The seed picks the season of a book from the **partner’s** three seasons. Ravabulle’s book uses season 4, 5, or 6. Troncadelle’s book uses season 1, 2, or 3. The player who sees the glyphs does not hold the chart for that season. The book’s season emblem is centered on the **back cover** only. Its text alternative is that season’s `alt` string in `glyph-seasons.json`, not the season name. The open pages and the front cover do not show it.
 
 Each physical notebook:
 
@@ -155,7 +155,7 @@ Each physical notebook:
 
 Season 1’s chart is `WEQDZKYBOXTURFISCVJHLGAPNM`. It is not A–Z. The same glyph never stands for the same letter in two seasons, so the three letters under one glyph are always different.
 
-The on-screen wheel replaces the piece box after the dossiers appear. It does not look up these charts. The tags are already written with the book’s season: the glyph on the page is the one whose chart entry is the letter underneath. Lining that glyph up with a letter and pressing Valider replaces it on every tag in the book. Réinitialiser puts the glyphs back. A wrong letter stays silent.
+The on-screen wheel replaces the piece box after the dossiers appear. It does not look up these charts. The tags are already written with the book’s season: the glyph on the page is the one whose chart entry is the letter underneath. Lining that glyph up with a letter and pressing Valider replaces it on every tag in the book. The undo control appears after the first match and removes only the latest one; it stays until every match has been undone. A wrong letter stays silent.
 
 The row is the glyph (A is file `1.png`, Z is file `26.png`). The cell is the letter that glyph stands for in that season. Ravabulle’s notebook prints Florange, Frisquaire, and Chaufféal. Troncadelle’s prints Bruméol, Diluviette, and Ouramoufle.
 

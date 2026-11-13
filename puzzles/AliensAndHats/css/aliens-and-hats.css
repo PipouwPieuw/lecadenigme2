@@ -94,7 +94,7 @@ body.ah_placements_locked .grab_piece {
 	min-width: 400px;
 	border: none;
 	background: transparent;
-	overflow: hidden;
+	overflow: visible;
 }
 
 #translation_wheel[hidden] {
@@ -132,22 +132,27 @@ body.ah_placements_locked .grab_piece {
 	position: absolute;
 	z-index: 4;
 	top: 50%;
-	width: 0;
-	height: 0;
+	height: 40px;
 	transform: translateY(-50%);
-	border-top: 12px solid transparent;
-	border-bottom: 12px solid transparent;
 	pointer-events: none;
+}
+
+.wheel_marker img {
+	display: block;
+	height: 40px;
+	width: auto;
 }
 
 .wheel_marker--glyph {
 	right: 2px;
-	border-right: 16px solid #c9a227;
+}
+
+.wheel_marker--glyph img {
+	transform: scaleX(-1);
 }
 
 .wheel_marker--letter {
-	left: 198px;
-	border-left: 16px solid #c9a227;
+	left: 193px;
 }
 
 .wheel_ring {
@@ -168,19 +173,11 @@ body.ah_placements_locked .grab_piece {
 }
 
 .wheel_ring--glyphs .wheel_spokes {
-	background: repeating-conic-gradient(
-		from calc(90deg - 180deg / 26 - 0.2deg),
-		#7a6248 0deg 0.1deg,
-		transparent 0.4deg calc(360deg / 26)
-	);
+	background: url("../assets/wheel/wheel-symbols.png") center / 100% 100% no-repeat;
 }
 
 .wheel_ring--letters .wheel_spokes {
-	background: repeating-conic-gradient(
-		from calc(90deg - 180deg / 26 - 0.2deg),
-		rgba(244, 240, 232, 0.55) 0deg 0.1deg,
-		transparent 0.4deg calc(360deg / 26)
-	);
+	background: url("../assets/wheel/wheel-letters.png") center / 100% 100% no-repeat;
 }
 
 .wheel_ring:focus-visible {
@@ -194,8 +191,7 @@ body.ah_placements_locked .grab_piece {
 
 .wheel_ring--glyphs {
 	inset: 0;
-	border: 3px solid #c9a227;
-	background: #f3ecdf;
+	background: transparent;
 }
 
 .wheel_ring--letters {
@@ -203,8 +199,7 @@ body.ah_placements_locked .grab_piece {
 	height: 600px;
 	left: 100px;
 	top: 100px;
-	border: 3px solid #8d7340;
-	background: rgba(48, 36, 68, 0.98);
+	background: transparent;
 }
 
 .wheel_item {
@@ -232,16 +227,19 @@ body.ah_placements_locked .grab_piece {
 .wheel_ring--glyphs .wheel_item img {
 	width: 48px;
 	height: 48px;
-	image-rendering: pixelated;
+	object-fit: contain;
 }
 
 .wheel_ring--letters .wheel_item {
-	width: 36px;
-	height: 36px;
-	margin: -18px 0 0 -18px;
-	font-size: 1.35rem;
-	font-weight: 700;
-	color: #f4f0e8;
+	width: 50px;
+	height: 50px;
+	margin: -25px 0 0 -25px;
+}
+
+.wheel_ring--letters .wheel_item img {
+	width: 50px;
+	height: 50px;
+	object-fit: contain;
 }
 
 .wheel_item img {
@@ -257,17 +255,18 @@ body.ah_placements_locked .grab_piece {
 	height: 400px;
 	left: 200px;
 	top: 200px;
+	border: 0;
 	border-radius: 50%;
-	border: 3px solid #c9a227;
-	background: #3a2a18;
-	color: #f4f0e8;
-	font: inherit;
-	font-size: 1rem;
-	display: flex;
-	align-items: center;
-	justify-content: flex-end;
-	padding-right: 0.45rem;
+	padding: 0;
+	background: transparent;
 	cursor: pointer;
+}
+
+.wheel_validate img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
 }
 
 .wheel_validate:focus-visible {
@@ -276,16 +275,24 @@ body.ah_placements_locked .grab_piece {
 }
 
 .wheel_reset {
-	flex: 0 0 auto;
-	align-self: flex-start;
-	margin: 0 0 0.75rem 0.75rem;
-	padding: 0.45rem 0.9rem;
-	border: 2px solid #c9a227;
-	border-radius: 8px;
-	background: #2d2440;
-	color: #f4f0e8;
-	font: inherit;
+	position: absolute;
+	right: 4px;
+	top: 0;
+	bottom: 0;
+	z-index: 6;
+	width: 100px;
+    height: 100px;
+    margin: auto;
+	padding: 0;
+	border: 0;
+	background: transparent;
 	cursor: pointer;
+}
+
+.wheel_reset img {
+	display: block;
+	width: 100px;
+	height: auto;
 }
 
 .wheel_reset:focus-visible {
@@ -342,27 +349,23 @@ body.ah_placements_locked .grab_piece {
 	object-fit: contain;
 }
 
-#book_cover.book_cover--back .season_name {
-	display: block;
+#btn_open_book .season_name {
+	display: none;
 	position: absolute;
-	left: 50%;
-	top: 50%;
+	left: 47.6%;
+	top: 50.6%;
+	width: 26%;
+	height: auto;
+	max-height: none;
 	transform: translate(-50%, -50%);
 	margin: 0;
-	max-width: 70%;
+	padding: 0;
 	pointer-events: none;
-	color: #1c1408;
-	background: rgba(243, 236, 223, 0.92);
-	padding: 0.35rem 0.8rem;
-	border-radius: 4px;
-	font-size: 1.25rem;
-	font-weight: 700;
-	line-height: 1.2;
-	text-align: center;
+	object-fit: contain;
 }
 
-.season_name {
-	display: none;
+#book_cover.book_cover--back .season_name {
+	display: block;
 }
 
 #book_open {
@@ -713,20 +716,24 @@ body.ah_placements_locked .grab_piece {
 
 .tag_input_hand {
 	position: absolute;
-	left: 16%;
-	right: 16%;
-	top: 18%;
-	bottom: 18%;
+	left: 14%;
+	right: 14%;
+	top: 14%;
+	bottom: 14%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	overflow: hidden;
 	pointer-events: none;
+	container-type: inline-size;
+	/* Voitouktouque is the widest catalog name: its capitals sum to 819px at the 172px source height. */
+	--tag-letter-height: calc(100cqw * 168 / 819);
 }
 
 .tag_input_hand .hand_line {
-	--hand-line-gap: -0.35rem;
-	--hand-word-gap: 0.16em;
+	--hand-line-gap: 0;
+	--hand-word-gap: 0;
+	flex-wrap: nowrap;
 	justify-content: center;
 	max-width: 100%;
 }
@@ -734,15 +741,15 @@ body.ah_placements_locked .grab_piece {
 .tag_input_field .hand_char,
 .tag_input_field .hand_plain {
 	width: auto;
-	height: 2rem;
+	height: var(--tag-letter-height);
 }
 
 .tag_input_caret {
 	flex: 0 0 1px;
 	width: 1px;
-	height: 1.05rem;
+	height: calc(var(--tag-letter-height) * 0.41);
 	align-self: flex-end;
-	margin: 0 0.05rem 0.42rem;
+	margin: 0 0.04rem calc(var(--tag-letter-height) * 0.32);
 	background: #1a1020;
 	animation: tag_caret_blink 1s step-end infinite;
 }
@@ -761,7 +768,7 @@ body.ah_placements_locked .grab_piece {
 	display: block;
 	min-height: 0;
 	width: 86%;
-	margin: 0.75rem 0 0;
+	margin: 0;
 	overflow: auto;
 	text-align: left;
 	color: #1a1020;

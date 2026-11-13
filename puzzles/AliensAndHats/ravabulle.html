@@ -14,15 +14,15 @@
 			<div id="grab_pool" aria-label="Réserve de chapeaux"></div>
 			<div id="translation_wheel" hidden>
 				<div class="wheel_viewport">
-					<div class="wheel_marker wheel_marker--glyph" aria-hidden="true"></div>
-					<div class="wheel_marker wheel_marker--letter" aria-hidden="true"></div>
+					<div class="wheel_marker wheel_marker--glyph" aria-hidden="true"><img src="assets/wheel/wheel-marker.png" alt="" draggable="false"></div>
+					<div class="wheel_marker wheel_marker--letter" aria-hidden="true"><img src="assets/wheel/wheel-marker.png" alt="" draggable="false"></div>
 					<div class="wheel_assembly">
 						<div id="wheel_ring_glyphs" class="wheel_ring wheel_ring--glyphs" tabindex="0" role="slider" aria-label="Symboles" aria-valuemin="0" aria-valuemax="25" aria-valuenow="0"></div>
 						<div id="wheel_ring_letters" class="wheel_ring wheel_ring--letters" tabindex="0" role="slider" aria-label="Lettres" aria-valuemin="0" aria-valuemax="25" aria-valuenow="0"></div>
-						<button type="button" id="btn_wheel_validate" class="wheel_validate">Valider</button>
+						<button type="button" id="btn_wheel_validate" class="wheel_validate" aria-label="Valider"><img src="assets/wheel/wheel-center.png" alt="" draggable="false"></button>
 					</div>
 				</div>
-				<button type="button" id="btn_wheel_reset" class="wheel_reset">Réinitialiser</button>
+				<button type="button" id="btn_wheel_reset" class="wheel_reset" hidden aria-label="Annuler la dernière correspondance"><img src="assets/wheel/undo.png" alt="" draggable="false"></button>
 				<p id="wheel_status" class="visually-hidden" aria-live="polite"></p>
 			</div>
 		</section>
@@ -30,7 +30,7 @@
 			<div id="book_cover">
 				<button type="button" id="btn_open_book" aria-expanded="false" aria-controls="book_open">
 					<img src="assets/misc/bookfront.png" alt="Ouvrir le livre des spécimens" draggable="false">
-					<span id="season_name" class="season_name"></span>
+					<img id="season_name" class="season_name" alt="" draggable="false">
 				</button>
 			</div>
 			<div id="book_open" hidden>
