@@ -1651,23 +1651,38 @@
 	var wheelBuilt = false;
 	var wheelDrag = null;
 	var wheelHistory = [];
+	var wheelMatchSeq = 0;
 
 	function wheelActiveIndex(steps) {
 		var index = -steps % WHEEL_LETTERS.length;
 		return (index + WHEEL_LETTERS.length) % WHEEL_LETTERS.length;
 	}
 
+	function wheelArtOffset(ring) {
+		var offset = parseFloat(getComputedStyle(ring).getPropertyValue('--wheel-art-offset'));
+		return isNaN(offset) ? WHEEL_STEP / 2 : offset;
+	}
+
+	function wheelInitialRotation(ring) {
+		var rotation = parseFloat(getComputedStyle(ring).getPropertyValue('--wheel-initial-rotation'));
+		return isNaN(rotation) ? 0 : rotation;
+	}
+
 	function layoutWheelRing(ring, rotation, steps) {
-		var radius = ring.classList.contains('wheel_ring--glyphs') ? 348 : 248;
+		var radius = ring.classList.contains('wheel_ring--glyphs') ? 348 : 228;
+		var artOffset = wheelArtOffset(ring);
+		var initial = wheelInitialRotation(ring);
+		// Keep the tuned gap between each symbol and its lines, then turn the whole ring back so both selected cells stay centered on each other.
+		var align = WHEEL_STEP / 2 - artOffset;
 		var spokes = ring.querySelector('.wheel_spokes');
 		if (spokes) {
-			spokes.style.transform = 'rotate(' + (rotation + WHEEL_STEP / 2) + 'deg)';
+			spokes.style.transform = 'rotate(' + (rotation + artOffset + align + initial) + 'deg)';
 		}
 		var items = ring.querySelectorAll('.wheel_item');
 		var activeSteps = steps === undefined ? Math.round(rotation / WHEEL_STEP) : steps;
 		var active = wheelActiveIndex(activeSteps);
 		for (var i = 0; i < items.length; i += 1) {
-			var place = i * WHEEL_STEP + rotation;
+			var place = i * WHEEL_STEP + rotation + align + initial;
 			items[i].style.transform = 'rotate(' + place + 'deg) translateX(' + radius + 'px) rotate(' + (-place) + 'deg)';
 		}
 		if (steps === undefined) {
@@ -1819,9 +1834,8 @@
 		}
 		fillWheelRing(glyphs, shuffleList(glyphIds, rng), true);
 		fillWheelRing(letters, WHEEL_LETTERS.split(''), false);
-		el('btn_wheel_validate').addEventListener('click', applyWheelMatch);
-		el('btn_wheel_reset').addEventListener('click', undoWheelMatch);
-		updateUndoButton();
+		el('btn_wheel_match').addEventListener('click', applyWheelMatch);
+		el('btn_wheel_matches').addEventListener('click', openMatchHistory);
 	}
 
 	function wheelValue(ring) {
@@ -1837,53 +1851,217 @@
 		}
 	}
 
-	function updateUndoButton() {
-		var button = el('btn_wheel_reset');
-		if (button) {
-			button.hidden = wheelHistory.length === 0;
-		}
-	}
-
 	function applyWheelMatch() {
 		var glyph = wheelValue(el('wheel_ring_glyphs'));
 		var letter = wheelValue(el('wheel_ring_letters'));
 		if (!glyph || !letter) {
 			return;
 		}
-		var changed = [];
+		var changed = false;
 		document.querySelectorAll('.tag_glyph_slot').forEach(function (slot) {
 			if (slot.dataset.glyph !== glyph || slot.dataset.shownLetter === letter) {
 				return;
 			}
-			changed.push({
-				slot: slot,
-				letter: slot.dataset.shownLetter || ''
-			});
+			changed = true;
 			showGlyphLetter(slot, letter);
 		});
-		if (!changed.length) {
+		if (!changed) {
 			return;
 		}
-		wheelHistory.push(changed);
-		updateUndoButton();
+		var existing = null;
+		for (var i = 0; i < wheelHistory.length; i += 1) {
+			if (wheelHistory[i].glyph === glyph) {
+				existing = wheelHistory[i];
+				break;
+			}
+		}
+		if (existing) {
+			existing.letter = letter;
+		} else {
+			wheelMatchSeq += 1;
+			wheelHistory.push({
+				id: wheelMatchSeq,
+				glyph: glyph,
+				letter: letter
+			});
+		}
 		setWheelStatus('Symbole remplacé.');
 	}
 
-	function undoWheelMatch() {
-		var entry = wheelHistory.pop();
-		if (!entry) {
-			updateUndoButton();
+	function replayWheelMatches() {
+		document.querySelectorAll('.tag_glyph_slot').forEach(restoreGlyphSlot);
+		wheelHistory.forEach(function (match) {
+			document.querySelectorAll('.tag_glyph_slot').forEach(function (slot) {
+				if (slot.dataset.glyph === match.glyph) {
+					showGlyphLetter(slot, match.letter);
+				}
+			});
+		});
+	}
+
+	function renderMatchHistory() {
+		var rows = el('match_history_rows');
+		if (!rows) {
 			return;
 		}
-		entry.forEach(function (item) {
-			if (item.letter) {
-				showGlyphLetter(item.slot, item.letter);
-			} else {
-				restoreGlyphSlot(item.slot);
+		rows.replaceChildren();
+		var empty = el('match_history_empty');
+		var table = rows.closest('table');
+		if (empty) {
+			empty.hidden = wheelHistory.length > 0;
+		}
+		if (table) {
+			table.hidden = wheelHistory.length === 0;
+		}
+		wheelHistory.forEach(function (match, index) {
+			var row = document.createElement('tr');
+			var glyphCell = document.createElement('td');
+			var glyphImg = document.createElement('img');
+			glyphImg.className = 'match_history_glyph';
+			glyphImg.draggable = false;
+			glyphImg.src = assetPath('glyphs', match.glyph);
+			glyphImg.alt = '';
+			glyphCell.appendChild(glyphImg);
+			var letterCell = document.createElement('td');
+			var letterImg = document.createElement('img');
+			letterImg.className = 'match_history_letter';
+			letterImg.draggable = false;
+			letterImg.src = 'assets/characters/' + handCharacterFile(match.letter) + '.png';
+			letterImg.alt = '';
+			letterCell.appendChild(letterImg);
+			var actionCell = document.createElement('td');
+			var undo = document.createElement('button');
+			undo.type = 'button';
+			undo.className = 'match_history_undo';
+			var undoImg = document.createElement('img');
+			undoImg.draggable = false;
+			undoImg.src = 'assets/wheel/undo.png';
+			undoImg.alt = '';
+			undo.appendChild(undoImg);
+			undo.setAttribute('title', 'Annuler');
+			undo.setAttribute('aria-label', 'Annuler la correspondance ' + (index + 1) + ', lettre ' + match.letter);
+			undo.addEventListener('click', function () {
+				undoWheelMatch(match.id);
+			});
+			actionCell.appendChild(undo);
+			row.appendChild(glyphCell);
+			row.appendChild(letterCell);
+			row.appendChild(actionCell);
+			rows.appendChild(row);
+			if (index < wheelHistory.length - 1) {
+				var lineRow = document.createElement('tr');
+				var lineCell = document.createElement('td');
+				lineCell.colSpan = 3;
+				lineCell.className = 'match_history_line';
+				var line = document.createElement('img');
+				line.draggable = false;
+				line.src = 'assets/wheel/line.png';
+				line.alt = '';
+				lineCell.appendChild(line);
+				lineRow.appendChild(lineCell);
+				rows.appendChild(lineRow);
 			}
 		});
-		updateUndoButton();
-		setWheelStatus(wheelHistory.length ? 'Dernière correspondance annulée.' : 'Symboles rétablis.');
+	}
+
+	function matchHistoryOpen() {
+		var dialog = el('match_history');
+		return !!(dialog && !dialog.hidden);
+	}
+
+	function openMatchHistory() {
+		if (matchHistoryOpen()) {
+			return;
+		}
+		renderMatchHistory();
+		var dialog = el('match_history');
+		var shell = el('puzzle_shell');
+		dialog.hidden = false;
+		if (shell) {
+			shell.setAttribute('aria-hidden', 'true');
+		}
+		el('btn_match_history_close').focus();
+	}
+
+	function closeMatchHistory() {
+		var dialog = el('match_history');
+		if (!dialog || dialog.hidden) {
+			return;
+		}
+		dialog.hidden = true;
+		var rows = el('match_history_rows');
+		if (rows) {
+			rows.replaceChildren();
+		}
+		var shell = el('puzzle_shell');
+		if (shell) {
+			shell.removeAttribute('aria-hidden');
+		}
+		var opener = el('btn_wheel_matches');
+		if (opener) {
+			opener.focus();
+		}
+	}
+
+	function onMatchHistoryKeyDown(event) {
+		if (!matchHistoryOpen()) {
+			return;
+		}
+		if (event.key === 'Escape') {
+			event.preventDefault();
+			closeMatchHistory();
+			return;
+		}
+		if (event.key !== 'Tab') {
+			return;
+		}
+		var dialog = el('match_history');
+		var focusable = dialog.querySelectorAll('button:not([disabled])');
+		if (!focusable.length) {
+			return;
+		}
+		var first = focusable[0];
+		var last = focusable[focusable.length - 1];
+		if (event.shiftKey && document.activeElement === first) {
+			event.preventDefault();
+			last.focus();
+		} else if (!event.shiftKey && document.activeElement === last) {
+			event.preventDefault();
+			first.focus();
+		}
+	}
+
+	function onMatchHistoryPointerDown(event) {
+		var dialog = el('match_history');
+		if (dialog && event.target === dialog) {
+			closeMatchHistory();
+		}
+	}
+
+	function undoWheelMatch(id) {
+		var index = -1;
+		for (var i = 0; i < wheelHistory.length; i += 1) {
+			if (wheelHistory[i].id === id) {
+				index = i;
+				break;
+			}
+		}
+		if (index < 0) {
+			return;
+		}
+		wheelHistory.splice(index, 1);
+		replayWheelMatches();
+		setWheelStatus(wheelHistory.length ? 'Correspondance annulée.' : 'Symboles rétablis.');
+		if (!wheelHistory.length) {
+			closeMatchHistory();
+			return;
+		}
+		renderMatchHistory();
+		var buttons = el('match_history').querySelectorAll('.match_history_undo');
+		var next = buttons[Math.min(index, buttons.length - 1)];
+		if (next) {
+			next.focus();
+		}
 	}
 
 	function showTranslationWheel() {
@@ -2181,6 +2359,10 @@
 		if (reveal && !reveal.hidden) {
 			return;
 		}
+		if (matchHistoryOpen()) {
+			e.preventDefault();
+			return;
+		}
 		if (!state.bookOpen) {
 			var openFromFront = state.coverSide !== 'back' && e.key === 'ArrowRight';
 			var openFromBack = state.coverSide === 'back' && e.key === 'ArrowLeft';
@@ -2205,6 +2387,9 @@
 		el('btn_dismiss_reveal').addEventListener('click', function () {
 			el('password_reveal').hidden = true;
 		});
+		el('btn_match_history_close').addEventListener('click', closeMatchHistory);
+		el('match_history').addEventListener('click', onMatchHistoryPointerDown);
+		document.addEventListener('keydown', onMatchHistoryKeyDown);
 		document.addEventListener('pointerdown', onPointerDown);
 		document.addEventListener('keydown', onBookKeyDown);
 		document.addEventListener('dragstart', function (e) {

@@ -116,7 +116,7 @@ body.ah_placements_locked .grab_piece {
 	width: 400px;
 	max-width: 100%;
 	min-height: 0;
-	overflow: hidden;
+	/* overflow: hidden; */
 }
 
 .wheel_assembly {
@@ -126,33 +126,6 @@ body.ah_placements_locked .grab_piece {
 	right: 0;
 	top: 50%;
 	transform: translateY(-50%);
-}
-
-.wheel_marker {
-	position: absolute;
-	z-index: 4;
-	top: 50%;
-	height: 40px;
-	transform: translateY(-50%);
-	pointer-events: none;
-}
-
-.wheel_marker img {
-	display: block;
-	height: 40px;
-	width: auto;
-}
-
-.wheel_marker--glyph {
-	right: 2px;
-}
-
-.wheel_marker--glyph img {
-	transform: scaleX(-1);
-}
-
-.wheel_marker--letter {
-	left: 193px;
 }
 
 .wheel_ring {
@@ -189,9 +162,12 @@ body.ah_placements_locked .grab_piece {
 	cursor: grabbing;
 }
 
+/* --wheel-art-offset turns the drawn lines clockwise relative to the symbols, then the ring turns back so the cells stay aligned. Half a cell is 6.923076923 (360 / 26 / 2). --wheel-initial-rotation turns the lines and the symbols together; positive is clockwise. */
 .wheel_ring--glyphs {
 	inset: 0;
 	background: transparent;
+	--wheel-art-offset: 6.5deg;
+	--wheel-initial-rotation: -1deg;
 }
 
 .wheel_ring--letters {
@@ -200,6 +176,8 @@ body.ah_placements_locked .grab_piece {
 	left: 100px;
 	top: 100px;
 	background: transparent;
+	--wheel-art-offset: 5.5deg;
+	--wheel-initial-rotation: 0deg;
 }
 
 .wheel_item {
@@ -274,28 +252,164 @@ body.ah_placements_locked .grab_piece {
 	outline-offset: 4px;
 }
 
-.wheel_reset {
+.wheel_match {
 	position: absolute;
-	right: 4px;
-	top: 0;
-	bottom: 0;
-	z-index: 6;
-	width: 100px;
-    height: 100px;
-    margin: auto;
+	z-index: 5;
+	/* 233px wide puts the two openings over the letter (radius 228) and the symbol (radius 348). */
+	left: 176px;
+	top: 50%;
+	width: 233px;
+	transform: translateY(-47.6%);
+	margin: 0;
 	padding: 0;
 	border: 0;
 	background: transparent;
 	cursor: pointer;
 }
 
-.wheel_reset img {
+.wheel_match img {
 	display: block;
-	width: 100px;
+	width: 100%;
+	height: auto;
+	pointer-events: none;
+}
+
+.wheel_match:focus-visible {
+	outline: 3px solid #f4f0e8;
+	outline-offset: 2px;
+}
+
+#match_history[hidden] {
+	display: none !important;
+}
+
+#match_history {
+	position: fixed;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(10, 6, 18, 0.82);
+	z-index: 3100;
+}
+
+#match_history_card {
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	width: min(500px, calc(100vh * 500 / 789), 92vw);
+	width: min(500px, calc(100dvh * 500 / 789), 92vw);
+	aspect-ratio: 500 / 789;
+	max-height: 100vh;
+	max-height: 100dvh;
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	background: url("../assets/wheel/modal.png") center / 100% 100% no-repeat;
+	color: #24180f;
+}
+
+.match_history_sheet {
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: 100%;
+	min-height: 0;
+	/* White page of modal.png, as a share of the frame width: top 69, right 64, bottom 69, left 57. */
+	padding: 13.8% 12.8% 13.8% 11.4%;
+}
+
+#match_history_title {
+	margin: 0 0 0.75rem;
+	font-size: 1.25rem;
+	text-align: center;
+}
+
+#match_history_empty {
+	margin: 1.25rem 0;
+	text-align: center;
+}
+
+.match_history_body {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.match_history_scroll {
+	margin: 0;
+	overflow: visible;
+}
+
+.match_history_table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.match_history_table th,
+.match_history_table td {
+	padding: 0.35rem 0.35rem;
+	text-align: center;
+	vertical-align: middle;
+}
+
+.match_history_line {
+	padding: 0.15rem 0;
+}
+
+.match_history_line img {
+	display: block;
+	width: 100%;
 	height: auto;
 }
 
-.wheel_reset:focus-visible {
+.match_history_glyph,
+.match_history_letter {
+	display: block;
+	width: 48px;
+	height: 48px;
+	margin: 0 auto;
+	object-fit: contain;
+}
+
+.match_history_undo {
+	padding: 0;
+	border: 0;
+	background: transparent;
+	cursor: pointer;
+	line-height: 0;
+}
+
+.match_history_undo img {
+	display: block;
+	width: 48px;
+	height: 48px;
+	object-fit: contain;
+}
+
+#btn_match_history_close {
+	align-self: flex-end;
+	flex: 0 0 auto;
+	width: 13%;
+	max-width: 56px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	cursor: pointer;
+	line-height: 0;
+}
+
+#btn_match_history_close img {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.match_history_undo:focus-visible,
+#btn_match_history_close:focus-visible {
 	outline: 3px solid #f4f0e8;
 	outline-offset: 2px;
 }
