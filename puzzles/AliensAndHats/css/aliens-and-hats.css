@@ -119,6 +119,12 @@ body.ah_placements_locked .grab_piece {
 	/* overflow: hidden; */
 }
 
+/* The match and history buttons sit above the rings. While a drag is active they must not become the hit target, or the release never reaches the ring. */
+.wheel_viewport--dragging .wheel_match,
+.wheel_viewport--dragging .wheel_validate {
+	pointer-events: none;
+}
+
 .wheel_assembly {
 	position: absolute;
 	width: 800px;

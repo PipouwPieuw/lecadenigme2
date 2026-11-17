@@ -1718,26 +1718,45 @@
 	}
 
 	function onWheelPointerDown(event) {
-		if (event.button !== 0) {
+		if (event.button !== 0 || wheelDrag) {
 			return;
 		}
 		var ring = event.currentTarget;
 		var rect = ring.getBoundingClientRect();
+		var centerX = rect.left + rect.width / 2;
+		var centerY = rect.top + rect.height / 2;
 		wheelDrag = {
 			ring: ring,
 			pointerId: event.pointerId,
-			cx: rect.left + rect.width / 2,
-			cy: rect.top + rect.height / 2,
-			lastAngle: pointerAngle(event, rect.left + rect.width / 2, rect.top + rect.height / 2),
+			cx: centerX,
+			cy: centerY,
+			lastAngle: pointerAngle(event, centerX, centerY),
 			rotation: (parseInt(ring.dataset.steps, 10) || 0) * WHEEL_STEP
 		};
 		ring.classList.add('wheel_ring--dragging');
 		ring.classList.remove('wheel_ring--settling');
-		ring.setPointerCapture(event.pointerId);
+		var viewport = ring.closest('.wheel_viewport');
+		if (viewport) {
+			viewport.classList.add('wheel_viewport--dragging');
+		}
+		try {
+			ring.setPointerCapture(event.pointerId);
+		} catch (err) {
+			/* ignore */
+		}
+		// Listen on document, not only the ring. A release over #btn_wheel_match (or the center button) is delivered to that button, so the ring never sees pointerup and the drag stays live.
+		document.addEventListener('pointermove', onWheelPointerMove, true);
+		document.addEventListener('pointerup', onWheelPointerUp, true);
+		document.addEventListener('pointercancel', onWheelPointerUp, true);
 	}
 
 	function onWheelPointerMove(event) {
 		if (!wheelDrag || event.pointerId !== wheelDrag.pointerId) {
+			return;
+		}
+		// A missed pointerup leaves later moves with no button held. Settle instead of tracking them.
+		if (event.pointerType === 'mouse' && event.buttons === 0) {
+			onWheelPointerUp(event);
 			return;
 		}
 		var angle = pointerAngle(event, wheelDrag.cx, wheelDrag.cy);
@@ -1756,10 +1775,26 @@
 		if (!wheelDrag || event.pointerId !== wheelDrag.pointerId) {
 			return;
 		}
+		document.removeEventListener('pointermove', onWheelPointerMove, true);
+		document.removeEventListener('pointerup', onWheelPointerUp, true);
+		document.removeEventListener('pointercancel', onWheelPointerUp, true);
 		var ring = wheelDrag.ring;
 		var rotation = wheelDrag.rotation;
+		var pointerId = wheelDrag.pointerId;
 		wheelDrag = null;
 		ring.classList.remove('wheel_ring--dragging');
+		var viewport = ring.closest('.wheel_viewport');
+		if (viewport) {
+			viewport.classList.remove('wheel_viewport--dragging');
+		}
+		try {
+			ring.releasePointerCapture(pointerId);
+		} catch (err) {
+			/* ignore */
+		}
+		if (event.cancelable) {
+			event.preventDefault();
+		}
 		settleWheelRing(ring, rotation);
 	}
 
@@ -1779,9 +1814,6 @@
 		ring.dataset.steps = '0';
 		layoutWheelRing(ring, 0, 0);
 		ring.addEventListener('pointerdown', onWheelPointerDown);
-		ring.addEventListener('pointermove', onWheelPointerMove);
-		ring.addEventListener('pointerup', onWheelPointerUp);
-		ring.addEventListener('pointercancel', onWheelPointerUp);
 		ring.addEventListener('keydown', onWheelKeyDown);
 	}
 
