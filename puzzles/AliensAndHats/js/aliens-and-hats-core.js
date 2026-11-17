@@ -237,6 +237,33 @@
 		return state.role === 'ravabulle' ? g.letter_rav : g.letter_tron;
 	}
 
+	function writeSpreadLetter(spread) {
+		var letter = spread.querySelector('.spread_letter');
+		if (!letter || letter.textContent) {
+			return letter;
+		}
+		letter.textContent = letterAtPage(parseInt(spread.dataset.spread, 10));
+		return letter;
+	}
+
+	// After the tags are drawn, keep the word this player types and this player's letters. Drop the glyph word, the partner's half, and the season chart.
+	function dropSecretsAfterRender() {
+		if (!state.instance) {
+			return;
+		}
+		var otherLetter = state.role === 'ravabulle' ? 'letter_tron' : 'letter_rav';
+		var otherHalf = state.role === 'ravabulle' ? 'password_half_tron' : 'password_half_rav';
+		var glyphWord = state.role === 'ravabulle' ? 'species_name' : 'name';
+		delete state.instance[otherHalf];
+		state.instance.guests.forEach(function (guest) {
+			delete guest[otherLetter];
+			delete guest[glyphWord];
+		});
+		if (state.season) {
+			delete state.season.map;
+		}
+	}
+
 	function passwordHalf() {
 		return state.role === 'ravabulle'
 			? state.instance.password_half_rav
@@ -1138,7 +1165,6 @@
 			var letter = document.createElement('div');
 			letter.className = 'page_letter spread_letter';
 			letter.hidden = true;
-			letter.textContent = letterAtPage(s);
 			letter.setAttribute('aria-hidden', 'true');
 			spread.appendChild(letter);
 			spread.appendChild(buildTurnButton(-1));
@@ -2217,7 +2243,10 @@
 		spread.querySelectorAll('.page_scene').forEach(function (scene) {
 			scene.hidden = true;
 		});
-		spread.querySelector('.spread_letter').hidden = false;
+		var letter = writeSpreadLetter(spread);
+		if (letter) {
+			letter.hidden = false;
+		}
 	}
 
 	function motionReduced() {
@@ -2263,6 +2292,7 @@
 				scenes.forEach(function (scene) {
 					scene.hidden = true;
 				});
+				writeSpreadLetter(spread);
 				letter.hidden = false;
 			} else {
 				scenes.forEach(function (scene) {
@@ -2291,7 +2321,7 @@
 				pending -= 1;
 				scene.hidden = true;
 				if (pending === 0) {
-					var letter = spread.querySelector('.spread_letter');
+					var letter = writeSpreadLetter(spread);
 					letter.hidden = false;
 					letter.classList.add('page_letter--fade-in');
 				}
@@ -2305,7 +2335,7 @@
 		});
 	}
 
-	function openBook() {
+	function openBook(silent) {
 		if (state.dossierAnimating) {
 			return;
 		}
@@ -2318,7 +2348,9 @@
 		el('btn_open_book').setAttribute('aria-expanded', 'true');
 		showCurrentSpread();
 		updateSpreadNav();
-		playPageTurn();
+		if (!silent) {
+			playPageTurn();
+		}
 	}
 
 	function setCoverImage(side) {
@@ -2466,7 +2498,7 @@
 		document.querySelectorAll('.page_scene--dossier').forEach(function (scene) {
 			scene.hidden = false;
 		});
-		openBook();
+		openBook(true);
 	}
 
 	function startUi() {
@@ -2477,6 +2509,7 @@
 		if (state.stage2) {
 			applyStage2();
 		}
+		dropSecretsAfterRender();
 	}
 
 	function fillPreviewSelect(select, options, allLabel) {
@@ -2613,7 +2646,13 @@
 		var id = pool[Math.floor(rng() * pool.length)];
 		for (var i = 0; i < chart.seasons.length; i += 1) {
 			if (chart.seasons[i].id === id) {
-				return chart.seasons[i];
+				var found = chart.seasons[i];
+				return {
+					id: found.id,
+					name: found.name,
+					alt: found.alt || '',
+					notebook: found.notebook
+				};
 			}
 		}
 		return null;
@@ -2663,6 +2702,14 @@
 			});
 		}).then(function (chart) {
 			state.season = pickBookSeason(chart, state.instance && state.instance.seed);
+			if (!state.season) {
+				return null;
+			}
+			return loadJson('data/season-maps/' + state.season.id + '.json');
+		}).then(function (mapFile) {
+			if (state.season && mapFile && mapFile.map) {
+				state.season.map = mapFile.map;
+			}
 			applySeasonLabel();
 			startUi();
 		});

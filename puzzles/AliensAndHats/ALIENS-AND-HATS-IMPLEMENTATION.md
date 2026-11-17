@@ -17,7 +17,7 @@ Open:
 
 **Both players must use the same `seed`** (until session sync exists) so the instance matches.
 
-`?seed=stage2` opens the book already at step 2 of seed **42**: correct portraits placed, right-hand pages visible, text fields empty. No entrance animation.
+`?seed=stage2` opens the book already at step 2 of seed **42**: correct portraits placed, right-hand pages visible, text fields empty. No entrance animation and no page-turn sound.
 
 ## File map
 
@@ -29,7 +29,8 @@ Open:
 | `css/aliens-and-hats.css` | Layout (⅓ pool, ⅔ book), portrait stack, dossier |
 | `data/book-layout.json` | Per-species sizes and hat-on-head offsets |
 | `data/catalog.json` | Guest names, species names, and species descriptions (placeholders until authored) |
-| `data/glyph-seasons.json` | Six glyph-to-letter charts. The back cover shows `assets/seasons/{id}.png` for the book's season |
+| `data/glyph-seasons.json` | Season names, notebook pools, and which seasons a book may use. The back cover shows `assets/seasons/{id}.png` for the book's season |
+| `data/season-maps/{id}.json` | That season's glyph-to-letter chart. The page loads only the chosen season |
 
 ## `init({ role, seed?, instance? })`
 
@@ -108,7 +109,7 @@ While dragging, the piece keeps its current pixel box; `.grab_piece--dragging` a
 - Drop on occupied slot → swap (slot↔slot, or pool↔slot). The piece that returns to the pool takes the pool position of the piece that replaced it.
 - Pool: seeded **shuffle**, then **≥3 columns** (round-robin, count grows if needed for height); even vertical spread, centered in column (no jitter); a hat wider than its column scales down, keeping its proportions; layout runs after images decode; all pieces clamped in bounds; `#grab_pool { overflow: hidden }`.
 - Silent check when all 10 slots are filled. If every placement is correct, navigation locks, `valid.mp3` plays after one second, and about 1.5 seconds later the right-hand pages appear. The open spread animates: species tag from above, description from the right, name tag from below, each with `swap.mp3`. Navigation stays locked until that entrance ends. Other spreads already show their dossier. A wrong full set stays silent.
-- When the dossiers appear, dragging stops for good and placed hats and aliens stay put. The piece box is replaced by the translation wheel, flush with the left edge of the screen. `?seed=stage2` starts in this state with the wheel already showing. The puzzle solves only when the placements are still correct **and** all 10 text fields for this role are non-empty and match. Typed answers are trim + case-insensitive, with internal whitespace collapsed. Accents must match the catalog. A wrong word leaves pieces and text in place.
+- When the dossiers appear, dragging stops for good and placed hats and aliens stay put. The piece box is replaced by the translation wheel, flush with the left edge of the screen. `?seed=stage2` starts in this state with the wheel already showing, and does not play a page-turn sound. The puzzle solves only when the placements are still correct **and** all 10 text fields for this role are non-empty and match. The field keeps letters A–Z only, up to 13: accents fold to the base letter, and spaces and punctuation are dropped as the player types. The check uses that same folding, case-insensitive, against the catalog word. A wrong word leaves pieces and text in place.
 - A drop that lands on a page plays `swap.mp3` once, including a swap onto an occupied slot. Reordering in the pool, returning a piece to the pool, and a rejected drop stay silent. Turning a page, or opening the book from either cover, plays one of `page1.mp3`–`page6.mp3` at random. Those clips are decoded ahead of time and started after their quiet lead-in, so the rustle lines up with the turn. Closing onto either cover plays `close.mp3`.
 
 ## Book navigation
@@ -121,7 +122,7 @@ While dragging, the piece keeps its current pixel box; `.grab_piece--dragging` a
 
 ## Password reveal
 
-- On a full correct book the same pause runs again: lock, `valid.mp3` after one second, then about 1.5 seconds later the password half. Other spreads show their letter immediately; the **current spread** fades both pages, then shows **one** centered letter.
+- On a full correct book the same pause runs again: lock, `valid.mp3` after one second, then about 1.5 seconds later the password half. Other spreads show their letter immediately; the **current spread** fades both pages, then shows **one** centered letter. A spread's letter is written into the page only at that reveal.
 - Modal shows the full 10-character half for this role.
 - Navigate the 10 spreads to read each letter.
 
@@ -139,7 +140,7 @@ Symbol codes stay seed-generated. They are not stored in the catalog. Reload the
 
 ## Seasons
 
-Six seasons. Each has a `name` (empty until authored) and its own chart in `data/glyph-seasons.json`. A chart is a full substitution: every glyph stands for one Latin letter, and every letter is used once.
+Six seasons: Florange, Frisquaire, Tempétuvial, Bruméol, Diluvior, and Ouramoufle. Names and pools live in `data/glyph-seasons.json`. Each chart is a full substitution in `data/season-maps/{id}.json`: every glyph stands for one Latin letter, and every letter is used once. The page requests only the chosen season's chart, uses it to draw the tags, then drops that chart. It also drops the plaintext of the word this player only sees as glyphs, and the partner's password half. The word this player types stays, so the field can still be checked.
 
 The seed picks the season of a book from the **partner’s** three seasons. Ravabulle’s book uses season 4, 5, or 6. Troncadelle’s book uses season 1, 2, or 3. The player who sees the glyphs does not hold the chart for that season. The book’s season emblem is centered on the **back cover** only. Its text alternative is that season’s `alt` string in `glyph-seasons.json`, not the season name. The open pages and the front cover do not show it.
 
@@ -157,9 +158,9 @@ Season 1’s chart is `WEQDZKYBOXTURFISCVJHLGAPNM`. It is not A–Z. The same gl
 
 The on-screen wheel replaces the piece box after the dossiers appear. It does not look up these charts. The tags are already written with the book’s season: the glyph on the page is the one whose chart entry is the letter underneath. Lining that glyph up with a letter and pressing Associer, the button between the active cells, replaces it on every tag in the book. The wheel center opens that list in the framed page `assets/wheel/modal.png`. Validating a symbol that already has a row replaces that letter instead of adding another. Each row removes that match, and the tags are rebuilt from the matches that remain. Removing the last match closes the list. A wrong letter stays silent.
 
-The row is the glyph (A is file `1.png`, Z is file `26.png`). The cell is the letter that glyph stands for in that season. Ravabulle’s notebook prints Florange, Frisquaire, and Chaufféal. Troncadelle’s prints Bruméol, Diluviette, and Ouramoufle.
+The row is the glyph (A is file `1.png`, Z is file `26.png`). The cell is the letter that glyph stands for in that season. Ravabulle’s notebook prints Florange, Frisquaire, and Tempétuvial. Troncadelle’s prints Bruméol, Diluvior, and Ouramoufle.
 
-| Glyph | Florange | Frisquaire | Chaufféal | Bruméol | Diluviette | Ouramoufle |
+| Glyph | Florange | Frisquaire | Tempétuvial | Bruméol | Diluvior | Ouramoufle |
 |-------|----------|------------|-----------|---------|------------|------------|
 | A     | W        | V          | O         | D       | Q          | K          |
 | B     | E        | U          | L         | Q       | Y          | C          |
